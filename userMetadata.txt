@@ -1,0 +1,5 @@
+species_id	run_id	reads_size	fastq_dir	transcriptome_path	annotation_path	working_path
+7227		38	/Users/jwollbrett/Documents/fastq/SRX323030	/Users/jwollbrett/Documents/fastq/bgee_D_melano/bgee_pipeline_without_intergenic.fa	/Users/jwollbrett/Documents/fastq/bgee_D_melano/bgee_pipeline.gtf	/Users/jwollbrett/Documents/git/BgeeCall
+#7227		38	/Users/jwollbrett/Documents/fastq/SRX323030	/Users/jwollbrett/Documents/fastq/ensembl_D_melano/ensembl_BDGP6_all.fa	/Users/jwollbrett/Documents/fastq/ensembl_D_melano/ensembl_BDGP6_84.gtf	/Users/jwollbrett/Documents/git/BgeeCall
+#7227		38	/Users/jwollbrett/Documents/fastq/SRX323030	/Users/jwollbrett/Documents/fastq/bgee_D_melano/bgee_pipeline_without_intergenic.fa	/Users/jwollbrett/Documents/fastq/bgee_D_melano/bgee_pipeline.gtf	/Users/jwollbrett/Documents/git/BgeeCall/ref_intergenic
+#7227		38	/Users/jwollbrett/Documents/fastq/SRX323030	/Users/jwollbrett/Documents/fastq/ensembl_D_melano/ensembl_BDGP6_all.fa	/Users/jwollbrett/Documents/fastq/ensembl_D_melano/ensembl_BDGP6_84.gtf	/Users/jwollbrett/Documents/git/BgeeCall/ref_intergenic
