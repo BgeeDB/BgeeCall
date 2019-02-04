@@ -109,11 +109,11 @@ user_BgeeCall@species_id <- "6239"
 user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBcel235_84")
 user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
 # provide path to the directory of your RNA-Seq library
-user_BgeeCall@fastq_path <- system.file("extdata", "SRX099901_subset", package = "BgeeCall")
+user_BgeeCall@rnaseq_lib_path <- system.file("extdata", "SRX099901_subset", package = "BgeeCall")
 ```
 
 And that's it... You can run the generation of your present/absent gene expression calls
-`` {r, message = FALSE, warning = FALSE}
+``` {r, message = FALSE, warning = FALSE}
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 Each analyze generates 4 files and return path to each one of them.
@@ -129,10 +129,15 @@ read.table(calls_output$cutoff_info_file_path)
 * abundance_tsv : path to tsv kallisto quant output file
 ``` {r, message = FALSE, warning = FALSE}
 head.DataTable(x = read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
+calls_output$TPM_distribution_path
 ```
 * TPM_distribution_path : path to plot in pdf reprensting density distribution of TPM values for all sequences, protein coding sequences, and intergenic sequences. The grey line corresponds to TPM threshold used to generate present/absent calls.
 ``` {r, eval = FALSE}
 openPDF(calls_output$TPM_distribution_path)
+```
+
+```{r, out.width= "85%", out.height= "300%", echo = FALSE}
+knitr::include_graphics(calls_output$TPM_distribution_path)
 ```
 
 ###  Generate present/absent calls for more than one RNA-Seq library
@@ -147,7 +152,9 @@ With these functions you will be able to run calls generation for different:
 - species as long as they are part of Bgee
 
 A template of the file usable as input of the function `run_from_file()` is available at the root directory of the package with the name `userMetadataTemplate.tsv`.
-Once it has been fill in expression calls can be generated with :
+In this template each column correspond to one parameter used to generate gene expression calls. Each line will correspond to one expression calls generation analyze.
+It is not mandatory to add a value to the `run_ids` column except if you want to generate expression calls for a subset of the runs of one RNA-Seq library as described in [Generate calls for a subset of RNA-Seq runs](#run_ids)
+Once the file has been fill in expression calls can be generated with :
 ``` {r, eval=FALSE}
 run_from_file(userMetadataFile = "path_to_your_file.tsv")
 ```
@@ -202,7 +209,7 @@ kallisto@read_size_kmer_threshold <- 70
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
 
-### Generate calls for a subset of RNA-Seq runs
+### <a name="run_ids"></a>Generate calls for a subset of RNA-Seq runs
 By default gene expression calls are generated using all runs of the RNA-Seq library. It is possible to select only a subset of these runs.
 ``` {r, eval=FALSE}
 user_BgeeCall <- new("UserMetadata")
