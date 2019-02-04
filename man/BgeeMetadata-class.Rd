@@ -11,13 +11,11 @@ An S4 class that contains all information to retrieve intergenic regions generat
 \section{Slots}{
 
 \describe{
-\item{\code{bgee_release}}{Bgee release that will be used}
+\item{\code{intergenic_release}}{Bgee intergenic release that will be used}
 
-\item{\code{bgee_prefix}}{String used to generate a bgee specific output directory}
+\item{\code{intergenic_prefix}}{String used to generate an intergenic release specific output directory}
 
-\item{\code{fasta_intergenic_url}}{URL to fasta file containing all intergenic regions as defined by the Bgee pipeline (https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq)}
-
-\item{\code{ref_intergenic_ids_url}}{URL to the file containing the list of true intergenic regions as defined by expertise of Bgee team (https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq)}
+\item{\code{fasta_intergenic_url}}{URL to fasta file containing reference intergenic regions as defined by the Bgee pipeline (https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq)}
 
 \item{\code{fasta_intergenic_name}}{Name of the fasta file containing all intergenic regions that will be download to get_species_path()}
 
