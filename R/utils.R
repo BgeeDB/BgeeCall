@@ -36,8 +36,8 @@ get_os <- function(){
 #'
 #' @description helper function to get the path to the bgee release directory
 #'
-get_bgee_release_path <- function(myBgeeMetadata, myUserMetadata) {
-  return(file.path(myUserMetadata@working_path, paste0(myBgeeMetadata@bgee_prefix, myBgeeMetadata@bgee_release)))
+get_intergenic_release_path <- function(myBgeeMetadata, myUserMetadata) {
+  return(file.path(myUserMetadata@working_path, paste0(myBgeeMetadata@intergenic_prefix, myBgeeMetadata@intergenic_release)))
 }
 
 #' @title Path to species directory
@@ -51,7 +51,7 @@ get_species_path <- function(myBgeeMetadata, myUserMetadata) {
   if(nchar(myUserMetadata@species_id) == 0) {
     stop("the object of the UserMetadata class must contains a species_id")
   }
-  return(file.path(get_bgee_release_path(myBgeeMetadata, myUserMetadata), myUserMetadata@species_id))
+  return(file.path(get_intergenic_release_path(myBgeeMetadata, myUserMetadata), myUserMetadata@species_id))
 }
 
 #' @title Path to transcriptome directory
@@ -110,7 +110,7 @@ get_tool_transcriptome_path <- function(myAbundanceMetadata, myBgeeMetadata, myU
 #'
 get_tool_output_path <- function(myAbundanceMetadata, myBgeeMetadata, myUserMetadata) {
   if(myUserMetadata@simple_arborescence == TRUE) {
-    return(file.path(get_bgee_release_path(myBgeeMetadata, myUserMetadata), "all_results", get_output_dir(myUserMetadata)))
+    return(file.path(get_intergenic_release_path(myBgeeMetadata, myUserMetadata), "all_results", get_output_dir(myUserMetadata)))
   }
   return(file.path(get_tool_transcriptome_path(myAbundanceMetadata, myBgeeMetadata, myUserMetadata), 
                    paste0("annotation_", gsub("\\.", "_", myUserMetadata@annotation_name)), get_output_dir(myUserMetadata)))
@@ -258,5 +258,21 @@ removeTxVersionFromAbundance <- function (myAbundanceMetadata, myBgeeMetadata,  
     stop(paste0("Removing transcript version for tool ", myAbundanceMetadata$tool_name, " is not implemented."))
   }
   write.table(x = abundance_data, file = abundance_path, sep = "\t", row.names = F, col.names = T, quote = F)
+}
+
+#' @title List species present in Bgee
+#'
+#' @description Call a webservice that returns all species present in Bgee. Retrieved information are species ID, genus, species name, common name and presence absence of datatypes in Bgee.
+#' This function call the `listBgeeSpecies()` function from the BgeeDB R package
+#'
+#' @param release	A character specifying a targeted release number. In the form "Release.subrelease" or "Release_subrelease", e.g., "14.0" or 14_0". If not specified, the latest release is used.
+#' @param ordering	A numeric indicating the number of the column which should be used to sort the data frame. Default NULL, returning unsorted data frame.
+#' @param allReleases	A data frame with information on all releases. Avoid redownloading this information if .getBgeeRelease() already called.
+#' @param removeFile	Boolean indicating whether the downloaded file should be deleted. Default to TRUE.
+#' @export
+#'
+list_bgee_species <- function(release = NULL, ordering = NULL, allReleases = NULL, 
+                              removeFile = TRUE) {
+  return(BgeeDB::listBgeeSpecies(release, ordering, allReleases, removeFile))
 }
 
