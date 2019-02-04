@@ -20,14 +20,11 @@ knitr::opts_chunk$set(
 
 The `BgeeCall` package allows to: 
 
-* Generate calls of presence/absence of expression at the gene level. You can generate these calls for any RNA-Seq samples as long as the species is available in Bgee (available from the `listBgeeSpecies` command in the package [BgeeDB](https://bioconductor.org/packages/release/bioc/html/BgeeDB.html)).
+* Generate calls of presence/absence of expression at the gene level. You can generate these calls for any RNA-Seq samples as long as the species is available in Bgee (information available from the `list_bgee_species()` function).
 * Download reference intergenic sequences for species available in Bgee.
 * Generate calls of presence/absence of expression at the transcript level (beta version)
 
 If you find a bug or have any issues with `BgeeCall` please write a bug report in our GitHub issues manager available at (URL).
-More functionalities will be implemented in the near future, among which:
-
-- Provide set of expressed/not expressed control ubiquitous genes to test quality of your dataset
 
 ## How present/absent calls are generated
 
@@ -118,11 +115,11 @@ calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 Each analyze generates 4 files and return path to each one of them.
 
-* calls_tsv_path : path to main tsv file with TPM, count, length, biotype, type, and presence/absence of expression summarized at gene level
+* calls_tsv_path : path to main tsv file with TPM, count, length, biotype, type, and presence/absence of expression summarized at gene level (or at the [transcript level](#transcript_level) if it was requested)
 ``` {r, message = FALSE, warning = FALSE}
 head.DataTable(x = read.table(calls_output$calls_tsv_path, header = TRUE), n = 5)
 ```
-* cutoff_info_file_path : path to tsv summary of the analyze containing proportion of gene, protein coding and intergenic defined as expressed
+* cutoff_info_file_path : path to tsv summary of the analyze containing the proportion of gene, protein coding and intergenic defined as expressed. It also contains the library ID and the present/absent TPM threshold
 ``` {r, message = FALSE, warning = FALSE}
 read.table(calls_output$cutoff_info_file_path)
 ```
@@ -142,7 +139,7 @@ knitr::include_graphics(calls_output$TPM_distribution_path)
 
 ###  Generate present/absent calls for more than one RNA-Seq library
 
-The function `run_from_object()` is perfect to generate calls for one library. You will potentialy be also interested to run more than one calls generation at the same time. It is possible to do that by using the ` run_from_file()` or the `run_from_dataframe()` functions.
+The function `run_from_object()` is perfect to generate calls for one library. You will potentialy be also interested to run more than one call generation at the same time. It is possible to do that by using the ` run_from_file()` or the `run_from_dataframe()` functions.
 With these functions you will be able to run calls generation for different:
 
 - RNA-Seq libraries
@@ -159,7 +156,7 @@ Once the file has been fill in expression calls can be generated with :
 run_from_file(userMetadataFile = "path_to_your_file.tsv")
 ```
 
-### Generate present/absent calls at transcript level (beta version)
+### <a name="transcript_level"></a>Generate present/absent calls at transcript level (beta version)
 
 kallisto generates TPMs at the transcript level. In the Bgee pipeline we summarize this expression at the gene level to calculate our present/absent calls.
 In `BgeeCall` it is now possible to generate present/absent calls at the transcript level. Be careful when using this feature as it has not been tested for the moment.
@@ -173,7 +170,7 @@ calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata =
 ### Tune how to use kallisto
 
 #### Download or reuse your own kallisto
-By default `BgeeCall`will download the version 0.45 of kallisto and will use it to quantify abundance of transcripts. It will only be used by this package and will have no impact on your potential already existing version of kallisto.
+By default `BgeeCall` will download the version 0.45 of kallisto and will use it to quantify abundance of transcripts. It will only be used by this package and will have no impact on your potential already existing version of kallisto.
 However, You can use a version already installed on your conputer or your cluster. It can be useful if you prefer to use an older version of kallisto.
 To do that, you only have to create one object of the class `KallistoMetadata` and edit the value of one attribute
 ``` {r, eval=FALSE}
@@ -200,7 +197,7 @@ calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata =
 By default 2 indexes with 2 different kmer sizes can be used by `BgeeCall`
 The default kmer size of kallisto (31) is used for libraries with reads length equal or larger than 50 nt.
 A kmer size of 21 is used for libraries with reads length smaller than 50 nt.
-It is not possible to change the size of the kmers but it is possible to modify the threshold of read length allowing to choose between default and small kmer size.
+We decided not to allow to tune kmers size because the generation of the index is time consuming and index generation takes even more time with small kmers size (< 21 nt). However it is possible to modify the threshold of read length allowing to choose between default and small kmer size.
 
 ``` {r, eval=FALSE}
 kallisto <- new("KallistoMetadata")
