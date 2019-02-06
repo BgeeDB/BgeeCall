@@ -1,5 +1,5 @@
 ---
-title: "BgeeCall, an R package for automatic gene expression calls generation"
+title: "BgeeCall, a R package for automatic gene expression calls generation"
 author: "Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -127,13 +127,14 @@ read.table(calls_output$cutoff_info_file_path)
 ``` {r, message = FALSE, warning = FALSE}
 head.DataTable(x = read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
 calls_output$TPM_distribution_path
+calls_output$abundance_tsv
 ```
 * TPM_distribution_path : path to plot in pdf reprensting density distribution of TPM values for all sequences, protein coding sequences, and intergenic sequences. The grey line corresponds to TPM threshold used to generate present/absent calls.
 ``` {r, eval = FALSE}
 openPDF(calls_output$TPM_distribution_path)
 ```
 
-```{r, out.width= "85%", out.height= "300%", echo = FALSE}
+```{r, out.width= "85%", echo = FALSE}
 knitr::include_graphics(calls_output$TPM_distribution_path)
 ```
 
@@ -155,6 +156,26 @@ Once the file has been fill in expression calls can be generated with :
 ``` {r, eval=FALSE}
 run_from_file(userMetadataFile = "path_to_your_file.tsv")
 ```
+
+### list species available on Bgee
+
+BgeeCall allows to generate gene expression call for any RNA-Seq libraries as long as the species is present in Bgee. To see all species in the last version of Bgee run :
+
+```{r}
+list_bgee_species()
+```
+
+### list reference intergenic releases
+
+Different releases of Bgee reference intergenic sequences are available. It is possible to list all these releases :
+```{r}
+list_intergenic_release()
+```
+It is then possible to choose one specific release to create a `BgeeMetadata` object.
+```{r}
+bgee <- new("BgeeMetadata", intergenic_release = "0.1")
+```
+By default the intergenic used when a `BgeeMetadata`object is created is the last created one.
 
 ### <a name="transcript_level"></a>Generate present/absent calls at transcript level (beta version)
 
@@ -216,6 +237,17 @@ calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 When run IDs are selected, the name output directory combine the library ID and all selected run IDs. In our example the expression calls will be stored in the directory `SRX099901_SRR1_SRR2`.
 
+### Modify present/absent threshold
+
+By default the threshold of present/absent is calculated with the formula :
+
+    proportion of ref intergenic present / proportion of protein coding present = 0.05
+
+This 0.05 corresponds to the ratio used in the Bgee pipeline. However it is possible to edit this value. Be careful when editing this value as it has a big impact on your present absent.
+
+```{r, eval=FALSE}
+kallisto <- new("KallistoMetadata", cutoff = 0.1)
+```
 
 ### Generate calls with a simple arborescence of directories
 By default the arborescence of directories created by `BgeeCall` is complex. This complexity allows to generate gene expression calls for the same RNA-Seq library using different transcriptomes or gene annotations.
@@ -228,3 +260,10 @@ calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 Be careful when you use this option. If you run different analysis for the same RNA-Seq library the results will be overwritten.
 
+``` {r, echo=FALSE, message=FALSE, warning=FALSE}
+# remove all data produced during generation of the vignette
+kallisto <- new("KallistoMetadata")
+bgee <- new("BgeeMetadata")
+unlink(kallisto@kallisto_dir, recursive = TRUE)
+unlink(file.path(user_BgeeCall@working_path, paste0(bgee@intergenic_prefix, "*")), recursive = TRUE)
+```

@@ -4,7 +4,7 @@
 \alias{download_kallisto}
 \title{Download binary version of kallisto.}
 \usage{
-download_kallisto(myKallistoMetadata)
+download_kallisto(myKallistoMetadata, myUserMetadata)
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}
