@@ -32,7 +32,7 @@ BgeeMetadata <- setClass(
 setMethod(f = "initialize", signature ="BgeeMetadata" , definition = function(.Object, ...) {
   .Object <- callNextMethod()
   ## Get release information
-  cat("\nQuerying Bgee to get release information...\n")
+  cat("\nQuerying Bgee to get intergenic release information...\n")
   allReleases <- try(.getIntergenicRelease(removeFile = FALSE), silent=TRUE)
   if (class(allReleases) == "data.frame"){
     file.rename(from=file.path(getwd(), 'release.tsv'),

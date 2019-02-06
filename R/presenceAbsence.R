@@ -66,7 +66,7 @@ generate_presence_absence <- function(myAbundanceMetadata, myBgeeMetadata, myUse
   selected_intergenic <- (abundance$type == "intergenic" & abundance$id %in% biotype_mapping$id)
 
   #calculate TPM cutoff
-  results <- calculate_abundance_cutoff(abundance, selected_coding, selected_intergenic)
+  results <- calculate_abundance_cutoff(abundance, selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
   abundance_cutoff <- results[1]
   r_cutoff <- results[2]
   
