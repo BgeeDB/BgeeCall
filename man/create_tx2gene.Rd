@@ -14,7 +14,8 @@ create_tx2gene(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
 \description{
-Create transcript to gene mapping file as used by tximport. The file contains both genic and intergenic regions.
+Create transcript to gene mapping file as used by tximport. 
+The file contains both genic and intergenic regions.
 }
 \author{
 Julien Wollbrett
