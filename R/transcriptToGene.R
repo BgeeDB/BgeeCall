@@ -1,6 +1,7 @@
 #' @title Generate transcript to gene mapping for intergenic
 #'
-#' @description Generate transcript to gene mapping for intergenic regions as used by tximport. Gene and transcript columns are identical.
+#' @description Generate transcript to gene mapping for intergenic regions as used by tximport. 
+#' Gene and transcript columns are identical.
 #'
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object.
 #' @param myUserMetadata A Reference Class UserMetadata object.
@@ -11,20 +12,26 @@
 #'
 #' @noMd
 #' @noRd
-#'
+#' 
+#' @examples { 
+#'   user <- new("UserMetadata", species_id = "6239")
+#'   bgee <- new("BgeeMetadata", intergenic_release = "0.1")
+#'   intergenic_tx2gene(bgee, user)
+#' }
 intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
   species_path <- get_species_path(myBgeeMetadata, myUserMetadata)
   bgee_intergenic_file <- file.path(species_path, myBgeeMetadata@fasta_intergenic_name)
   if (!file.exists(bgee_intergenic_file)) {
     if (!dir.exists(species_path)) {
-      dir.create(species_path, recursive = T)
+      dir.create(species_path, recursive = TRUE)
     }
     download_fasta_intergenic(myBgeeMetadata, myUserMetadata, bgee_intergenic_file)
   }
   bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
   #intergenic ID correspond to part of the header before the first space character
   all_transcripts <- as.data.frame(sub("^([^ ]+).*", "\\1", names(bgee_intergenic)))
-  # Create a second column idantical to the first one. Then each intergenic region will be consider as a gene (of the same name) for tximport
+  # Create a second column idantical to the first one. 
+  # Then each intergenic region will be consider as a gene (of the same name) for tximport
   all_transcripts[,2] <- all_transcripts[,1]
   names(all_transcripts) <- c("TXNAME", "GENEID")
   return(all_transcripts)
@@ -49,14 +56,16 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 create_TxDb <- function(myAbundanceMetadata, myUserMetadata) {
   # create txdb from GRanges Object
-  txdb <- makeTxDbFromGRanges(myUserMetadata@annotation_object, taxonomyId = as.numeric(myUserMetadata@species_id))
+  txdb <- makeTxDbFromGRanges(myUserMetadata@annotation_object, 
+                              taxonomyId = as.numeric(myUserMetadata@species_id))
   return(txdb)
 }
 
 
 #' @title Create transcript to gene mapping file
 #'
-#' @description Create transcript to gene mapping file as used by tximport. The file contains both genic and intergenic regions.
+#' @description Create transcript to gene mapping file as used by tximport. 
+#' The file contains both genic and intergenic regions.
 #'
 #' @param myAbundanceMetadata A descendant object of the Class myAbundanceMetadata.
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object.
@@ -92,7 +101,9 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata, myUserMetadata) 
 
 #' @title Run tximport
 #'
-#' @description Run tximport. Will summarize abundance estimation from transcript level to gene level if `myAbundanceMetadata@txout == FALSE`. Otherwise keep abundance estimation at transcript level.
+#' @description Run tximport. Will summarize abundance estimation from transcript 
+#' level to gene level if `myAbundanceMetadata@txout == FALSE`. 
+#' Otherwise keep abundance estimation at transcript level.
 #'
 #' @param myAbundanceMetadata A descendant object of the Class myAbundanceMetadata.
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object.
@@ -111,9 +122,12 @@ run_tximport <- function (myAbundanceMetadata, myBgeeMetadata, myUserMetadata) {
   output_path <- get_tool_output_path(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
   abundance_file <- file.path(output_path, myAbundanceMetadata@abundance_file)
   if (!file.exists(abundance_file)) {
-    stop(paste0("can not generate presence/absence calls. Abundance file is missing : ", abundance_file, "."))
+    stop(paste0("can not generate presence/absence calls. 
+                Abundance file is missing : ", abundance_file, "."))
   }
-  txi <- tximport(abundance_file, type= myAbundanceMetadata@tool_name, tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, ignoreTxVersion = T)
+  txi <- tximport(abundance_file, type= myAbundanceMetadata@tool_name, 
+                  tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, 
+                  ignoreTxVersion = TRUE)
   return(txi)
 }
 
@@ -131,13 +145,23 @@ abundance_without_intergenic <- function (myAbundanceMetadata, myBgeeMetadata, m
   output_path <- get_tool_output_path(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
   abundance_file <- file.path(output_path, "abundance.tsv")#myAbundanceMetadata@abundance_file)
   abundance <- read.table(abundance_file, header = TRUE, sep = "\t")
-  abundance_without_intergenic <- abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] %in% tx2gene_without_intergenic$TXNAME),]
-  temp_abundance_file_without_intergenic <- file.path(output_path, file_without_intergenic_name)
-  write.table(abundance_without_intergenic, temp_abundance_file_without_intergenic, sep = "\t", row.names = F )
+  abundance_without_intergenic <- 
+    abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] 
+                    %in% tx2gene_without_intergenic$TXNAME),]
+  temp_abundance_file_without_intergenic <- 
+    file.path(output_path, file_without_intergenic_name)
+  write.table(abundance_without_intergenic, temp_abundance_file_without_intergenic, 
+              sep = "\t", row.names = FALSE )
 
   # calculate corrected TPM value
-  abundance_without_intergenic[ myAbundanceMetadata@abundance_header ] <- countToTpm(abundance_without_intergenic[[myAbundanceMetadata@count_header]], abundance_without_intergenic[[myAbundanceMetadata@eff_length_header]])
-  txi_without_intergenic <- tximport(temp_abundance_file_without_intergenic, type= myAbundanceMetadata@tool_name, tx2gene = tx2gene_without_intergenic, txOut = myAbundanceMetadata@txOut, ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion)
+  abundance_without_intergenic[ myAbundanceMetadata@abundance_header ] <- 
+    countToTpm(abundance_without_intergenic[[myAbundanceMetadata@count_header]], 
+               abundance_without_intergenic[[myAbundanceMetadata@eff_length_header]])
+  txi_without_intergenic <- 
+    tximport(temp_abundance_file_without_intergenic, 
+             type= myAbundanceMetadata@tool_name, tx2gene = tx2gene_without_intergenic, 
+             txOut = myAbundanceMetadata@txOut, 
+             ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion)
   file.remove(temp_abundance_file_without_intergenic)
   return(txi_without_intergenic)
 }

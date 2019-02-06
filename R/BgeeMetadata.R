@@ -34,10 +34,10 @@ setMethod(f = "initialize", signature ="BgeeMetadata" , definition = function(.O
   ## Get release information
   cat("\nQuerying Bgee to get intergenic release information...\n")
   allReleases <- try(.getIntergenicRelease(removeFile = FALSE), silent=TRUE)
-  if (class(allReleases) == "data.frame"){
+  if ( is(allReleases, "data.frame") ){
     file.rename(from=file.path(getwd(), 'release.tsv'),
                 to=file.path(getwd(), "release.tsv"))
-  } else if (class(allReleases) == "try-error"){
+  } else if ( is(allReleases, "try-error") ){
     if (file.exists(file.path(getwd(), "release.tsv"))){
       cat(paste0("\nWARNING: BgeeCall could not access intergenic releases information from the internet, but a release information file was found in the download directory ",
                  getwd(), ". This release file will be used, but be warned that it may not be up to date!\n"))

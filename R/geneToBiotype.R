@@ -22,7 +22,7 @@ load_gene_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, myUserMeta
   #check if file already exist
   if (!file.exists(gene_to_biotype_file)) {
     if (!dir.exists(annotation_path)) {
-      dir.create(annotation_path, recursive = T)
+      dir.create(annotation_path, recursive = TRUE)
     }
     cat(paste0("Generate file ", myAbundanceMetadata@gene2biotype_file, ".\n"))
     #retrieve gene2biotype data frame from annotation file
@@ -33,7 +33,8 @@ load_gene_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, myUserMeta
     names(gene_to_biotype) <- column_names
 
     #retrieve gene2biotype information from intergenic fasta file
-    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
+    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, myUserMetadata), 
+                                      myBgeeMetadata@fasta_intergenic_name)
     if (!file.exists(bgee_intergenic_file)) {
       download_fasta_intergenic(myBgeeMetadata, myUserMetadata, bgee_intergenic_file)
     }
@@ -46,7 +47,8 @@ load_gene_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, myUserMeta
 
     # merge both data frame and write file
     gene_to_biotype <- rbind(gene_to_biotype, intergenic_to_biotype)
-    write.table(gene_to_biotype, gene_to_biotype_file, sep = "\t", row.names = FALSE, quote = FALSE)
+    write.table(gene_to_biotype, gene_to_biotype_file, sep = "\t", 
+                row.names = FALSE, quote = FALSE)
   }
   return(read.table(gene_to_biotype_file, header = TRUE))
 }
