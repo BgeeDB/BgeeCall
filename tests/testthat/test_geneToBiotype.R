@@ -2,7 +2,7 @@ context('testing generation of gene to biotype file')
 library(AnnotationHub)
 
 test_that("test generation of gene to biotype file", {
-  bgee <- new("BgeeMetadata")
+  bgee <- new("BgeeMetadata", intergenic_release = "0.1")
   kallisto <- new ("KallistoMetadata")
   user <- new("UserMetadata")
   user@species_id <- "6239" # C. elegans
@@ -14,5 +14,6 @@ test_that("test generation of gene to biotype file", {
   expect_failure(expect_error(test <- load_gene_to_biotype(kallisto, bgee, user), NULL))
   expect_equal(nrow(test), 51025)
   expect_equal(ncol(test), 3)
-  unlink(BgeeCall:::get_bgee_release_path(myBgeeMetadata = bgee, myUserMetadata = user), recursive = TRUE)
+  unlink(BgeeCall:::get_intergenic_release_path(myBgeeMetadata = bgee, myUserMetadata = user), recursive = TRUE)
+  unlink(file.path(user@working_path, "release.tsv"))
 })
