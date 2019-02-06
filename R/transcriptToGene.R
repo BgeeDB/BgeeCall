@@ -49,7 +49,7 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 create_TxDb <- function(myAbundanceMetadata, myUserMetadata) {
   # create txdb from GRanges Object
-  txdb <- makeTxDbFromGRanges(myUserMetadata@annotation_object, drop.stop.codons = TRUE, taxonomyId = as.numeric(myUserMetadata@species_id))
+  txdb <- makeTxDbFromGRanges(myUserMetadata@annotation_object, taxonomyId = as.numeric(myUserMetadata@species_id))
   return(txdb)
 }
 
@@ -82,7 +82,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata, myUserMetadata) 
     tx2gene <- rbind(tx2gene, intergenic_tx2gene)
     # Remove the transcript version that can be present in transcript id of gtf files
     if(myAbundanceMetadata@ignoreTxVersion) {
-      cat(paste0("remove transcript version info in ", myAbundanceMetadata@tx2gene_file, " file."))
+      cat(paste0("remove transcript version info in ", myAbundanceMetadata@tx2gene_file, " file.\n"))
       tx2gene$TXNAME <- gsub(pattern = "\\..*", "", tx2gene$TXNAME )
     }
     write.table(x = tx2gene, file = tx2gene_path, sep = "\t", row.names = FALSE, quote = FALSE)

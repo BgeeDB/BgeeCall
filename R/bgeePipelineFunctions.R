@@ -5,14 +5,15 @@
 
 #' @title Calculate TPM cutoff
 #'
-#' @description This function calculate the TPM cutoff. This cutoff will correspond to the minimal value of TPM for which the ratio of genes and intergenic regions is equal to 0.05 or lower (first test if at least 1 TPM value has this property):
+#' @description This function calculate the TPM cutoff. This cutoff will correspond to the minimal value of TPM for which the ratio of genes and intergenic regions is equal to `intergenic_cutoff` (by default = 0.05) or lower (first test if at least 1 TPM value has this property):
 
 #'
 #' @param counts TPM information for both genic and intergenic regions
 #' @param selected_coding TPM information for both protein_coding regions
 #' @param selected_intergenic TPM information for intergenic regions
+#' @param intergenic_cutoff value of the ratio between prop of intergenic present and protein coding present (called r in this function)
 #'
-#' @return the TPM cutoff and the value of r (fixed proportion of intergenic regions considered as present)
+#' @return the TPM cutoff and the value of r (proportion of intergenic regions considered as present )
 #'
 #' @author Julien Roux
 #' @author Julien Wollbrett
@@ -20,11 +21,11 @@
 #' @noMd
 #' @noRd
 #'
-calculate_abundance_cutoff <- function(counts, selected_coding, selected_intergenic){
+calculate_abundance_cutoff <- function(counts, selected_coding, selected_intergenic, intergenic_cutoff){
   ## r = (number of intergenic regions with TPM values higher than x * number of coding regions) /
   ##     (number of coding regions with TPM values higher than x * number of intergenic regions)
   ##   = 0.05
-  ## What is value of x (cutoff)? calculate the distribution of r for a range of TPMs, then select the closest value to 0.05
+  ## What is value of x (cutoff)? calculate the distribution of r for a range of TPMs, then select the closest value to `cutoff`
 
   ## Counting how many intergenic regions have equal or higher value of TPM for every value of TPM
   ## For each gene's TPM (sorted), calculate r
@@ -39,26 +40,19 @@ calculate_abundance_cutoff <- function(counts, selected_coding, selected_interge
   ## Now we can calculate r
   r <- ( summed_intergenic / sum(selected_intergenic) ) /
     ( summed_coding / sum(selected_coding) )
-  ## This is twice faster as code above!
+  
+  prot_coding_present <- 100 - (intergenic_cutoff * 100)
 
-  ## Select the minimal value of TPM for which the ratio of genes and intergenic regions is equal to 0.05 or lower (first test if at least 1 TPM value has this property):
-  if (sum(r < 0.05) == 0){
+  ## Select the minimal value of TPM for which the ratio of genes and intergenic regions is equal to `intergenic_cutoff` or lower (first test if at least 1 TPM value has this property):
+  if (sum(r < intergenic_cutoff) == 0){
     abundance_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r == min(r))[1]]
     r_cutoff <- min(r)
-    cat(paste0("There is no TPM cutoff for which 95% of the expressed genes would be coding. TPM cutoff is fixed at the first value with maximum coding/intergenic ratio. r=", r_cutoff, "at TPM=", abundance_cutoff,"\n"))
+    cat(paste0("There is no TPM cutoff for which ", prot_coding_present, "% of the expressed genes would be coding. TPM cutoff is fixed at the first value with maximum coding/intergenic ratio. r=", r_cutoff, "at TPM=", abundance_cutoff,"\n"))
   } else {
-    abundance_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r < 0.05)[1]]
-    r_cutoff <- 0.05
-    cat(paste0("TPM cutoff for which 95% of the expressed genes are coding found at TPM = ", abundance_cutoff,"\n"))
+    abundance_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r < intergenic_cutoff)[1]]
+    r_cutoff <- intergenic_cutoff
+    cat(paste0("TPM cutoff for which ", prot_coding_present, "% of the expressed genes are coding found at TPM = ", abundance_cutoff,"\n"))
   }
-
-  ## Plot TPMs vs. ratio: should mostly go down
-  #plot(log2(sort(unique(counts$abundance[selected_coding]))+10e-6), r, pch=16, xlab="log2(TPM + 10^-6)", type="l")
-  #abline(h=0.05, lty=2, col="gray")
-  #if (r_cutoff > 0.05){
-  #  abline(h=0.05, lty=3, col="gray")
-  #}
-  #arrows(log2(abundance_cutoff + 10e-6), par("usr")[3], log2(abundance_cutoff + 10e-6), par("usr")[4]/2, col="gray", lty=1, lwd=2, angle=160, length=0.1)
   return(c(abundance_cutoff, r_cutoff))
 }
 

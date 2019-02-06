@@ -85,7 +85,7 @@ run_kallisto <- function (myKallistoMetadata, myBgeeMetadata, myUserMetadata) {
         cat("It is the first time you try to use Kallisto downloaded from this package. Kallisto has to be downloaded.
         This version of Kallisto will only be used inside of this package.
         It will have no impact on your potential already installed version of Kallisto.\n")
-        download_kallisto(myKallistoMetadata)
+        download_kallisto(myKallistoMetadata, myUserMetadata)
       }
     }
 
@@ -112,7 +112,7 @@ run_kallisto <- function (myKallistoMetadata, myBgeeMetadata, myUserMetadata) {
       kallisto_parameters <- myKallistoMetadata@pair_end_parameters
     }
     kallisto_command <- paste(kallisto_exec_path, "quant -i", kallisto_index_path, "-o", kallisto_output_path, kallisto_parameters, fastq_files, sep = " ")
-    cat(paste0("Will run kallisto using this command line : ", kallisto_command, "\n"))
+    message("Will run kallisto using this command line : ", kallisto_command)
     system(kallisto_command)
     if(myKallistoMetadata@ignoreTxVersion) {
       cat(paste0("remove transcript version info in ", myKallistoMetadata@abundance_file," ", myKallistoMetadata@tool_name, " abundance file.\n"))
@@ -160,7 +160,7 @@ is_kallisto_installed <- function(myKallistoMetadata) {
 #'
 #' @export
 #'
-download_kallisto <- function(myKallistoMetadata) {
+download_kallisto <- function(myKallistoMetadata, myUserMetadata) {
   if (dir.exists(myKallistoMetadata@kallisto_dir)) {
     message("kallisto directory already present. Kallisto do not need to be downloaded and installed again.")
   } else {
@@ -172,15 +172,15 @@ download_kallisto <- function(myKallistoMetadata) {
     if(os_version == 'linux') {
       temp_path <- file.path(myKallistoMetadata@kallisto_dir, "temp.gz")
       success <- download.file(url = myKallistoMetadata@kallisto_linux_url, destfile=temp_path, mode='wb')
-      untar(temp_path, exdir= getwd())
+      untar(temp_path, exdir = myUserMetadata@working_path)
     } else if(os_version == 'osx') {
       temp_path <- file.path(myKallistoMetadata@kallisto_dir, "temp.gz")
       success <- download.file(url = myKallistoMetadata@kallisto_osx_url, destfile=temp_path, mode='wb')
-      untar(temp_path, exdir=getwd())
+      untar(temp_path, exdir = myUserMetadata@working_path)
     } else if (os_version == 'windows') {
       temp_path <- file.path(myKallistoMetadata@kallisto_dir, "temp.zip")
       success <- download.file(url = myKallistoMetadata@kallisto_windows_url, destfile=temp_path, mode='wb')
-      unzip(temp_path, exdir=getwd())
+      unzip(temp_path, exdir = myUserMetadata@working_path)
     } else {
       stop("kallisto can not be downloaded on your computer. Only linux, OSX, and windows OS are compatible with this functionality.\n
          If you want to use this package please install your own version of Kallisto and run this command :\n
