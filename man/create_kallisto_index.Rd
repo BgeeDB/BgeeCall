@@ -14,7 +14,8 @@ create_kallisto_index(myKallistoMetadata, myBgeeMetadata, myUserMetadata)
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
 \description{
-This function creates kallisto indexes. 2 indexes are created. One with default kmer value and one with kmer size of 21nt.
+This function creates kallisto indexes. 
+Two indexes are created. One with default kmer value and one with kmer size of 21nt.
 }
 \author{
 Julien Wollbrett.

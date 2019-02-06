@@ -14,7 +14,9 @@ run_tximport(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
 \description{
-Run tximport. Will summarize abundance estimation from transcript level to gene level if `myAbundanceMetadata@txout == FALSE`. Otherwise keep abundance estimation at transcript level.
+Run tximport. Will summarize abundance estimation from transcript 
+level to gene level if `myAbundanceMetadata@txout == FALSE`. 
+Otherwise keep abundance estimation at transcript level.
 }
 \author{
 Julien Wollbrett

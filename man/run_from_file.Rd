@@ -12,10 +12,12 @@ run_from_file(myAbundanceMetadata = new("KallistoMetadata"),
 
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object (optional)}
 
-\item{userMetadataFile}{A tsv file describing all user libraries for which present/absent calls have to be generated}
+\item{userMetadataFile}{A tsv file describing all user libraries for which 
+present/absent calls have to be generated}
 }
 \description{
-Main function allowing to generate present/absent calls for some libraries described in a file. Each line of the file describes one RNA-Seq library.
+Main function allowing to generate present/absent calls for some 
+libraries described in a file. Each line of the file describes one RNA-Seq library.
 }
 \author{
 Julien Wollbrett

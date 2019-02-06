@@ -15,7 +15,8 @@ get_ref_intergenic_ids(myBgeeMetadata, myUserMetadata)
 A dataframe containing reference intergenic ids
 }
 \description{
-Retrieve a dataframe of reference intergenic IDs. It is generated using the reference intergenic fasta file from Bgee FTP.
+Retrieve a dataframe of reference intergenic IDs. 
+It is generated using the reference intergenic fasta file from Bgee FTP.
 }
 \author{
 Julien Wollbrett

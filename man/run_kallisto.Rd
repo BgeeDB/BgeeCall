@@ -11,7 +11,8 @@ run_kallisto(myKallistoMetadata, myBgeeMetadata, myUserMetadata)
 
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object.}
 
-\item{myUserMetadata}{A Reference Class UserMetadata object. This object has to be edited before running kallisto @seealso UserMetadata.R}
+\item{myUserMetadata}{A Reference Class UserMetadata object. 
+This object has to be edited before running kallisto @seealso UserMetadata.R}
 }
 \description{
 Run kallisto and all preliminary steps if needed like :
