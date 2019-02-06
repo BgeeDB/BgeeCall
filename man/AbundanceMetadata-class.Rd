@@ -16,6 +16,8 @@ This class can be seen as an abstract class, you should never instanciate it.
 
 \item{\code{ignoreTxVersion}}{logical used to remove transcript version in transcript ID if TRUE}
 
+\item{\code{cutoff}}{numeric corresponding to the proportion of intergenic present divided by proportion of protein coding present (default = 0.05). In the Bgee pipeline this cutoff is fixed and its value is 0.05. Be careful when changing this parameter as it could have a huge impact on your present/absent calls.}
+
 \item{\code{full_transcriptome_file}}{Name of the fasta file containing both transcriptomic and intergenic regions. This file is created by the pipeline. You should edit this slot only if you already have such a file with a different name.}
 
 \item{\code{tx2gene_file}}{Name of the file containing the mapping between transcript IDs and gene IDs (See the tximport package vignette for more details). This file is created by the pipeline. You should edit this slot only if you already have such a file with a different name. This file must be store at get_species_path()}
