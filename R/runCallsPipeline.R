@@ -68,54 +68,22 @@ run_from_dataframe <- function (myAbundanceMetadata = new("KallistoMetadata"), m
 
 #' @title generate present/absent calls from a file
 #'
-#' @description Main function allowing to generate present/absent calls for some libraries described in a file. Each line of the file describes one RNA-Seq library.
+#' @description Main function allowing to generate present/absent calls for some 
+#' libraries described in a file. Each line of the file describes one RNA-Seq library.
 #'
 #' @param myAbundanceMetadata A Reference Class BgeeMetadata object (optional)
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
-#' @param userMetadataFile A tsv file describing all user libraries for which present/absent calls have to be generated
+#' @param userMetadataFile A tsv file describing all user libraries for which 
+#' present/absent calls have to be generated
 #'
 #' @author Julien Wollbrett
 #' 
 #' @export
 #'
-run_from_file <- function (myAbundanceMetadata = new("KallistoMetadata"), myBgeeMetadata = new("BgeeMetadata"), userMetadataFile) {
-  user_metadata_df <- read.table(userMetadataFile, header = T, sep = "\t",comment.char = "#")
+run_from_file <- function (myAbundanceMetadata = new("KallistoMetadata"), 
+                           myBgeeMetadata = new("BgeeMetadata"), userMetadataFile) {
+  user_metadata_df <- read.table(userMetadataFile, header = TRUE, sep = "\t",
+                                 comment.char = "#")
   run_from_dataframe(myAbundanceMetadata, myBgeeMetadata, user_metadata_df)
 }
 
-run_from_file_parallel <- function (myAbundanceMetadata = new("KallistoMetadata"), myBgeeMetadata = new("BgeeMetadata"), userMetadataFile, core_number = detectCores()) {
-  userMetadata_df <- read.table(userMetadataFile, header = T, sep = "\t")
-
-  # Start by creating files needed for all species because not possible in the parallel loop of the pipeline
-  species_ids <- as.array(unique(as.character(userMetadata_df$species_id)))
-  for (i in 1:length(species_ids)) {
-    species_id <- species_ids[i]
-    species_line <- userMetadata_df[userMetadata_df$species_id == species_id,][1,]
-    myUserMetadata <- new("UserMetadata")
-    myUserMetadata@species_id <- species_id
-    myUserMetadata@run_id <- species_line$run_id
-    myUserMetadata <- setTrancriptomeFromFile(myUserMetadata, row$transcriptome_path)
-    myUserMetadata <- setAnnotationFromFile(myUserMetadata, row$annotation_path)
-    myUserMetadata@working_path <- row$working_path
-
-    #merge_transcriptome_and_intergenic
-  }
-
-  cat("Start creating indexes for all species. This step can take a lot of time (~ 20 minutes per species)")
-  for (row in 1:nrow(userMetadata_df)) {
-
-    # init myUserMetadata object
-    myUserMetadata <- new("UserMetadata")
-    myUserMetadata@species_id <- row$species_id
-    myUserMetadata@run_id <- row$run_id
-    myUserMetadata@reads_size <- row$reads_size
-    myUserMetadata@rnaseq_lib_path <- row$rnaseq_lib_path
-    myUserMetadata@transcriptome_path <- row$transcriptome_path
-    myUserMetadata@annotation_path <- row$annotation_path
-    myUserMetadata@working_path <- row$working_path
-
-    # run pipeline
-    run_from_object(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
-  }
-
-}

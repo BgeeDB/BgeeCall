@@ -1,17 +1,23 @@
 # these functions should be part of presenceAbsence.R
-# they mainly correspond to duplicated code between the pipeline and this package. They do not need to be exported
-# We decided to move them in a different file to easily update them when the pipeline is updated.
-# XXX We should maybe centralise these functions somewhere outside of the package and the bgee pipeline
+# they mainly correspond to duplicated code between the pipeline and this package. 
+# They do not need to be exported
+# We decided to move them in a different file to easily update them 
+# when the pipeline is updated.
+# XXX We should maybe centralise these functions somewhere outside of the package 
+# and the bgee pipeline
 
 #' @title Calculate TPM cutoff
 #'
-#' @description This function calculate the TPM cutoff. This cutoff will correspond to the minimal value of TPM for which the ratio of genes and intergenic regions is equal to `intergenic_cutoff` (by default = 0.05) or lower (first test if at least 1 TPM value has this property):
-
+#' @description This function calculate the TPM cutoff. 
+#' This cutoff will correspond to the minimal value of TPM for which the ratio of genes 
+#' and intergenic regions is equal to `intergenic_cutoff` (by default = 0.05) 
+#' or lower (first test if at least 1 TPM value has this property):
 #'
 #' @param counts TPM information for both genic and intergenic regions
 #' @param selected_coding TPM information for both protein_coding regions
 #' @param selected_intergenic TPM information for intergenic regions
-#' @param intergenic_cutoff value of the ratio between prop of intergenic present and protein coding present (called r in this function)
+#' @param intergenic_cutoff value of the ratio between prop of 
+#' intergenic present and protein coding present (called r in this function)
 #'
 #' @return the TPM cutoff and the value of r (proportion of intergenic regions considered as present )
 #'
@@ -25,14 +31,19 @@ calculate_abundance_cutoff <- function(counts, selected_coding, selected_interge
   ## r = (number of intergenic regions with TPM values higher than x * number of coding regions) /
   ##     (number of coding regions with TPM values higher than x * number of intergenic regions)
   ##   = 0.05
-  ## What is value of x (cutoff)? calculate the distribution of r for a range of TPMs, then select the closest value to `cutoff`
+  ## What is value of x (cutoff)? calculate the distribution of r for a range of TPMs, 
+  ## then select the closest value to `cutoff`
 
   ## Counting how many intergenic regions have equal or higher value of TPM for every value of TPM
   ## For each gene's TPM (sorted), calculate r
   summed_intergenic <- sapply(unique(sort(counts$abundance[selected_coding])), function(x){
     return( sum(counts$abundance[selected_intergenic] >= x) )
   })
-  ## It is not necessary to do the same for coding regions: for a sorted vector the number of greater elements is equal to lenght(vector) - position + 1. Here, it is a bit trickier since we do not consider all coding TPM values, but the unique ones, so we use the rle function to know the lengths of the runs of similar values and sum them
+  ## It is not necessary to do the same for coding regions: for a sorted vector 
+  # the number of greater elements is equal to lenght(vector) - position + 1. 
+  # Here, it is a bit trickier since we do not consider all coding TPM values, 
+  # but the unique ones, so we use the rle function to know the lengths of the runs 
+  # of similar values and sum them
   summed_coding <- c(0, cumsum(rle(sort(counts$abundance[selected_coding]))$lengths))
   summed_coding <- summed_coding[-(length(summed_coding))]
   summed_coding <- sum(selected_coding) - summed_coding
@@ -43,15 +54,21 @@ calculate_abundance_cutoff <- function(counts, selected_coding, selected_interge
   
   prot_coding_present <- 100 - (intergenic_cutoff * 100)
 
-  ## Select the minimal value of TPM for which the ratio of genes and intergenic regions is equal to `intergenic_cutoff` or lower (first test if at least 1 TPM value has this property):
+  ## Select the minimal value of TPM for which the ratio of genes and intergenic regions 
+  ## is equal to `intergenic_cutoff` or lower (first test if at least 1 TPM value has this property):
   if (sum(r < intergenic_cutoff) == 0){
     abundance_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r == min(r))[1]]
     r_cutoff <- min(r)
-    cat(paste0("There is no TPM cutoff for which ", prot_coding_present, "% of the expressed genes would be coding. TPM cutoff is fixed at the first value with maximum coding/intergenic ratio. r=", r_cutoff, "at TPM=", abundance_cutoff,"\n"))
+    cat(paste0("There is no TPM cutoff for which ", prot_coding_present, 
+               "% of the expressed genes would be coding. TPM cutoff is fixed at the first 
+               value with maximum coding/intergenic ratio. r=", r_cutoff,
+               "at TPM=", abundance_cutoff,"\n"))
   } else {
-    abundance_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r < intergenic_cutoff)[1]]
+    abundance_cutoff <- sort(unique(
+      counts$abundance[selected_coding]))[which(r < intergenic_cutoff)[1]]
     r_cutoff <- intergenic_cutoff
-    cat(paste0("TPM cutoff for which ", prot_coding_present, "% of the expressed genes are coding found at TPM = ", abundance_cutoff,"\n"))
+    cat(paste0("TPM cutoff for which ", prot_coding_present, 
+               "% of the expressed genes are coding found at TPM = ", abundance_cutoff,"\n"))
   }
   return(c(abundance_cutoff, r_cutoff))
 }
@@ -64,7 +81,8 @@ calculate_abundance_cutoff <- function(counts, selected_coding, selected_interge
 #' @param selected_coding TPM information for protein_coding regions
 #' @param selected_intergenic TPM information for intergenic regions
 #' @param cutoff TPM cutoff below which calls are considered as absent
-#' @param myUserMetadata A Reference Class UserMetadata object. This object has to be edited before running kallisto @seealso UserMetadata.R
+#' @param myUserMetadata A Reference Class UserMetadata object. 
+#' This object has to be edited before running kallisto @seealso UserMetadata.R
 #'
 #' @author Julien Roux
 #' @author Julien Wollbrett
@@ -90,12 +108,14 @@ plot_distributions <- function(counts, selected_coding, selected_intergenic, cut
 
   ## Plot whole distribution
   title <- basename(myUserMetadata@rnaseq_lib_path)
-  plot(dens, ylim=c(0, max(dens$y)*1.1), xlim=c(-23, 21), lwd=2, main=title, bty="n", axes=F, xlab="")
+  plot(dens, ylim=c(0, max(dens$y)*1.1), xlim=c(-23, 21), 
+       lwd=2, main=title, bty="n", axes=FALSE, xlab="")
   axis(2, las=1)
 
   ## Plot the TPM cutoff
   ## abline(v=cutoff, col="gray", lty=1, lwd=2)
-  arrows(log2(cutoff + 10e-6), par("usr")[3], log2(cutoff + 10e-6), par("usr")[4]/2, col="gray", lty=1, lwd=2, angle=160, length=0.1)
+  arrows(log2(cutoff + 10e-6), par("usr")[3], log2(cutoff + 10e-6), 
+         par("usr")[4]/2, col="gray", lty=1, lwd=2, angle=160, length=0.1)
 
   ## Add subgroups distributions (coding, intergenic, etc):
   ## protein-coding genes
@@ -104,12 +124,15 @@ plot_distributions <- function(counts, selected_coding, selected_intergenic, cut
   lines(dens_intergenic, col="dodgerblue3", lwd=2, lty=2)
 
   ## legend
-  legend("topright", c("all", "selected protein-coding genes", "selected intergenic regions"), lwd=2, col=c("black", "firebrick3", "dodgerblue3"), lty=c(1, 2, 2), bty="n")
+  legend("topright", c("all", "selected protein-coding genes",
+                       "selected intergenic regions"), lwd=2, 
+         col=c("black", "firebrick3", "dodgerblue3"), lty=c(1, 2, 2), bty="n")
   return();
 }
 
 # this function is not exactly the same than in the bgee pipeline.
-# We removed the max_intergenic variable. In the pipeline this variable was used to define the the reference intergenic regions.
+# We removed the max_intergenic variable. In the pipeline this variable 
+# was used to define the the reference intergenic regions.
 # We do not need it anymore in this package as we precomputed the list of intergenic regions
 # we also remove TPM_final_cutoff, FPKM_cutoff, FPKM_final_cutoff
 
@@ -121,7 +144,8 @@ plot_distributions <- function(counts, selected_coding, selected_intergenic, cut
 #' @param column Name of the column containing presence/absence information
 #' @param abundance_cutoff TPM cutoff below which calls are considered as absent
 #' @param r_cutoff Proportion of intergenic regions considered as present
-#' @param myUserMetadata A Reference Class UserMetadata object. This object has to be edited before running kallisto @seealso UserMetadata.R
+#' @param myUserMetadata A Reference Class UserMetadata object. 
+#' This object has to be edited before running kallisto @seealso UserMetadata.R
 #'
 #' @return summary statistics to export in cutoff info file
 #'
@@ -133,13 +157,17 @@ plot_distributions <- function(counts, selected_coding, selected_intergenic, cut
 #'
 cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, myUserMetadata){
   ## Calculate summary statistics to export in cutoff info file
-  genic_present <- sum(counts[[column]][counts$type == "genic"] == "present")/sum(counts$type == "genic") * 100
+  genic_present <- sum(counts[[column]][counts$type == "genic"] == 
+                         "present")/sum(counts$type == "genic") * 100
   number_genic_present <- sum(counts[[column]][counts$type == "genic"] == "present")
 
-  coding_present <- sum(counts[[column]][counts$biotype %in% "protein_coding"] == "present")/sum(counts$biotype %in% "protein_coding") * 100
+  coding_present <- 
+    sum(counts[[column]][counts$biotype %in% "protein_coding"] == "present")/
+        sum(counts$biotype %in% "protein_coding") * 100
   number_coding_present <- sum(counts[[column]][counts$biotype %in% "protein_coding"] == "present")
 
-  intergenic_present <- sum(counts[[column]][counts$type == "intergenic"] == "present")/sum(counts$type == "intergenic") * 100
+  intergenic_present <- sum(counts[[column]][counts$type == "intergenic"] == "present")/
+        sum(counts$type == "intergenic") * 100
   number_intergenic_present <- sum(counts[[column]][counts$type == "intergenic"] == "present")
 
   ## Export cutoff_info_file
@@ -154,14 +182,15 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, myUserMetada
                         "cutoffTPM",
                         "proportionGenicPresent", "numberGenicPresent", "numberGenic",
                         "proportionCodingPresent", "numberPresentCoding", "numberCoding",
-                        "proportionIntergenicPresent", "numberIntergenicPresent", "numberIntergenic",
-                        "ratioIntergenicCodingPresent")
+                        "proportionIntergenicPresent", "numberIntergenicPresent", 
+                        "numberIntergenic", "ratioIntergenicCodingPresent")
   return(to_export)
 }
 
 #' @title Recalculate TPMs
 #'
-#' @description Recalculate TPMs using functions from ```https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/```
+#' @description Recalculate TPMs using functions from 
+#' ```https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/```
 #'
 #' @param counts A list of extimated counts
 #' @param effLen A list of effective length

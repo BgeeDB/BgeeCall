@@ -3,12 +3,13 @@
 #' @description Create a file containing the mapping between transcript IDs, type 
 #' (genic or intergenic) and biotypes. Load data from this file.
 #' This transcript to biotype mapping is used when expression estimation is not 
-#' summurize at gene level but stay at transcript level. Will create the mapping file if not already existing.
+#' summurize at gene level but stay at transcript level. Will create the mapping file if 
+#' not already existing.
 #' 
 #' @param myAbundanceMetadata A descendant object of the Class myAbundanceMetadata.
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object.
-#' @param myUserMetadata A Reference Class UserMetadata object. This object has to be edited before running 
-#' kallisto 
+#' @param myUserMetadata A Reference Class UserMetadata object. 
+#' This object has to be edited before running kallisto 
 #' 
 #' @seealso UserMetadata.R BgeeMetadata.R AbundanceMetadata.R
 #'
@@ -29,18 +30,20 @@ load_transcript_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, myUs
   #check if file already exist
   if (!file.exists(transcript_to_biotype_file)) {
     if (!dir.exists(annotation_path)) {
-      dir.create(annotation_path, recursive = T)
+      dir.create(annotation_path, recursive = TRUE)
     }
     cat(paste0("Generate file ", myAbundanceMetadata@tx2biotype_file, ".\n"))
     #retrieve tx2biotype data frame from annotation file
     gtf=as.data.frame(myUserMetadata@annotation_object)
     gtf_transcript <- gtf[gtf$type == "transcript",]
-    transcript_to_biotype <- as.data.frame(unique(cbind(gtf_transcript$transcript_id, gtf_transcript$transcript_biotype)))
+    transcript_to_biotype <- as.data.frame(unique(cbind(gtf_transcript$transcript_id, 
+                                                        gtf_transcript$transcript_biotype)))
     transcript_to_biotype[,3] <- "genic"
     names(transcript_to_biotype) <- column_names
     
     #retrieve gene2biotype information from intergenic fasta file
-    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
+    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, myUserMetadata), 
+                                      myBgeeMetadata@fasta_intergenic_name)
     if (!file.exists(bgee_intergenic_file)) {
       download_fasta_intergenic(myBgeeMetadata, myUserMetadata, bgee_intergenic_file)
     }
@@ -53,7 +56,8 @@ load_transcript_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, myUs
     
     # merge both data frame and write file
     transcript_to_biotype <- rbind(transcript_to_biotype, intergenic_to_biotype)
-    write.table(transcript_to_biotype, transcript_to_biotype_file, sep = "\t", row.names = FALSE, quote = FALSE)
+    write.table(transcript_to_biotype, transcript_to_biotype_file, sep = "\t", 
+                row.names = FALSE, quote = FALSE)
   }
   return(read.table(transcript_to_biotype_file, header = TRUE))
 }

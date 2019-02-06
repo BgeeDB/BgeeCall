@@ -241,9 +241,12 @@ get_output_dir <- function(myUserMetadata) {
 #' @title Remove transcript version from abundance file
 #'
 #' @description Remove the transcript version that can be present in transcript id of transcriptome files.
-#' Removing the transcript version means detecting a dot in transcript id and removing the dot and all caracters following it.
-#' This method has been develop because in some case the ignoreTxVersion attribut of the tximport package with kallisto was not working.
-#' this method is called if the logical "ignoreTxVersion" attribut of the AbundanceMetadata class is set to TRUE.
+#' Removing the transcript version means detecting a dot in transcript id and removing 
+#' the dot and all caracters following it.
+#' This method has been develop because in some case the ignoreTxVersion attribut of the 
+#' tximport package with kallisto was not working.
+#' this method is called if the logical "ignoreTxVersion" attribut of the AbundanceMetadata 
+#' class is set to TRUE.
 #'
 #' @noMd
 #' @noRd
@@ -255,20 +258,29 @@ removeTxVersionFromAbundance <- function (myAbundanceMetadata, myBgeeMetadata,  
   if(myAbundanceMetadata@tool_name == "kallisto") {
     abundance_data$target_id <- gsub(pattern = "\\..*", "", abundance_data$target_id )
   } else{
-    stop(paste0("Removing transcript version for tool ", myAbundanceMetadata$tool_name, " is not implemented."))
+    stop(paste0("Removing transcript version for tool ", 
+                myAbundanceMetadata$tool_name, " is not implemented."))
   }
-  write.table(x = abundance_data, file = abundance_path, sep = "\t", row.names = F, col.names = T, quote = F)
+  write.table(x = abundance_data, file = abundance_path, sep = "\t", row.names = FALSE,
+              col.names = TRUE, quote = FALSE)
 }
 
 #' @title List species present in Bgee
 #'
-#' @description Call a webservice that returns all species present in Bgee. Retrieved information are species ID, genus, species name, common name and presence absence of datatypes in Bgee.
-#' This function call the `listBgeeSpecies()` function from the BgeeDB R package
+#' @description Call a webservice that returns all species present in Bgee. Retrieved 
+#' information are species ID, genus, species name, common name and presence absence 
+#' of datatypes in Bgee. This function call the `listBgeeSpecies()` function from the 
+#' BgeeDB R package
 #'
-#' @param release	A character specifying a targeted release number. In the form "Release.subrelease" or "Release_subrelease", e.g., "14.0" or 14_0". If not specified, the latest release is used.
-#' @param ordering	A numeric indicating the number of the column which should be used to sort the data frame. Default NULL, returning unsorted data frame.
-#' @param allReleases	A data frame with information on all releases. Avoid redownloading this information if .getBgeeRelease() already called.
-#' @param removeFile	Boolean indicating whether the downloaded file should be deleted. Default to TRUE.
+#' @param release	A character specifying a targeted release number. 
+#' In the form "Release.subrelease" or "Release_subrelease", 
+#' e.g., "14.0" or 14_0". If not specified, the latest release is used.
+#' @param ordering	A numeric indicating the number of the column which should be used 
+#' to sort the data frame. Default NULL, returning unsorted data frame.
+#' @param allReleases	A data frame with information on all releases. Avoid redownloading 
+#' this information if .getBgeeRelease() already called.
+#' @param removeFile	Boolean indicating whether the downloaded file should be deleted.
+#' Default to TRUE.
 #' @export
 #'
 list_bgee_species <- function(release = NULL, ordering = NULL, allReleases = NULL, 
