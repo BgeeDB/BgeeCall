@@ -40,8 +40,8 @@ user_BgeeCall <- new("UserMetadata", species_id = "6239")
 user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBcel235_84")
 user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
 # provide path to the directory of your RNA-Seq library
-user <- setRnaSeqPath(user, file.path(getWorkingPath(user), 
-                     "extdata", "SRX099901_subset"))
+user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, file.path(getWorkingPath(user_BgeeCall), 
+                     "inst", "extdata", "SRX099901_subset"))
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)                                           
 }
 
