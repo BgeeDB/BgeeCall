@@ -8,6 +8,8 @@ download_kallisto(myKallistoMetadata, myUserMetadata)
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}
+
+\item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
 \description{
 Check your OS and download correct binary 

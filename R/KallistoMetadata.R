@@ -77,7 +77,10 @@ KallistoMetadata <- setClass(
     contains="AbundanceMetadata"
 )
 
-# define methods of the KallistoMetadata class
+setGeneric(
+    name="getKallistoPath" ,
+    def = function(myKallistoMetadata) {standardGeneric("getKallistoPath")}
+)
 
 #' @title Path to kallisto tool that have to be exectuted.
 #'
@@ -99,28 +102,23 @@ KallistoMetadata <- setClass(
 #' 
 #' @exportMethod getKallistoPath
 #'
-setGeneric(
-    name="getKallistoPath" ,
-    def = function( object ) {standardGeneric("getKallistoPath")}
-)
-
 setMethod(
     f ="getKallistoPath" ,
     signature ="KallistoMetadata" ,
-    definition <- function(object) {
+    definition <- function(myKallistoMetadata) {
         if (get_os() == 'windows') {
-            if (object@download_kallisto == TRUE) {
-                kallisto_command <- file.path(object@kallisto_dir, 
-                                              object@windows_kallisto_name)
+            if (myKallistoMetadata@download_kallisto == TRUE) {
+                kallisto_command <- file.path(myKallistoMetadata@kallisto_dir, 
+                                              myKallistoMetadata@windows_kallisto_name)
             } else {
-                kallisto_command <- object@windows_kallisto_name
+                kallisto_command <- myKallistoMetadata@windows_kallisto_name
             }
         } else {
-            if (object@download_kallisto == TRUE) {
-                kallisto_command <- file.path(object@kallisto_dir, 
-                                              object@unix_kallisto_name)
+            if (myKallistoMetadata@download_kallisto == TRUE) {
+                kallisto_command <- file.path(myKallistoMetadata@kallisto_dir, 
+                                              myKallistoMetadata@unix_kallisto_name)
             } else {
-                kallisto_command <- object@unix_kallisto_name
+                kallisto_command <- myKallistoMetadata@unix_kallisto_name
             }
         }
         return(kallisto_command)

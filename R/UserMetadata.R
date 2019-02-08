@@ -55,57 +55,183 @@ UserMetadata <- setClass(
     )
 )
 
-#' 
-#' @title Set annotation_object of one UserMetadata object
-#' 
-#' @description Method of the class UserMetadata. Set annotation_object of one 
-#' UserMetadata object 
-#' by using one GRanges object as input.
-#' 
-#' @details GRanges object is used as input. The class GRanges comes from the 
-#' rtacklayer package 
-#' 
-#' @param userObject UserMetadata object
-#' @param annotationObject Object of the GRanges S4 class
-#' @param annotationName Name of the annotation. Will be used to create 
-#' annotation folders.
-#' 
-#' @return an object of UserMetadata
-#' 
-#' @examples {
-#' library(AnnotationHub)
-#' ah <- AnnotationHub()
-#' ah_annotations <- query(ah, c("GTF","Ensembl", 
-#'             "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.84"))
-#' user <- new("UserMetadata", species_id = "6239")
-#' user <- setAnnotationFromObject(user, 
-#'               ah_annotations[["AH50789"]],
-#'               "annotation_name")
-#' }
-#' 
-#' @exportMethod setAnnotationFromObject
-#' 
+
 setGeneric("setAnnotationFromObject", function(userObject, 
                                                annotationObject, 
                                                annotationName) {
     standardGeneric("setAnnotationFromObject")
 })
 
+setGeneric("setTranscriptomeFromObject", function(userObject, 
+                                                  transcriptomeObject, 
+                                                  transcriptomeName) {
+    standardGeneric("setTranscriptomeFromObject")
+})
+setGeneric(name="setAnnotationFromFile", 
+           def=function(userObject, annotationPath, annotationName) {
+               standardGeneric("setAnnotationFromFile")
+           })
+setGeneric(name="setTranscriptomeFromFile", def=function(userObject, 
+                                                         transcriptomePath, 
+                                                         transcriptomeName) {
+    standardGeneric("setTranscriptomeFromFile")
+})
+setGeneric(name="setWorkingPath", def=function(userObject, 
+                                                         workingPath) {
+    standardGeneric("setWorkingPath")
+})
+setGeneric(name="getWorkingPath", def=function(userObject) {
+    standardGeneric("getWorkingPath")
+})
+setGeneric(name="setRNASeqLibPath", def=function(userObject, 
+                                                 rnaSeqLibPath) {
+    standardGeneric("setRNASeqLibPath")
+})
 
-setMethod(f="setAnnotationFromObject", 
+#' @title `working_path` Setter
+#' 
+#' @description Set value of the `working_path` slot
+#' 
+#' @param userObject The UserMetadata object
+#' @param workingPath path to the directory wanted as `working_path`
+#' 
+#' @return An object of the class UserMetadata with new `working_path`
+#'  value
+#' 
+#' @exportMethod setWorkingPath
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' user <- setWorkingPath(user, getwd())
+#' }
+#'
+setMethod(f="setWorkingPath",
           signature=c(userObject = "UserMetadata", 
-                      annotationObject = "GRanges", 
-                      annotationName = "character"),
-          definition=function(userObject, annotationObject, annotationName) {
-              if(typeof(annotationObject) == "S4") {
-                  userObject@annotation_object <- annotationObject
-                  userObject@annotation_name <- annotationName
+                      workingPath = "character"), 
+          definition=function(userObject, workingPath) {
+              userObject@working_path <- workingPath
+              return(userObject)
+          })
+
+#' @title `working_path` Getter
+#' 
+#' @description Get value of the `working_path` slot
+#' 
+#' @param userObject The UserMetadata object
+#' 
+#' @return the value of the `working_path` slot of the object
+#' 
+#' @exportMethod getWorkingPath
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' working_path <- getWorkingPath(user)
+#' }
+#'
+setMethod(f="getWorkingPath", 
+          signature=c(userObject = "UserMetadata"), 
+          definition=function(userObject) {
+              return(userObject@working_path)
+          })
+
+#' @title `rnaseq_lib_path` Setter
+#' 
+#' @description Set value of the `rnaseq_lib_path` slot
+#' 
+#' @param userObject The UserMetadata object
+#' @param rnaSeqLibPath path to the directory wanted as `rnaseq_lib_path`
+#' 
+#' @return An object of the class UserMetadata with new `rnaseq_lib_path`
+#'  value
+#' 
+#' @exportMethod setRNASeqLibPath
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' user <- setRNASeqLibPath(user, getwd())
+#' }
+#'
+setMethod(f="setRNASeqLibPath", 
+          signature=c(userObject = "UserMetadata", 
+                      rnaSeqLibPath = "character"), 
+          definition=function(userObject, rnaSeqLibPath) {
+              userObject@rnaseq_lib_path <- rnaSeqLibPath
+              return(userObject)
+          })
+
+#' 
+#' @title Set transcriptome_object of one UserMetadata object
+#' 
+#' @description Method of the class UserMetadata. Set transcriptome_object of 
+#' one UserMetadata object 
+#' by providing the path to a fasta transcriptome file.
+#' 
+#' @param userObject The UserMetadata object
+#' @param annotationPath Absolute path to the transcriptome file
+#' @param annotationName (optional) Name of the trancriptome Will be used to 
+#' create folders. 
+#' 
+#' @details If no annotationNAme is provided the name of the annotation file 
+#' will be used to create folders. 
+#' 
+#' @return An object of the class UserMetadata
+#' 
+#' @exportMethod setTranscriptomeFromFile
+#' 
+#' @examples {
+#' library(AnnotationHub)
+#' ah <- AnnotationHub()
+#' ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
+#'       "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235"))
+#' user <- new("UserMetadata")
+#' user <- setTranscriptomeFromFile(user, ah_transcriptomes[["AH49057"]]$path,
+#'                                  "transcriptome_name")
+#' }
+#'
+setMethod(f="setTranscriptomeFromFile", 
+          signature=c(userObject = "UserMetadata", 
+                      transcriptomePath = "character", 
+                      transcriptomeName = "character"), 
+          definition=function(userObject, transcriptomePath, 
+                              transcriptomeName = "") {
+              if(typeof(transcriptomePath) == "character") {
+                  if(file.exists(transcriptomePath)) {
+                      userObject@transcriptome_object <- 
+                          readDNAStringSet(transcriptomePath)
+                  } else {
+                      stop(paste0("file ", transcriptomePath, 
+                                  " does not exist. Should be the full path to your 
+                            transcriptome file"))
+                  }
+              }
+              if (length(transcriptomeName) == 0) {
+                  userObject@transcriptome_name <- basename(transcriptomePath)
               } else {
-                  stop("Please provide an object imported using 
-                   rtracklayer::import()")
+                  userObject@transcriptome_name <- transcriptomeName
               }
               return(userObject)
           })
+
+
+setMethod(f="setAnnotationFromFile", 
+          signature=c(userObject = "UserMetadata", 
+                      annotationPath = "character", annotationName = "character"),
+          definition=function(userObject, annotationPath, annotationName = "") {
+              if(typeof(annotationPath) == "character") {
+                  if(file.exists(annotationPath)) {
+                      userObject@annotation_object <- rtracklayer::import(annotationPath)
+                  } else {
+                      stop(paste0("file ", annotationPath, " does not exist. 
+                                  Should be the full path to your annotation file"))
+                  }
+                  }
+              if (length(annotationName) == 0) {
+                  userObject@annotation_name <- basename(annotationPath)
+              } else {
+                  userObject@annotation_name <- annotationName
+              }
+              return(userObject)
+              })
 
 #' 
 #' @title Set transcriptome_object of one UserMetadata object
@@ -137,12 +263,6 @@ setMethod(f="setAnnotationFromObject",
 #' 
 #' @exportMethod setTranscriptomeFromObject
 #' 
-setGeneric("setTranscriptomeFromObject", function(userObject, 
-                                                  transcriptomeObject, 
-                                                  transcriptomeName) {
-    standardGeneric("setTranscriptomeFromObject")
-})
-
 setMethod(f="setTranscriptomeFromObject", 
           signature=c(userObject = "UserMetadata", 
                       transcriptomeObject = "DNAStringSet", 
@@ -154,21 +274,18 @@ setMethod(f="setTranscriptomeFromObject",
                   userObject@transcriptome_name <- transcriptomeName
               } else {
                   stop("Please provide an object imported using 
-                   rtracklayer::import()")
+                       rtracklayer::import()")
               }
               return(userObject)
-          })
-
+              })
 
 #' 
 #' @title Set annotation_object of one UserMetadata object
 #' 
 #' @description Method of the class UserMetadata. Set annotation_object of one 
-#' UserMetadata object 
-#' by providing the path to a gtf file.
-#' 
+#' UserMetadata object by using one GRanges object as input.
 #' @param userObject The UserMetadata object
-#' @param annotationPath Absolute path to the annotation file
+#' @param annotationObject object of thr GRanges S4 class
 #' @param annotationName (optional) Name of the annotation. Will be used to 
 #' create folders. 
 #' 
@@ -177,198 +294,19 @@ setMethod(f="setTranscriptomeFromObject",
 #' 
 #' @return An object of the class UserMetadata
 #' 
-#' @exportMethod setAnnotationFromFile
+#' @exportMethod setAnnotationFromObject
 #'
-setGeneric(name="setAnnotationFromFile", def=function(userObject, annotationPath) {
-    standardGeneric("setAnnotationFromFile")
-})
-setGeneric(name="setAnnotationFromFile", 
-           def=function(userObject, annotationPath, annotationName) {
-               standardGeneric("setAnnotationFromFile")
-           })
-
-
-setMethod(f="setAnnotationFromFile", 
-          signature=c(userObject = "UserMetadata", annotationPath = "character"),
-          definition=function(userObject, annotationPath) {
-              userObject <- setAnnotationFromFile(userObject, annotationPath, "")
-              return(userObject)
-          })
-
-setMethod(f="setAnnotationFromFile", 
+setMethod(f="setAnnotationFromObject", 
           signature=c(userObject = "UserMetadata", 
-                      annotationPath = "character", annotationName = "character"),
-          definition=function(userObject, annotationPath, annotationName = "") {
-              if(typeof(annotationPath) == "character") {
-                  if(file.exists(annotationPath)) {
-                      userObject@annotation_object <- rtracklayer::import(annotationPath)
-                  } else {
-                      stop(paste0("file ", annotationPath, " does not exist. 
-                            Should be the full path to your annotation file"))
-                  }
-              }
-              if (annotationName == "") {
-                  userObject@annotation_name <- basename(annotationPath)
-              } else {
+                      annotationObject = "GRanges", 
+                      annotationName = "character"),
+          definition=function(userObject, annotationObject, annotationName = "") {
+              if(typeof(annotationObject) == "S4") {
+                  userObject@annotation_object <- annotationObject
                   userObject@annotation_name <- annotationName
-              }
-              return(userObject)
-          })
-
-
-#' 
-#' @title Set transcriptome_object of one UserMetadata object
-#' 
-#' @description Method of the class UserMetadata. Set transcriptome_object of 
-#' one UserMetadata object 
-#' by providing the path to a fasta transcriptome file.
-#' 
-#' @param userObject The UserMetadata object
-#' @param annotationPath Absolute path to the transcriptome file
-#' @param annotationName (optional) Name of the trancriptome Will be used to 
-#' create folders. 
-#' 
-#' @details If no annotationNAme is provided the name of the annotation file 
-#' will be used to create folders. 
-#' 
-#' @return An object of the class UserMetadata
-#' 
-#' @exportMethod setTranscriptomeFromFile
-#' 
-#' @examples {
-#' library(AnnotationHub)
-#' ah <- AnnotationHub()
-#' ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
-#'       "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235"))
-#' user <- new("UserMetadata")
-#' user <- setTranscriptomeFromFile(user, ah_transcriptomes[["AH49057"]]$path,
-#'                                  "transcriptome_name")
-#' }
-#'
-setGeneric(name="setTranscriptomeFromFile", def=function(userObject, 
-                                                         transcriptomePath) {
-    standardGeneric("setTranscriptomeFromFile")
-})
-setGeneric(name="setTranscriptomeFromFile", def=function(userObject, 
-                                                         transcriptomePath, 
-                                                         transcriptomeName) {
-    standardGeneric("setTranscriptomeFromFile")
-})
-
-#' @title `working_path` Setter
-#' 
-#' @description Set value of the `working_path` slot
-#' 
-#' @param userObject The UserMetadata object
-#' @param workingPath path to the directory wanted as `working_path`
-#' 
-#' @return An object of the class UserMetadata with new `working_path`
-#'  value
-#' 
-#' @exportMethod setWorkingPath
-#' 
-#' @examples {
-#' user <- new("UserMetadata")
-#' user <- setWorkingPath(user, getwd())
-#' }
-#'
-setGeneric(name="setWorkingPath", def=function(userObject, 
-                                                         workingPath) {
-    standardGeneric("setWorkingPath")
-})
-
-#' @title `working_path` Getter
-#' 
-#' @description Get value of the `working_path` slot
-#' 
-#' @param userObject The UserMetadata object
-#' 
-#' @return the value of the `working_path` slot of the object
-#' 
-#' @exportMethod getWorkingPath
-#' 
-#' @examples {
-#' user <- new("UserMetadata")
-#' working_path <- getWorkingPath(user)
-#' }
-#'
-setGeneric(name="getWorkingPath", def=function(userObject) {
-    standardGeneric("getWorkingPath")
-})
-
-#' @title `rnaseq_lib_path` Setter
-#' 
-#' @description Set value of the `rnaseq_lib_path` slot
-#' 
-#' @param userObject The UserMetadata object
-#' @param rnaSeqLibPath path to the directory wanted as `rnaseq_lib_path`
-#' 
-#' @return An object of the class UserMetadata with new `rnaseq_lib_path`
-#'  value
-#' 
-#' @exportMethod setRNASeqLibPath
-#' 
-#' @examples {
-#' user <- new("UserMetadata")
-#' user <- setRNASeqLibPath(user, getwd())
-#' }
-#'
-setGeneric(name="setRNASeqLibPath", def=function(userObject, 
-                                                 rnaSeqLibPath) {
-    standardGeneric("setRNASeqLibPath")
-})
-
-setMethod(f="setWorkingPath", 
-          signature=c(userObject = "UserMetadata", 
-                      workingPath = "character"), 
-          definition=function(userObject, workingPath) {
-              userObject@working_path <- workingPath
-              return(userObject)
-          })
-
-setMethod(f="getWorkingPath", 
-          signature=c(userObject = "UserMetadata"), 
-          definition=function(userObject) {
-              return(userObject@working_path)
-          })
-
-setMethod(f="setRNASeqLibPath", 
-          signature=c(userObject = "UserMetadata", 
-                      rnaSeqLibPath = "character"), 
-          definition=function(userObject, rnaSeqLibPath) {
-              userObject@rnaseq_lib_path <- rnaSeqLibPath
-              return(userObject)
-          })
-
-setMethod(f="setTranscriptomeFromFile", 
-          signature=c(userObject = "UserMetadata", 
-                      transcriptomePath = "character"), 
-          definition=function(userObject, transcriptomePath) {
-              userObject <- setTranscriptomeFromFile(userObject, 
-                                                     transcriptomePath, "")
-              return(userObject)
-          })
-
-setMethod(f="setTranscriptomeFromFile", 
-          signature=c(userObject = "UserMetadata", 
-                      transcriptomePath = "character", 
-                      transcriptomeName = "character"), 
-          definition=function(userObject, transcriptomePath, 
-                              transcriptomeName = "") {
-              if(typeof(transcriptomePath) == "character") {
-                  if(file.exists(transcriptomePath)) {
-                      userObject@transcriptome_object <- 
-                          readDNAStringSet(transcriptomePath)
-                  } else {
-                      stop(paste0("file ", transcriptomePath, 
-                                  " does not exist. Should be the full path to your 
-                            transcriptome file"))
-                  }
-              }
-              if (length(transcriptomeName) == 0) {
-                  userObject@transcriptome_name <- basename(transcriptomePath)
               } else {
-                  userObject@transcriptome_name <- transcriptomeName
+                  stop("Please provide an object imported using 
+                       rtracklayer::import()")
               }
               return(userObject)
-          })
+              })

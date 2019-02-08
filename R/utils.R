@@ -37,6 +37,9 @@ get_os <- function(){
 #'
 #' @description helper function to get the path to the bgee release directory
 #' 
+#' @param myBgeeMetadata A Reference Class BgeeMetadata object.
+#' @param myUserMetadata A Reference Class UserMetadata object.
+#' 
 #' @return path to the file containing details about intergenic releases
 #'
 get_intergenic_release_path <- function(myBgeeMetadata, myUserMetadata) {
@@ -275,6 +278,8 @@ is_pair_end <- function(fastq_files) {
 #' Otherwise the name of the output directory will be the concatenation of the 
 #' name of the last directory of myUserMetadata@rnaseq_lib_path and all 
 #' myUserMetadata@run_ids
+#' 
+#' @param A Reference Class UserMetadata object.
 #' 
 #' @return Name of the output directory
 #'
