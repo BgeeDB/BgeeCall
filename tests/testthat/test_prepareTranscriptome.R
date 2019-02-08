@@ -9,7 +9,7 @@ test_that ("test merging of transcriptome and intergenic regions", {
   # query the annotation hub
   potential_datasets <- query(ah, c("FaFile","Ensembl", "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.cdna.all.fa"))
   # retrieve dataset locally and keep path to local file
-  user <- setTranscriptomeFromFile(user, potential_datasets[["AH49057"]]$path)
+  user <- setTranscriptomeFromFile(user, potential_datasets[["AH49057"]]$path, "")
   user@working_path <- getwd()
   merge_transcriptome_and_intergenic(kallisto, bgee, user)
   # test that no error is produced
