@@ -27,7 +27,7 @@ Otherwise keep abundance estimation at transcript level.
 }
 \examples{
 {
-kallisto <- New("KallistoMetadata")
+kallisto <- new("KallistoMetadata")
 user <- new("UserMetadata")
 bgee <- new("BgeeMetadata")
 abundance_file <- system.file("extdata", "abundance.tsv", package = "BgeeCall")

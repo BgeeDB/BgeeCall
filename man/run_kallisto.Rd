@@ -43,7 +43,7 @@ transcriptome_path <- ah_transcriptomes[["AH49057"]]$path
 # initialize objects needed to create destination folder
 bgee <- new("BgeeMetadata")
 user <- new("UserMetadata", species_id = "6239")
-user <- setRnaSeqPath(user, file.path(getWorkingPath(user), 
+user <- setRNASeqLibPath(user, file.path(getWorkingPath(user), 
                      "extdata", "SRX099901_subset"))
 kallisto <- new("KallistoMetadata")
 

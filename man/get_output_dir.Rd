@@ -7,7 +7,7 @@
 get_output_dir(myUserMetadata)
 }
 \arguments{
-\item{A}{Reference Class UserMetadata object.}
+\item{myUserMetadata}{Reference Class UserMetadata object.}
 }
 \value{
 Name of the output directory
