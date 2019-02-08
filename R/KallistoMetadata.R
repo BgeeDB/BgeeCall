@@ -77,11 +77,6 @@ KallistoMetadata <- setClass(
     contains="AbundanceMetadata"
 )
 
-setGeneric(
-    name="getKallistoPath" ,
-    def = function(myKallistoMetadata) {standardGeneric("getKallistoPath")}
-)
-
 #' @title Path to kallisto tool that have to be exectuted.
 #'
 #' @description This function retrieve the path to kallisto tool that have to be 
@@ -100,8 +95,17 @@ setGeneric(
 #' kallisto_exec <- getKallistoPath(myKallistoMetadata)
 #' }
 #' 
-#' @exportMethod getKallistoPath
+#' @export
+#' @docType methods
+#' @rdname getKallistoPath
 #'
+setGeneric(
+    name="getKallistoPath" ,
+    def = function(myKallistoMetadata) {standardGeneric("getKallistoPath")}
+)
+
+#' @rdname getKallistoPath
+#' @aliases getKallistoPath,kallistoMetadata
 setMethod(
     f ="getKallistoPath" ,
     signature ="KallistoMetadata" ,
