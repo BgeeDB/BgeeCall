@@ -4,19 +4,36 @@
 \alias{run_tximport}
 \title{Run tximport}
 \usage{
-run_tximport(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
+run_tximport(myAbundanceMetadata, myBgeeMetadata, myUserMetadata,
+  abundanceFile = NULL)
 }
 \arguments{
-\item{myAbundanceMetadata}{A descendant object of the Class myAbundanceMetadata.}
+\item{myAbundanceMetadata}{A descendant object of the Class 
+myAbundanceMetadata.}
 
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object.}
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
+
+\item{abundanceFile}{(Optional) Path to the abundance file. NULL by default.
+If not NULL, the file located at `abundanceFile` will be used to run tximport.
+Otherwise (Default) the path to the abundance file is deduced fom attributes of
+classes `BgeeMetadata`, `UserMetadata` and `AbundanceMetadata`}
 }
 \description{
 Run tximport. Will summarize abundance estimation from transcript 
 level to gene level if `myAbundanceMetadata@txout == FALSE`. 
 Otherwise keep abundance estimation at transcript level.
+}
+\examples{
+{
+kallisto <- New("KallistoMetadata")
+user <- new("UserMetadata")
+bgee <- new("BgeeMetadata")
+abundance_file <- system.file("extdata", "abundance.tsv", package = "BgeeCall")
+run_tximport(kallisto, bgee, user, abundance_file)
+}
+
 }
 \author{
 Julien Wollbrett

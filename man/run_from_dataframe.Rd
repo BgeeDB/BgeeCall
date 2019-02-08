@@ -12,10 +12,29 @@ run_from_dataframe(myAbundanceMetadata = new("KallistoMetadata"),
 
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object (optional)}
 
-\item{myUserMetadata}{A data frame containing all information needed to generate UserMetadata objects}
+\item{userMetadataDataFrame}{A data frame containing all information needed to 
+generate UserMetadata objects. This data frame must contains 7 columns (species_id, 
+run_ids, reads_size, rnaseq_lib_path, transcriptome_path, annotation_path, working_path)}
+}
+\value{
+paths to the 4 output files generated per call generation
 }
 \description{
-Main function allowing to generate present/absent calls for one library described in a data frame
+Main function allowing to generate present/absent calls for one 
+library described in a data frame
+}
+\examples{
+\dontrun{
+metadata_file <- system.file("userMetadataTemplate.tsv",
+                               package = "BgeeCall")
+user_metadata_df <- read.table(metadata_file, header = TRUE, sep = "\\t",
+                              comment.char = "#")
+run_from_dataframe(userMetadataDataFrame = metadata_file)
+}
+
+}
+\seealso{
+run_from_file()
 }
 \author{
 Julien Wollbrett

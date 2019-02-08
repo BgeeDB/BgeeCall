@@ -4,7 +4,8 @@
 \alias{run_kallisto}
 \title{Run one kallisto abundance analyse}
 \usage{
-run_kallisto(myKallistoMetadata, myBgeeMetadata, myUserMetadata)
+run_kallisto(myKallistoMetadata, myBgeeMetadata, myUserMetadata,
+  transcriptome_path = "")
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}
@@ -12,7 +13,14 @@ run_kallisto(myKallistoMetadata, myBgeeMetadata, myUserMetadata)
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object.}
 
 \item{myUserMetadata}{A Reference Class UserMetadata object. 
-This object has to be edited before running kallisto @seealso UserMetadata.R}
+This object has to be edited before running kallisto @seealso 
+UserMetadata.R}
+
+\item{transcriptome_path}{path to the transcriptome fasta file. 
+If no path is provided the default path created using BgeeCall
+will be used. IMPORTANT : in BgeeCall the transcriptome used
+to generate present/absent calls contains both intergenic sequences 
+downloaded from Bgee and the reference transcriptome.}
 }
 \description{
 Run kallisto and all preliminary steps if needed like :
@@ -20,6 +28,29 @@ Run kallisto and all preliminary steps if needed like :
 - installation of kallisto (if needed)
 - index creation (if needed)
 - run kallisto quantification
+}
+\examples{
+{
+# first a transcriptome is needed. Here it is downloaded from AnnotationHub
+library(AnnotationHub)
+ah <- AnnotationHub()
+ah_transcriptomes <- query(ah, c("FaFile","Ensembl", "Caenorhabditis elegans", 
+"Caenorhabditis_elegans.WBcel235"))
+
+# kallisto can not deal with S4 objects. Path to transcriptome file is required
+transcriptome_path <- ah_transcriptomes[["AH49057"]]$path
+
+# initialize objects needed to create destination folder
+bgee <- new("BgeeMetadata")
+user <- new("UserMetadata", species_id = "6239")
+user <- setRnaSeqPath(user, file.path(getWorkingPath(user), 
+                     "extdata", "SRX099901_subset"))
+kallisto <- new("KallistoMetadata")
+
+# generate transcriptome index
+run_kallisto(kallisto, bgee, user, transcriptome_path)
+}
+
 }
 \author{
 Julien Wollbrett.

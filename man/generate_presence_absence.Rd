@@ -14,6 +14,9 @@ generate_presence_absence(myAbundanceMetadata, myBgeeMetadata,
 
 \item{myUserMetadata}{A Class UserMetadata object.}
 }
+\value{
+path to the 4 output files
+}
 \description{
 Generate presence absence calls
 }

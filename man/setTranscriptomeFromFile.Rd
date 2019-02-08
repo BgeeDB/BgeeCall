@@ -11,15 +11,30 @@ setTranscriptomeFromFile(userObject, transcriptomePath, transcriptomeName)
 
 \item{annotationPath}{Absolute path to the transcriptome file}
 
-\item{annotationName}{(optional) Name of the trancriptome Will be used to create folders.}
+\item{annotationName}{(optional) Name of the trancriptome Will be used to 
+create folders.}
 }
 \value{
 An object of the class UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set transcriptome_object of one UserMetadata object 
+Method of the class UserMetadata. Set transcriptome_object of 
+one UserMetadata object 
 by providing the path to a fasta transcriptome file.
 }
 \details{
-If no annotationNAme is provided the name of the annotation file will be used to create folders.
+If no annotationNAme is provided the name of the annotation file 
+will be used to create folders.
+}
+\examples{
+{
+library(AnnotationHub)
+ah <- AnnotationHub()
+ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
+      "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235"))
+user <- new("UserMetadata")
+user <- setTranscriptomeFromFile(user, ah_transcriptomes[["AH49057"]]$path,
+                                 "transcriptome_name")
+}
+
 }

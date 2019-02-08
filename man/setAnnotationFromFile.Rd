@@ -11,15 +11,18 @@ setAnnotationFromFile(userObject, annotationPath, annotationName)
 
 \item{annotationPath}{Absolute path to the annotation file}
 
-\item{annotationName}{(optional) Name of the annotation. Will be used to create folders.}
+\item{annotationName}{(optional) Name of the annotation. Will be used to 
+create folders.}
 }
 \value{
 An object of the class UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set annotation_object of one UserMetadata object 
+Method of the class UserMetadata. Set annotation_object of one 
+UserMetadata object 
 by providing the path to a gtf file.
 }
 \details{
-If no annotationName is provided the name of the file is used to create folders.
+If no annotationName is provided the name of the file is used to 
+create folders.
 }

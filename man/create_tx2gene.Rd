@@ -7,11 +7,15 @@
 create_tx2gene(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
 }
 \arguments{
-\item{myAbundanceMetadata}{A descendant object of the Class myAbundanceMetadata.}
+\item{myAbundanceMetadata}{A descendant object of the Class 
+myAbundanceMetadata.}
 
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object.}
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
+}
+\value{
+path to the tx2gene file
 }
 \description{
 Create transcript to gene mapping file as used by tximport. 
