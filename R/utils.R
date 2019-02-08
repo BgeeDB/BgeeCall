@@ -279,7 +279,7 @@ is_pair_end <- function(fastq_files) {
 #' name of the last directory of myUserMetadata@rnaseq_lib_path and all 
 #' myUserMetadata@run_ids
 #' 
-#' @param A Reference Class UserMetadata object.
+#' @param myUserMetadata Reference Class UserMetadata object.
 #' 
 #' @return Name of the output directory
 #'
