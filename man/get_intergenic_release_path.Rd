@@ -6,6 +6,11 @@
 \usage{
 get_intergenic_release_path(myBgeeMetadata, myUserMetadata)
 }
+\arguments{
+\item{myBgeeMetadata}{A Reference Class BgeeMetadata object.}
+
+\item{myUserMetadata}{A Reference Class UserMetadata object.}
+}
 \value{
 path to the file containing details about intergenic releases
 }

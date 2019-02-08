@@ -267,6 +267,7 @@ is_kallisto_installed <- function(myKallistoMetadata) {
 #' version of kallisto.
 #'
 #' @param myKallistoMetadata A Reference Class KallistoMetadata object.
+#' @param myUserMetadata A Reference Class UserMetadata object.
 #'
 #' @author Julien Wollbrett.
 #' 
