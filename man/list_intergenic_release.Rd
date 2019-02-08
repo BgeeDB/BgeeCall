@@ -7,13 +7,16 @@
 list_intergenic_release(release = NULL)
 }
 \arguments{
-\item{release}{A character specifying a targeted release number (e.g., "14"). If not specified, all available releases are shown.}
+\item{release}{A character specifying a targeted release number (e.g., "14"). 
+If not specified, all available releases are shown.}
 }
 \value{
-A data frame with information on Bgee intergenic releases available to use with the BgeeCall package.
+A data frame with information on Bgee intergenic releases available to 
+use with the BgeeCall package.
 }
 \description{
-Returns information on available Bgee intergenic releases, the access URL for FTP, and the date of release
+Returns information on available Bgee intergenic releases, 
+the access URL for FTP, and the date of release
 }
 \examples{
 {

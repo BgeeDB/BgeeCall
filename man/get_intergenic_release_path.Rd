@@ -6,6 +6,9 @@
 \usage{
 get_intergenic_release_path(myBgeeMetadata, myUserMetadata)
 }
+\value{
+path to the file containing details about intergenic releases
+}
 \description{
 helper function to get the path to the bgee release directory
 }

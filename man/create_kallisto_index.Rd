@@ -4,7 +4,8 @@
 \alias{create_kallisto_index}
 \title{Create kallisto indexes.}
 \usage{
-create_kallisto_index(myKallistoMetadata, myBgeeMetadata, myUserMetadata)
+create_kallisto_index(myKallistoMetadata, myBgeeMetadata, myUserMetadata,
+  transcriptome_path = "")
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}
@@ -12,10 +13,41 @@ create_kallisto_index(myKallistoMetadata, myBgeeMetadata, myUserMetadata)
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object.}
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
+
+\item{transcriptome_path}{path to the transcriptome fasta file. 
+If no path is provided the default path created using BgeeCall
+will be used. IMPORTANT : in BgeeCall the transcriptome used
+to generate present/absent calls contains both intergenic sequences 
+downloaded from Bgee and the reference transcriptome.}
 }
 \description{
 This function creates kallisto indexes. 
-Two indexes are created. One with default kmer value and one with kmer size of 21nt.
+Two indexes can be created depending on the reads size (see 
+`AbundanceMetadata@read_size_kmer_threshold` and `UserMetadata@reads_size` 
+for more information). One with default kmer value (31 nt) and one with 
+kmer size of 21 nt. In order to generate.
+}
+\examples{
+{
+# first a transcriptome is needed. Here it is downloaded from AnnotationHub
+library(AnnotationHub)
+ah <- AnnotationHub()
+ah_transcriptomes <- query(ah, c("FaFile","Ensembl", "Caenorhabditis elegans", 
+"Caenorhabditis_elegans.WBcel235"))
+
+# kallisto can not deal with S4 objects. Path to transcriptome file is required
+transcriptome_path <- ah_transcriptomes[["AH49057"]]$path
+
+# initialize objects needed to create destination folder
+bgee <- new("BgeeMetadata")
+user <- new("UserMetadata", species_id = "6239")
+kallisto <- new("KallistoMetadata")
+
+# generate transcriptome index
+create_kallisto_index(kallisto, bgee, user, transcriptome_path)
+}
+
+
 }
 \author{
 Julien Wollbrett.

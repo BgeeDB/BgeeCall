@@ -11,15 +11,31 @@ setAnnotationFromObject(userObject, annotationObject, annotationName)
 
 \item{annotationObject}{Object of the GRanges S4 class}
 
-\item{annotationName}{Name of the annotation. Will be used to create annotation folders.}
+\item{annotationName}{Name of the annotation. Will be used to create 
+annotation folders.}
 }
 \value{
 an object of UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set annotation_object of one UserMetadata object 
+Method of the class UserMetadata. Set annotation_object of one 
+UserMetadata object 
 by using one GRanges object as input.
 }
 \details{
-GRanges object is used as input. The class GRanges comes from the rtacklayer package
+GRanges object is used as input. The class GRanges comes from the 
+rtacklayer package
+}
+\examples{
+{
+library(AnnotationHub)
+ah <- AnnotationHub()
+ah_annotations <- query(ah, c("GTF","Ensembl", 
+            "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.84"))
+user <- new("UserMetadata", species_id = "6239")
+user <- setAnnotationFromObject(user, 
+              ah_annotations[["AH50789"]],
+              "annotation_name")
+}
+
 }

@@ -12,18 +12,28 @@ list_bgee_species(release = NULL, ordering = NULL,
 In the form "Release.subrelease" or "Release_subrelease", 
 e.g., "14.0" or 14_0". If not specified, the latest release is used.}
 
-\item{ordering}{A numeric indicating the number of the column which should be used 
-to sort the data frame. Default NULL, returning unsorted data frame.}
+\item{ordering}{A numeric indicating the number of the column which should 
+be used to sort the data frame. Default NULL, returning unsorted data frame.}
 
-\item{allReleases}{A data frame with information on all releases. Avoid redownloading 
-this information if .getBgeeRelease() already called.}
+\item{allReleases}{A data frame with information on all releases. 
+Avoid redownloading this information if .getBgeeRelease() already called.}
 
-\item{removeFile}{Boolean indicating whether the downloaded file should be deleted.
-Default to TRUE.}
+\item{removeFile}{Boolean indicating whether the downloaded file should be 
+deleted. Default to TRUE.}
+}
+\value{
+information about species available in Bgee
 }
 \description{
-Call a webservice that returns all species present in Bgee. Retrieved 
-information are species ID, genus, species name, common name and presence absence 
-of datatypes in Bgee. This function call the `listBgeeSpecies()` function from the 
-BgeeDB R package
+Call a webservice that returns all species present in Bgee.
+Retrieved information are species ID, genus, species name, common name and 
+presence absence of datatypes in Bgee. This function call the 
+`listBgeeSpecies()` function from the BgeeDB R package
+}
+\examples{
+{
+list_bgee_species()
+list_bgee_species(release = "14")
+}
+
 }

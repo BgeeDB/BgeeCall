@@ -13,11 +13,32 @@ run_from_file(myAbundanceMetadata = new("KallistoMetadata"),
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object (optional)}
 
 \item{userMetadataFile}{A tsv file describing all user libraries for which 
-present/absent calls have to be generated}
+present/absent calls have to be generated. A template of this file named 
+`userMetadataTemplate.tsv` is available at the root of the `BgeeCall` package.
+It is a tabular separated value file containing 7 columns :
+- species_id : species ID
+- run_ids : (optional) only if you want to generate calls for a subpart of all runs 
+  of the library 
+- reads_size (optional) the size of the reads of the library (Default = 50)
+- rnaseq_lib_path : path to RNA-Seq library directory
+- transcriptome_path : path to transcriptome file
+- annotation_path : path to annotation file
+- working_path : root of the output directory}
+}
+\value{
+paths to the 4 output files generated per call generation
 }
 \description{
 Main function allowing to generate present/absent calls for some 
-libraries described in a file. Each line of the file describes one RNA-Seq library.
+libraries described in a file. Each line of the file describes one RNA-Seq 
+library.
+}
+\examples{
+\dontrun{
+metadata_file <- system.file("userMetadataTemplate.tsv", package = "BgeeCall")
+run_from_file(userMetadataFile = metadata_file)
+}
+
 }
 \author{
 Julien Wollbrett

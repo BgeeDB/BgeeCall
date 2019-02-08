@@ -10,7 +10,16 @@ download_kallisto(myKallistoMetadata, myUserMetadata)
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}
 }
 \description{
-Check your OS and download correct binary version of kallisto.
+Check your OS and download correct binary 
+version of kallisto.
+}
+\examples{
+{
+  kallisto <- new("KallistoMetadata")
+  user <- new("UserMetadata")
+  download_kallisto(kallisto, user)
+}
+
 }
 \author{
 Julien Wollbrett.

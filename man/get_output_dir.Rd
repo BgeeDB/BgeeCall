@@ -10,7 +10,11 @@ get_output_dir(myUserMetadata)
 Name of the output directory
 }
 \description{
-Retireve name of output directory depending on myUserMetadata@rnaseq_lib_path and myUserMetadata@run_ids
-if myUserMetadata@run_ids is empty then the output directory will correspond to name of the last directory of myUserMetadata@rnaseq_lib_path.
-Otherwise the name of the output directory will be the concatenation of the name of the last directory of myUserMetadata@rnaseq_lib_path and all myUserMetadata@run_ids
+Retireve name of output directory depending on 
+myUserMetadata@rnaseq_lib_path and myUserMetadata@run_ids
+if myUserMetadata@run_ids is empty then the output directory will correspond 
+to name of the last directory of myUserMetadata@rnaseq_lib_path.
+Otherwise the name of the output directory will be the concatenation of the 
+name of the last directory of myUserMetadata@rnaseq_lib_path and all 
+myUserMetadata@run_ids
 }

@@ -12,15 +12,31 @@ setTranscriptomeFromObject(userObject, transcriptomeObject,
 
 \item{transcriptomeObject}{Object of the DNAStringSet S4 class}
 
-\item{transcriptomeName}{Name of the transcriptome. Will be used to create transcriptome folders.}
+\item{transcriptomeName}{Name of the transcriptome. Will be used to create 
+transcriptome folders.}
 }
 \value{
 an object of UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set transcriptome_object of one UserMetadata object 
+Method of the class UserMetadata. Set transcriptome_object of 
+one UserMetadata object 
 by using one DNAStringSet object as input.
 }
 \details{
-Please use a DNAStringSet object as input. This class is defined in the Biostrings package
+Please use a DNAStringSet object as input. This class is defined 
+in the Biostrings package
+}
+\examples{
+{
+library(AnnotationHub)
+ah <- AnnotationHub()
+ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
+      "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235"))
+user <- new("UserMetadata")
+user <- setTranscriptomeFromObject(user, 
+                 readDNAStringSet(ah_transcriptomes[["AH49057"]]$path),
+                 "transcriptome_name")
+}
+
 }

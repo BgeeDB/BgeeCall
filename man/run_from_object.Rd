@@ -14,8 +14,36 @@ run_from_object(myAbundanceMetadata = new("KallistoMetadata"),
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
+\value{
+4 paths to results files
+}
 \description{
-Main function allowing to generate present/absent calls for one library described as a UserMetadata object
+Main function allowing to generate present/absent calls for one 
+library described as a UserMetadata object
+}
+\examples{
+{
+ah <- AnnotationHub()
+ah_annotations <- query(ah, c("GTF","Ensembl", 
+                             "Caenorhabditis elegans", 
+                             "Caenorhabditis_elegans.WBcel235.84"))
+annotation_object <- ah_annotations[["AH50789"]]
+ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
+                                "Caenorhabditis elegans", 
+                                "Caenorhabditis_elegans.WBcel235"))
+path_to_transcriptome <- ah_transcriptomes[["AH49057"]]$path
+user_BgeeCall <- new("UserMetadata", species_id = "6239")
+# import annotation and transcriptome in the user_BgeeCall object
+# it is possible to import them using an S4 object (GRanges, DNAStringSet) 
+# or a file (gtf, fasta)
+user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBcel235_84")
+user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
+# provide path to the directory of your RNA-Seq library
+user <- setRnaSeqPath(user, file.path(getWorkingPath(user), 
+                     "extdata", "SRX099901_subset"))
+calls_output <- run_from_object(myUserMetadata = user_BgeeCall)                                           
+}
+
 }
 \author{
 Julien Wollbrett
