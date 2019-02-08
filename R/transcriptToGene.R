@@ -14,9 +14,9 @@
 #' @noRd
 #' 
 #' @examples { 
-#'   user <- new("UserMetadata", species_id = "6239")
-#'   bgee <- new("BgeeMetadata", intergenic_release = "0.1")
-#'   intergenic_tx2gene(bgee, user)
+#' user <- new("UserMetadata", species_id = "6239")
+#' bgee <- new("BgeeMetadata", intergenic_release = "0.1")
+#' intergenic_tx2gene(bgee, user)
 #' }
 intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
     species_path <- get_species_path(myBgeeMetadata, myUserMetadata)
@@ -137,9 +137,15 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata, myUserMetadata) 
 #' @export
 #' 
 #' @examples {
-#' kallisto <- New("KallistoMetadata")
-#' user <- new("UserMetadata")
-#' bgee <- new("BgeeMetadata")
+#' ah <- AnnotationHub()
+#' ah_annotations <- query(ah, c("GTF","Ensembl", 
+#'                              "Caenorhabditis elegans", 
+#'                              "Caenorhabditis_elegans.WBcel235.84"))
+#' annotation_object <- ah_annotations[["AH50789"]]
+#' user <- new("UserMetadata", species_id = "6239")
+#' user <- setAnnotationFromObject(user, annotation_object, "WBcel235_84")
+#' bgee <- new("BgeeMetadata", intergenic_release = "0.1")
+#' kallisto <- new("KallistoMetadata")
 #' abundance_file <- system.file("extdata", "abundance.tsv", package = "BgeeCall")
 #' run_tximport(kallisto, bgee, user, abundance_file)
 #' }

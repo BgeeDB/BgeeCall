@@ -34,7 +34,7 @@
 #' user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBcel235_84")
 #' user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
 #' # provide path to the directory of your RNA-Seq library
-#' user <- setRnaSeqPath(user, file.path(getWorkingPath(user), 
+#' user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, file.path(getWorkingPath(user_BgeeCall), 
 #'                      "extdata", "SRX099901_subset"))
 #' calls_output <- run_from_object(myUserMetadata = user_BgeeCall)                                           
 #' }
@@ -111,10 +111,12 @@ run_from_dataframe <- function (myAbundanceMetadata = new("KallistoMetadata"),
         myUserMetadata <- setTranscriptomeFromFile(
             userObject = myUserMetadata, 
             transcriptomePath = as.character(
-                userMetadataDataFrame[["transcriptome_path"]][row_number]))
+                userMetadataDataFrame[["transcriptome_path"]][row_number]),
+            transcriptomeName = "")
         myUserMetadata <- setAnnotationFromFile(
             userObject = myUserMetadata, annotationPath = 
-                as.character(userMetadataDataFrame[["annotation_path"]][row_number]))
+                as.character(userMetadataDataFrame[["annotation_path"]][row_number]),
+            annotationName = "")
         myUserMetadata@working_path <- as.character(
             userMetadataDataFrame[["working_path"]][row_number])
         
