@@ -1,6 +1,3 @@
-# BgeeCall, an R package to automatically generate gene expression calls
-##### Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian
-
 `BgeeCall` is a collection of functions that uses [Bgee](https://bgee.org/) expertise to create gene expression present/absent calls
 
 The `BgeeCall` package allows to: 
@@ -64,8 +61,8 @@ For this vignette we created a toy fastq file example based on the SRX099901 lib
 
 ``` {r, eval=FALSE}
 library("ShortRead")
-# keep 52.000 reads
-sampler <- FastqSampler(file.path("absolute_path","/SRX099901/SRR350955.fastq.gz"), 52000)
+# keep 48.000 reads
+sampler <- FastqSampler(file.path("absolute_path","/SRX099901/SRR350955.fastq.gz"), 48000)
 set.seed(1); SRR350955 <- yield(sampler)
 writeFastq(object = SRR350955, file =file.path( "absolute_path","SRX099901_subset", "SRR350955_subset.fastq.gz"), mode = "w", full = FALSE, compress = TRUE)
 ```
@@ -82,16 +79,15 @@ path_to_transcriptome <- ah_transcriptomes[["AH49057"]]$path
 
 Once you have access to transcriptome, gene annotations and your RNA-Seq library, an object of class `UserMetadata` has to be created.
 ``` {r, message = FALSE, warning = FALSE}
-# create an object of class UserMetadata
-user_BgeeCall <- new("UserMetadata")
-# provide the NCBI Taxon ID of the species (C. elegans)
-user_BgeeCall@species_id <- "6239"
+# create an object of class UserMetadata and specify the species ID
+user_BgeeCall <- new("UserMetadata", species_id = "6239")
 # import annotation and transcriptome in the user_BgeeCall object
 # it is possible to import them using an S4 object (GRanges, DNAStringSet) or a file (gtf, fasta)
 user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBcel235_84")
 user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
 # provide path to the directory of your RNA-Seq library
-user_BgeeCall@rnaseq_lib_path <- system.file("extdata", "SRX099901_subset", package = "BgeeCall")
+user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
+                                  system.file("extdata", "SRX099901_subset", package = "BgeeCall"))
 ```
 
 And that's it... You can run the generation of your present/absent gene expression calls
@@ -112,6 +108,7 @@ read.table(calls_output$cutoff_info_file_path)
 ``` {r, message = FALSE, warning = FALSE}
 head.DataTable(x = read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
 calls_output$TPM_distribution_path
+calls_output$abundance_tsv
 ```
 * TPM_distribution_path : path to plot in pdf reprensting density distribution of TPM values for all sequences, protein coding sequences, and intergenic sequences. The grey line corresponds to TPM threshold used to generate present/absent calls.
 ``` {r, eval = FALSE}
@@ -137,14 +134,33 @@ Once the file has been fill in expression calls can be generated with :
 run_from_file(userMetadataFile = "path_to_your_file.tsv")
 ```
 
+### list species available on Bgee
+
+BgeeCall allows to generate gene expression call for any RNA-Seq libraries as long as the species is present in Bgee. To see all species in the last version of Bgee run :
+
+```{r}
+list_bgee_species()
+```
+
+### list reference intergenic releases
+
+Different releases of Bgee reference intergenic sequences are available. It is possible to list all these releases :
+```{r}
+list_intergenic_release()
+```
+It is then possible to choose one specific release to create a `BgeeMetadata` object.
+```{r}
+bgee <- new("BgeeMetadata", intergenic_release = "0.1")
+```
+By default the intergenic used when a `BgeeMetadata`object is created is the last created one.
+
 ### <a name="transcript_level"></a>Generate present/absent calls at transcript level (beta version)
 
 kallisto generates TPMs at the transcript level. In the Bgee pipeline we summarize this expression at the gene level to calculate our present/absent calls.
 In `BgeeCall` it is now possible to generate present/absent calls at the transcript level. Be careful when using this feature as it has not been tested for the moment.
 To generate such calls you only have to create one object of the class `KallistoMetadata` and edit the value of one attribute
 ``` {r, eval=FALSE}
-kallisto <- new("KallistoMetadata")
-kallisto@txOut <- TRUE
+kallisto <- new("KallistoMetadata", txOut = TRUE)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
 
@@ -155,8 +171,7 @@ By default `BgeeCall` will download the version 0.45 of kallisto and will use it
 However, You can use a version already installed on your conputer or your cluster. It can be useful if you prefer to use an older version of kallisto.
 To do that, you only have to create one object of the class `KallistoMetadata` and edit the value of one attribute
 ``` {r, eval=FALSE}
-kallisto <- new("KallistoMetadata")
-kallisto@download_kallisto <- FALSE
+kallisto <- new("KallistoMetadata", download_kallisto = FALSE)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
 
@@ -167,10 +182,8 @@ By default kallisto is run with the same parameters that we use in the RNA-Seq B
 * paired end : "-t 1 --bias"
 
 It is possible to modify them and use your favourite kallisto parameters
-``` {r, eval=FALSE}
-kallisto <- new("KallistoMetadata")
-kallisto@single_end_parameters <- "-t 3 --single-overhang -l 150 -s 30"
-kallisto@pair_end_parameters <- "-t 2 -b --seed 36"
+``` {r, message = FALSE, warning = FALSE}
+kallisto <- new("KallistoMetadata", single_end_parameters = "-t 3 --single -l 150 -s 30", pair_end_parameters = "-t 2 -b --seed 36")
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
 
@@ -180,32 +193,39 @@ The default kmer size of kallisto (31) is used for libraries with reads length e
 A kmer size of 21 is used for libraries with reads length smaller than 50 nt.
 We decided not to allow to tune kmers size because the generation of the index is time consuming and index generation takes even more time with small kmers size (< 21 nt). However it is possible to modify the threshold of read length allowing to choose between default and small kmer size.
 
-``` {r, eval=FALSE}
-kallisto <- new("KallistoMetadata")
+``` {r, message = FALSE, warning = FALSE}
 # libraries with reads smaller than 70nt will use the index with kmer size = 21
-kallisto@read_size_kmer_threshold <- 70
+kallisto <- new("KallistoMetadata", read_size_kmer_threshold = 70)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
 
 ### <a name="run_ids"></a>Generate calls for a subset of RNA-Seq runs
 By default gene expression calls are generated using all runs of the RNA-Seq library. It is possible to select only a subset of these runs.
-``` {r, eval=FALSE}
-user_BgeeCall <- new("UserMetadata")
-# Runs SRR1 and SRR2 of the RNA-Seq library will be used to generate the calls
-user_BgeeCall@run_ids <- c("SRR1", "SRR2")
+``` {r}
+# RNA-Seq run SRR350955_subsetof from the RNA-Seq library will be used to generate the calls
+user_BgeeCall@run_ids <- c("SRR350955_subset")
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 When run IDs are selected, the name output directory combine the library ID and all selected run IDs. In our example the expression calls will be stored in the directory `SRX099901_SRR1_SRR2`.
 
+### Modify present/absent threshold
+
+By default the threshold of present/absent is calculated with the formula :
+
+    proportion of ref intergenic present / proportion of protein coding present = 0.05
+
+This 0.05 corresponds to the ratio used in the Bgee pipeline. However it is possible to edit this value. Be careful when editing this value as it has a big impact on your present absent.
+
+```{r}
+kallisto <- new("KallistoMetadata", cutoff = 0.1)
+```
 
 ### Generate calls with a simple arborescence of directories
 By default the arborescence of directories created by `BgeeCall` is complex. This complexity allows to generate gene expression calls for the same RNA-Seq library using different transcriptomes or gene annotations.
 The `UserMetadata` class has an attribute allowing to simplify this arborescence and store the result of all libraries in the same directory.
 ``` {r, eval=FALSE}
-user_BgeeCall <- new("UserMetadata")
-# Runs SRR1 and SRR2 of the RNA-Seq library will be used to generate the calls
+user_BgeeCall@run_ids <- ""
 user_BgeeCall@simple_arborescence <- TRUE
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 Be careful when you use this option. If you run different analysis for the same RNA-Seq library the results will be overwritten.
-
