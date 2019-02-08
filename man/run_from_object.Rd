@@ -23,6 +23,7 @@ library described as a UserMetadata object
 }
 \examples{
 {
+library(AnnotationHub)
 ah <- AnnotationHub()
 ah_annotations <- query(ah, c("GTF","Ensembl", 
                              "Caenorhabditis elegans", 
