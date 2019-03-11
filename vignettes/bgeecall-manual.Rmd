@@ -47,9 +47,9 @@ The present/absent abundance threshold is calculated for each library using the 
 ## Installation
 In R:
 ``` {r, message = FALSE, warning = FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("BgeeCall", version = "3.8")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("BgeeCall")
 ```
 
 ## How to use the BgeeCall package
@@ -133,7 +133,7 @@ calls_output$abundance_tsv
 openPDF(calls_output$TPM_distribution_path)
 ```
 
-```{r, out.width= "85%", echo = FALSE, eval = FALSE}
+```{r, out.width= "85%", echo = FALSE}
 knitr::include_graphics(calls_output$TPM_distribution_path)
 ```
 
