@@ -47,9 +47,9 @@ The present/absent abundance threshold is calculated for each library using the 
 ## Installation
 In R:
 ``` {r, message = FALSE, warning = FALSE}
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#BiocManager::install("BgeeCall")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("BgeeCall", version = "3.9")
 ```
 
 ## How to use the BgeeCall package
@@ -87,6 +87,7 @@ writeFastq(object = SRR350955, file =file.path( "absolute_path","SRX099901_subse
 
 In this example we used the Bioconductor AnnotationHub to load transcriptome and gene annotations but you can load them from wherever you want.
 ``` {r, message = FALSE, warning = FALSE}
+BiocManager::install("AnnotationHub")
 library(AnnotationHub)
 ah <- AnnotationHub()
 ah_annotations <- query(ah, c("GTF","Ensembl", "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.84"))
