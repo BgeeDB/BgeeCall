@@ -87,7 +87,7 @@ writeFastq(object = SRR350955, file =file.path( "absolute_path","SRX099901_subse
 
 In this example we used the Bioconductor AnnotationHub to load transcriptome and gene annotations but you can load them from wherever you want.
 ``` {r, message = FALSE, warning = FALSE}
-BiocManager::install("AnnotationHub")
+BiocManager::install("AnnotationHub", version = "3.8")
 library(AnnotationHub)
 ah <- AnnotationHub()
 ah_annotations <- query(ah, c("GTF","Ensembl", "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.84"))
