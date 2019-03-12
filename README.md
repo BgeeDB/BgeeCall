@@ -31,7 +31,7 @@ In R:
 ``` {r, message = FALSE, warning = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("BgeeCall", version = "3.8")
+BiocManager::install("BgeeCall", version = "3.9")
 ```
 
 ## How to use the BgeeCall package
