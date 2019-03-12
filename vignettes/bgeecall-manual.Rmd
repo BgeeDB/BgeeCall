@@ -106,7 +106,9 @@ user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBce
 user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
 # provide path to the directory of your RNA-Seq library
 user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
-                                  system.file("extdata", "SRX099901_subset", package = "BgeeCall"))
+                                  system.file("extdata", 
+                                              "SRX099901_subset", 
+                                              package = "BgeeCall"))
 ```
 
 And that's it... You can run the generation of your present/absent gene expression calls
@@ -134,7 +136,7 @@ calls_output$abundance_tsv
 openPDF(calls_output$TPM_distribution_path)
 ```
 
-```{r, out.width= "85%", echo = FALSE}
+```{r}
 knitr::include_graphics(calls_output$TPM_distribution_path)
 ```
 

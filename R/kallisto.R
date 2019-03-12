@@ -143,8 +143,8 @@ for species ", myUserMetadata@species_id, ".\n"))
 #' # initialize objects needed to create destination folder
 #' bgee <- new("BgeeMetadata")
 #' user <- new("UserMetadata", species_id = "6239")
-#' user <- setRNASeqLibPath(user, file.path(getWorkingPath(user), 
-#'                      "extdata", "SRX099901_subset"))
+#' user <- setRNASeqLibPath(user, system.file( 
+#'                      "extdata", "SRX099901_subset", package = "BgeeCall"))
 #' kallisto <- new("KallistoMetadata")
 #' 
 #' # generate transcriptome index

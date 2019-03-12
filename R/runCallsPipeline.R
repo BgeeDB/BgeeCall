@@ -39,8 +39,7 @@
 #'                                           "WBcel235")
 #' # provide path to the directory of your RNA-Seq library
 #' user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
-#'                  file.path(getWorkingPath(user_BgeeCall), 
-#'                      "extdata", "SRX099901_subset"))
+#'                  system.file("extdata", "SRX099901_subset", package = "BgeeCall"))
 #' calls_output <- run_from_object(
 #'              myUserMetadata = user_BgeeCall)                                           
 #' }
