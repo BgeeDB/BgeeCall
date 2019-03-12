@@ -259,7 +259,8 @@ setGeneric(name="setRNASeqLibPath",
     standardGeneric("setRNASeqLibPath")
 })
 
-
+#' @rdname setWorkingPath
+#' @aliases setWorkingPath,userMetadata,character
 setMethod(f="setWorkingPath",
           signature=c(userObject = "UserMetadata", 
                       workingPath = "character"), 
