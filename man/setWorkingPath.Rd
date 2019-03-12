@@ -3,9 +3,13 @@
 \docType{methods}
 \name{setWorkingPath}
 \alias{setWorkingPath}
+\alias{setWorkingPath,UserMetadata,character-method}
+\alias{setWorkingPath,userMetadata,character}
 \title{`working_path` Setter}
 \usage{
 setWorkingPath(userObject, workingPath)
+
+\S4method{setWorkingPath}{UserMetadata,character}(userObject, workingPath)
 }
 \arguments{
 \item{userObject}{The UserMetadata object}

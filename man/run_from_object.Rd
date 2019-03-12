@@ -37,12 +37,18 @@ user_BgeeCall <- new("UserMetadata", species_id = "6239")
 # import annotation and transcriptome in the user_BgeeCall object
 # it is possible to import them using an S4 object (GRanges, DNAStringSet) 
 # or a file (gtf, fasta)
-user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, annotation_object, "WBcel235_84")
-user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, path_to_transcriptome, "WBcel235")
+user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, 
+                                         annotation_object, 
+                                         "WBcel235_84")
+user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, 
+                                          path_to_transcriptome, 
+                                          "WBcel235")
 # provide path to the directory of your RNA-Seq library
-user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, file.path(getWorkingPath(user_BgeeCall), 
-                     "inst", "extdata", "SRX099901_subset"))
-calls_output <- run_from_object(myUserMetadata = user_BgeeCall)                                           
+user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
+                 file.path(getWorkingPath(user_BgeeCall), 
+                     "extdata", "SRX099901_subset"))
+calls_output <- run_from_object(
+             myUserMetadata = user_BgeeCall)                                           
 }
 
 }
