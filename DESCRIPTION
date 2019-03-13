@@ -1,12 +1,12 @@
 Package: BgeeCall
 Type: Package
 Title: BgeeCall, a R package for automatic gene expression calls generation
-Version: 0.99.1
+Version: 0.99.2
 Date: 2019-03
 Author: Julien Wollbrett [aut, cre], Julien Roux [aut, cre], Sara Fonseca Costa[ctb], Frederic Bastien [aut]
 Maintainer: Julien Wollbrett <bgee@sib.swiss>
 Description: A package using expertise of Bgee to generate present/absent RNA-Seq expression calls from your own RNA-Seq libraries as long as the species is present in Bgee.
-Depends: R (>= 3.6.0)
+Depends: R (>= 3.5.0)
 Imports: GenomicFeatures, rhdf5, tximport, Biostrings, rtracklayer, BgeeDB, biomaRt, methods
 License: GPL-3
 URL: https://github.com/BgeeDB/BgeeCall
