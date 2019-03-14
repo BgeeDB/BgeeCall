@@ -133,8 +133,8 @@ calls_output$abundance_tsv
 openPDF(calls_output$TPM_distribution_path)
 ```
 
-```{r}
-knitr::include_graphics(calls_output$TPM_distribution_path)
+```{r, include = FALSE}
+#knitr::include_graphics(calls_output$TPM_distribution_path)
 ```
 
 ###  Generate present/absent calls for more than one RNA-Seq library
@@ -225,10 +225,11 @@ calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata =
 By default gene expression calls are generated using all runs of the RNA-Seq library. It is possible to select only a subset of these runs.
 ``` {r}
 # RNA-Seq run SRR350955_subsetof from the RNA-Seq library will be used to generate the calls
+cat("subset")
 user_BgeeCall@run_ids <- c("SRR350955_subset")
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
-When run IDs are selected, the name output directory combine the library ID and all selected run IDs. In our example the expression calls will be stored in the directory `SRX099901_SRR1_SRR2`.
+When run IDs are selected, the name output directory combine the library ID and all selected run IDs. In our example the expression calls will be stored in the directory `SRX099901_SRR350955_subset`.
 
 ### Modify present/absent threshold
 
@@ -246,6 +247,7 @@ kallisto <- new("KallistoMetadata", cutoff = 0.1)
 By default the arborescence of directories created by `BgeeCall` is complex. This complexity allows to generate gene expression calls for the same RNA-Seq library using different transcriptomes or gene annotations.
 The `UserMetadata` class has an attribute allowing to simplify this arborescence and store the result of all libraries in the same directory.
 ``` {r, eval=FALSE}
+cat("simple arborescence")
 user_BgeeCall@run_ids <- ""
 user_BgeeCall@simple_arborescence <- TRUE
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
@@ -253,6 +255,7 @@ calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 Be careful when you use this option. If you run different analysis for the same RNA-Seq library the results will be overwritten.
 
 ``` {r, echo=FALSE, message=FALSE, warning=FALSE}
+cat("unlink")
 unlink(kallisto@kallisto_dir, recursive = TRUE)
 unlink(file.path(user_BgeeCall@working_path, paste0(bgee@intergenic_prefix, "*")), recursive = TRUE)
 ```
