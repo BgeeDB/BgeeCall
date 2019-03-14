@@ -18,7 +18,9 @@ create_kallisto_index(myKallistoMetadata, myBgeeMetadata, myUserMetadata,
 If no path is provided the default path created using BgeeCall
 will be used. IMPORTANT : in BgeeCall the transcriptome used
 to generate present/absent calls contains both intergenic sequences 
-downloaded from Bgee and the reference transcriptome.}
+downloaded from Bgee and the reference transcriptome. If this 
+function is run to generate present/absent then 'transcriptome_path' 
+has to be empty}
 }
 \description{
 This function creates kallisto indexes. 
@@ -32,11 +34,15 @@ kmer size of 21 nt. In order to generate.
 # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_transcriptomes <- query(ah, c("FaFile","Ensembl", "Caenorhabditis elegans", 
-"Caenorhabditis_elegans.WBcel235"))
+ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 
-# kallisto can not deal with S4 objects. Path to transcriptome file is required
-transcriptome_path <- ah_transcriptomes[["AH49057"]]$path
+# kallisto can not deal with S4 objects. A Path to a transcriptome file is 
+required
+transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
+transcriptome_path <- file.path(getwd(),"transcriptome.fa")
+writeXStringSet(transcriptome_object, transcriptome_path)
+
+
 
 # initialize objects needed to create destination folder
 bgee <- new("BgeeMetadata")

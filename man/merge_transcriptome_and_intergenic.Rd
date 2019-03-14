@@ -28,9 +28,9 @@ kallisto <- new("KallistoMetadata")
 # load transcriptome from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_transcriptomes <- query(ah, c("FaFile","Ensembl", "Caenorhabditis elegans", 
-                                "Caenorhabditis_elegans.WBcel235"))
-user <- setTranscriptomeFromFile(user, ah_transcriptomes[["AH49057"]]$path,
+ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
+user <- setTranscriptomeFromObject(user, transcriptome_object,
                                 "WBcel235")
 merge_transcriptome_and_intergenic(kallisto, bgee, user)
 }
