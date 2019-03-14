@@ -138,10 +138,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata, myUserMetadata) 
 #' 
 #' @examples {
 #' ah <- AnnotationHub()
-#' ah_annotations <- query(ah, c("GTF","Ensembl", 
-#'                              "Caenorhabditis elegans", 
-#'                              "Caenorhabditis_elegans.WBcel235.84"))
-#' annotation_object <- ah_annotations[["AH50789"]]
+#' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+#' annotation_object <- ah_resources[["AH50789"]]
 #' user <- new("UserMetadata", species_id = "6239")
 #' user <- setAnnotationFromObject(user, annotation_object, "WBcel235_84")
 #' bgee <- new("BgeeMetadata", intergenic_release = "0.1")

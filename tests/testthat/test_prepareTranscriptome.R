@@ -7,9 +7,10 @@ test_that ("test merging of transcriptome and intergenic regions", {
   user@species_id <- "6239" # C. elegans
   ah = AnnotationHub()
   # query the annotation hub
-  potential_datasets <- query(ah, c("FaFile","Ensembl", "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.cdna.all.fa"))
+  ah_resources <- AnnotationHub::query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+  transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
   # retrieve dataset locally and keep path to local file
-  user <- setTranscriptomeFromFile(user, potential_datasets[["AH49057"]]$path, "")
+  user <- setTranscriptomeFromObject(user, transcriptome_object, "WBcel235")
   user@working_path <- getwd()
   merge_transcriptome_and_intergenic(kallisto, bgee, user)
   # test that no error is produced
