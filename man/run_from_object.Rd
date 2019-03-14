@@ -25,28 +25,23 @@ library described as a UserMetadata object
 {
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_annotations <- query(ah, c("GTF","Ensembl", 
-                             "Caenorhabditis elegans", 
-                             "Caenorhabditis_elegans.WBcel235.84"))
-annotation_object <- ah_annotations[["AH50789"]]
-ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
-                                "Caenorhabditis elegans", 
-                                "Caenorhabditis_elegans.WBcel235"))
-path_to_transcriptome <- ah_transcriptomes[["AH49057"]]$path
+ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+annotation_object <- ah_resources[["AH50789"]]
+transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 user_BgeeCall <- new("UserMetadata", species_id = "6239")
 # import annotation and transcriptome in the user_BgeeCall object
 # it is possible to import them using an S4 object (GRanges, DNAStringSet) 
-# or a file (gtf, fasta)
+# or a file (gtf, fasta) with methods setAnnotationFromFile() and
+# setTranscriptomeFromFile()
 user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, 
                                          annotation_object, 
                                          "WBcel235_84")
-user_BgeeCall <- setTranscriptomeFromFile(user_BgeeCall, 
-                                          path_to_transcriptome, 
+user_BgeeCall <- setTranscriptomeFromObject(user_BgeeCall, 
+                                          transcriptome_object, 
                                           "WBcel235")
 # provide path to the directory of your RNA-Seq library
 user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
-                 file.path(getWorkingPath(user_BgeeCall), 
-                     "extdata", "SRX099901_subset"))
+                 system.file("extdata", "SRX099901_subset", package = "BgeeCall"))
 calls_output <- run_from_object(
              myUserMetadata = user_BgeeCall)                                           
 }
