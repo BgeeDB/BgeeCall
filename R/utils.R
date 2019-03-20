@@ -308,7 +308,8 @@ get_output_dir <- function(myUserMetadata) {
 #' @return path to kallisto dir
 #'
 #' @noMd
-#'
+#' @noRd
+#' 
 get_kallisto_dir_path <- function(myAbundanceMetadata, myUserMetadata) {
     os_version <- get_os()
     kallisto_dir <- 
@@ -340,6 +341,7 @@ get_kallisto_dir_path <- function(myAbundanceMetadata, myUserMetadata) {
 #' @return path to kallisto program
 #'
 #' @noMd
+#' @noRd
 #'
 get_kallisto_program_path <- function(myAbundanceMetadata, myUserMetadata) {
     os_version <- get_os()

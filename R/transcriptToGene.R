@@ -79,7 +79,8 @@ create_TxDb <- function(myAbundanceMetadata, myUserMetadata) {
 #'
 #' @author Julien Wollbrett
 #'
-#' @export
+#' @noMd
+#' @noRd
 #' 
 #' @return path to the tx2gene file
 #'
