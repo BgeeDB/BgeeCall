@@ -24,3 +24,11 @@ import(GenomicFeatures)
 import(rhdf5)
 import(rtracklayer)
 import(tximport)
+importFrom("grDevices", "dev.off", "pdf")
+importFrom("graphics", "arrows", "axis", "legend", "lines", "par",
+           "plot")
+importFrom("methods", "callNextMethod", "is", "new")
+importFrom("stats", "density", "na.omit")
+importFrom("utils", "compareVersion", "download.file",
+          "packageVersion", "read.table", "untar", "unzip",
+          "write.table")

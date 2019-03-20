@@ -192,6 +192,7 @@ To do that, you only have to create one object of the class `KallistoMetadata` a
 kallisto <- new("KallistoMetadata", download_kallisto = FALSE)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
+To download and install kallisto please follow the instructions here : http://pachterlab.github.io/kallisto/download
 
 #### Edit kallisto quant attributes
 By default kallisto is run with the same parameters that we use in the RNA-Seq Bgee pipeline:

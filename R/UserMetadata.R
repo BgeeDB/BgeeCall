@@ -70,7 +70,7 @@ UserMetadata <- setClass(
 #' 
 #' @return An object of the class UserMetadata
 #' 
-#' #' @examples {
+#' @examples {
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()
 #' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
