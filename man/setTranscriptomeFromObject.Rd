@@ -38,11 +38,10 @@ in the Biostrings package
 {
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
-      "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235"))
+ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 user <- new("UserMetadata")
 user <- setTranscriptomeFromObject(user, 
-                 readDNAStringSet(ah_transcriptomes[["AH49057"]]$path),
+                 rtracklayer::import.2bit(ah_resources[["AH50453"]]),
                  "transcriptome_name")
 }
 

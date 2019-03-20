@@ -5,7 +5,7 @@
 \title{Run tximport}
 \usage{
 run_tximport(myAbundanceMetadata, myBgeeMetadata, myUserMetadata,
-  abundanceFile = NULL)
+  abundanceFile = "")
 }
 \arguments{
 \item{myAbundanceMetadata}{A descendant object of the Class 
@@ -27,15 +27,20 @@ Otherwise keep abundance estimation at transcript level.
 }
 \examples{
 {
+library(AnnotationHub)
 ah <- AnnotationHub()
 ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 annotation_object <- ah_resources[["AH50789"]]
 user <- new("UserMetadata", species_id = "6239")
 user <- setAnnotationFromObject(user, annotation_object, "WBcel235_84")
+user <- setRNASeqLibPath(user, 
+                        system.file("extdata", 
+                        "SRX099901_subset", 
+                        package = "BgeeCall"))
 bgee <- new("BgeeMetadata", intergenic_release = "0.1")
 kallisto <- new("KallistoMetadata")
 abundance_file <- system.file("extdata", "abundance.tsv", package = "BgeeCall")
-run_tximport(kallisto, bgee, user, abundance_file)
+tx_import <- run_tximport(kallisto, bgee, user, abundance_file)
 }
 
 }
