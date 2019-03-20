@@ -249,6 +249,6 @@ calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 Be careful when you use this option. If you run different analysis for the same RNA-Seq library the results will be overwritten.
 
 ``` {r, echo=FALSE, message=FALSE, warning=FALSE}
-unlink(kallisto@kallisto_dir, recursive = TRUE)
+unlink(BgeeCall:::get_kallisto_dir_path(kallisto, user_BgeeCall), recursive = TRUE)
 unlink(file.path(user_BgeeCall@working_path, paste0(bgee@intergenic_prefix, "*")), recursive = TRUE)
 ```
