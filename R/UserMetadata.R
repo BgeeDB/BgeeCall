@@ -70,10 +70,19 @@ UserMetadata <- setClass(
 #' 
 #' @return An object of the class UserMetadata
 #' 
+#' #' @examples {
+#' library(AnnotationHub)
+#' ah <- AnnotationHub()
+#' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+#' user <- new("UserMetadata")
+#' user <- setAnnotationFromObject(user, ah_resources[["AH50789"]],
+#'                                  "annotation_name")
+#' }
+#' 
 #' @export
 #' @docType methods
 #' @rdname setAnnotationFromObject
-#'
+#' 
 setGeneric("setAnnotationFromObject", 
            function(userObject, annotationObject, 
                     annotationName) {
@@ -100,11 +109,10 @@ setGeneric("setAnnotationFromObject",
 #' @examples {
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()
-#' ah_transcriptomes <- query(ah, c("FaFile","Ensembl", 
-#'       "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235"))
+#' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 #' user <- new("UserMetadata")
 #' user <- setTranscriptomeFromObject(user, 
-#'                  readDNAStringSet(ah_transcriptomes[["AH49057"]]$path),
+#'                  rtracklayer::import.2bit(ah_resources[["AH50453"]]),
 #'                  "transcriptome_name")
 #' }
 #' 
@@ -139,14 +147,11 @@ setGeneric("setTranscriptomeFromObject", function(userObject,
 #' @rdname setAnnotationFromFile
 #' 
 #' @examples {
-#' library(AnnotationHub)
-#' ah <- AnnotationHub()
-#' ah_annotation <- query(ah, c("GTF","Ensembl", 
-#'                              "Caenorhabditis elegans", 
-#'                              "Caenorhabditis_elegans.WBcel235.84"))
+#' # path to gtf annotation file
+#' annotation_file <- system.file("extdata", "annotation.gtf", package = "BgeeCall")
 #' user <- new("UserMetadata")
-#' user <- setAnnotationFromFile(user, ah_annotation[["AH50789"]]$path,
-#'                                  "annotation_name")
+#' user <- setAnnotationFromFile(user, annotation_file,
+#'                              "annotation_name")
 #' }
 #'
 setGeneric(name="setAnnotationFromFile", 
@@ -179,10 +184,9 @@ setGeneric(name="setAnnotationFromFile",
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()
 #' ah_resources <- AnnotationHub::query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-#' annotation_object <- ah_resources[["AH50789"]]
 #' transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 #' transcriptome_path <- file.path(getwd(), "transcriptome.fa")
-#' writeXStringSet(transcriptome_object, transcriptome_path)
+#' Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 #' user <- new("UserMetadata")
 #' user <- setTranscriptomeFromFile(user, transcriptome_path,
 #'                                  "transcriptome_name")

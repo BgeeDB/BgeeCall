@@ -137,25 +137,33 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata, myUserMetadata) 
 #' @export
 #' 
 #' @examples {
+#' library(AnnotationHub)
 #' ah <- AnnotationHub()
 #' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 #' annotation_object <- ah_resources[["AH50789"]]
 #' user <- new("UserMetadata", species_id = "6239")
 #' user <- setAnnotationFromObject(user, annotation_object, "WBcel235_84")
+#' user <- setRNASeqLibPath(user, 
+#'                         system.file("extdata", 
+#'                         "SRX099901_subset", 
+#'                         package = "BgeeCall"))
 #' bgee <- new("BgeeMetadata", intergenic_release = "0.1")
 #' kallisto <- new("KallistoMetadata")
 #' abundance_file <- system.file("extdata", "abundance.tsv", package = "BgeeCall")
-#' run_tximport(kallisto, bgee, user, abundance_file)
+#' tx_import <- run_tximport(kallisto, bgee, user, abundance_file)
 #' }
 #'
 run_tximport <- function (myAbundanceMetadata, myBgeeMetadata, myUserMetadata,
-                          abundanceFile = NULL) {
+                          abundanceFile = "") {
     tx2gene_path <- create_tx2gene(myAbundanceMetadata, myBgeeMetadata, 
                                    myUserMetadata)
     tx2gene <- read.table(tx2gene_path,header = TRUE, sep = "\t")
     output_path <- get_tool_output_path(myAbundanceMetadata, myBgeeMetadata, 
                                         myUserMetadata)
-    abundance_file <- file.path(output_path, myAbundanceMetadata@abundance_file)
+    abundance_file <- abundanceFile
+    if( nchar(abundance_file) == 0) {
+        abundance_file <- file.path(output_path, myAbundanceMetadata@abundance_file)
+    }
     if (!file.exists(abundance_file)) {
         stop(paste0("can not generate presence/absence calls. 
                 Abundance file is missing : ", abundance_file, "."))
