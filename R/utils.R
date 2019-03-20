@@ -131,10 +131,16 @@ get_tool_transcriptome_path <- function(myAbundanceMetadata, myBgeeMetadata,
 #'
 get_tool_output_path <- function(myAbundanceMetadata, myBgeeMetadata,
                                  myUserMetadata) {
+    cat("tool output funtion\n")
     if(myUserMetadata@simple_arborescence == TRUE) {
+        cat("simple arborescence\n")
         return(file.path(get_intergenic_release_path(myBgeeMetadata, myUserMetadata), 
                          "all_results", get_output_dir(myUserMetadata)))
     }
+    cat("normal arborescence\n")
+    cat(paste0("transcriptome_path : ", get_tool_transcriptome_path(myAbundanceMetadata, 
+                                                                    myBgeeMetadata, myUserMetadata), "\n"))
+    cat(paste0("get_output_dir : ", get_output_dir(myUserMetadata), "\n"))
     return(file.path(get_tool_transcriptome_path(myAbundanceMetadata, 
                                                  myBgeeMetadata, myUserMetadata), 
                      paste0("annotation_", gsub("\\.", "_", 
@@ -295,6 +301,62 @@ get_output_dir <- function(myUserMetadata) {
     } else {
         return(paste0(basename(myUserMetadata@rnaseq_lib_path),"_",
                       paste(myUserMetadata@run_ids, collapse = "_") ))
+    }
+}
+
+#' @title Retrieve path to kallisto directory
+#'
+#' @description Retireve path to kallisto directory. This path depends
+#' on the OS
+#' 
+#' @param myAbundanceMetadata Reference Class AbundanceMetadata object.
+#' @param myUserMetadata Reference Class UserMetadata object.
+#' 
+#' @return path to kallisto dir
+#'
+#' @noMd
+#'
+get_kallisto_dir_path <- function(myAbundanceMetadata, myUserMetadata) {
+    os_version <- get_os()
+    kallisto_dir <- 
+    if (os_version == 'linux') {
+        return( file.path(myUserMetadata@working_path, 
+                          myAbundanceMetadata@kallisto_linux_dir) )
+    } else if (os_version == 'osx') {
+        return( file.path(myUserMetadata@working_path, 
+                          myAbundanceMetadata@kallisto_osx_dir) )
+    } else if (os_version == 'windows') {
+        return( file.path(myUserMetadata@working_path, 
+                          myAbundanceMetadata@kallisto_windows_dir) )
+    } else {
+        stop("can not access to kallisto dir for this operating system. 
+             Please install it by yourself and change the value of the
+             parameter `download_kallisto` of the AbundanceMetadata
+             object to FALSE")
+    }
+}
+
+#' @title Retrieve path to kallisto program
+#'
+#' @description Retireve path to kallisto program file. This path depends
+#' on the OS
+#' 
+#' @param myAbundanceMetadata Reference Class AbundanceMetadata object.
+#' @param myUserMetadata Reference Class UserMetadata object.
+#' 
+#' @return path to kallisto program
+#'
+#' @noMd
+#'
+get_kallisto_program_path <- function(myAbundanceMetadata, myUserMetadata) {
+    os_version <- get_os()
+    kallisto_dir <- get_kallisto_dir_path(myAbundanceMetadata, myUserMetadata)
+    if (os_version == 'linux' || os_version == 'osx') {
+        return(file.path(kallisto_dir, myAbundanceMetadata@unix_kallisto_name))
+    } else if (os_version == 'windows') {
+        return(file.path(kallisto_dir, myAbundanceMetadata@windows_kallisto_name))
+    } else {
+        stop("can not access to kallisto program file for Your operating system.")
     }
 }
 

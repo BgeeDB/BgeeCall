@@ -28,10 +28,10 @@
 #' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 #' 
 #' # kallisto can not deal with S4 objects. A Path to a transcriptome file is 
-#' required
+#' # required
 #' transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 #' transcriptome_path <- file.path(getwd(),"transcriptome.fa")
-#' writeXStringSet(transcriptome_object, transcriptome_path)
+#' Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 #' 
 #' 
 #' 
@@ -60,7 +60,7 @@ create_kallisto_index <- function (myKallistoMetadata,
                                           myKallistoMetadata@index_file)
     transcriptome_k21_index_path <- file.path(index_path, 
                                               myKallistoMetadata@k21_index_file)
-    kallisto_exec <- getKallistoPath(myKallistoMetadata)
+    kallisto_exec <- get_kallisto_program_path(myKallistoMetadata, myUserMetadata)
     
     # If no transcriptome path is provided the default path is used for 
     # index creation
@@ -72,7 +72,7 @@ create_kallisto_index <- function (myKallistoMetadata,
     
     # test if kallisto has to be installed
     if(myKallistoMetadata@download_kallisto) {
-        if (is_kallisto_installed(myKallistoMetadata) == 1) {
+        if (is_kallisto_installed(myKallistoMetadata, myUserMetadata) == 1) {
             cat("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
@@ -154,16 +154,17 @@ for species ", myUserMetadata@species_id, ".\n"))
 #, 
 #' 
 #' # kallisto can not deal with S4 objects. Path to transcriptome file is 
-#' #required
+#' # required
 #' transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 #' transcriptome_path <- file.path(getwd(),"transcriptome.fa")
-#' writeXStringSet(transcriptome_object, transcriptome_path)
+#' Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 #' 
 #' # initialize objects needed to create destination folder
 #' bgee <- new("BgeeMetadata")
 #' user <- new("UserMetadata", species_id = "6239")
 #' user <- setRNASeqLibPath(user, system.file( 
-#'                      "extdata", "SRX099901_subset", package = "BgeeCall"))
+#'                      "extdata", "SRX099901_subset", 
+#'                      package = "BgeeCall"))
 #' kallisto <- new("KallistoMetadata")
 #' 
 #' # generate transcriptome index
@@ -174,7 +175,7 @@ run_kallisto <- function (myKallistoMetadata, myBgeeMetadata,
                           myUserMetadata, transcriptome_path = "") {
     
     # define path needed in this function
-    kallisto_exec_path <- getKallistoPath(myKallistoMetadata)
+    kallisto_exec_path <- get_kallisto_program_path(myKallistoMetadata, myUserMetadata)
     kallisto_index_dir <- get_tool_transcriptome_path(myKallistoMetadata, 
                                                       myBgeeMetadata, myUserMetadata)
     kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
@@ -198,7 +199,7 @@ run_kallisto <- function (myKallistoMetadata, myBgeeMetadata,
     
     # test if kallisto has to be installed
     if(myKallistoMetadata@download_kallisto) {
-        if (is_kallisto_installed(myKallistoMetadata) == 1) {
+        if (is_kallisto_installed(myKallistoMetadata, myUserMetadata) == 1) {
             cat("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
@@ -272,8 +273,8 @@ potential already installed version of Kallisto.\n")
 #' @noRd
 #' 
 
-is_kallisto_installed <- function(myKallistoMetadata) {
-    if ( file.exists(getKallistoPath(myKallistoMetadata ))) {
+is_kallisto_installed <- function(myKallistoMetadata, myUserMetadata) {
+    if ( file.exists(get_kallisto_program_path(myKallistoMetadata, myUserMetadata))) {
         return(0)
     } else {
         return (1)
@@ -301,29 +302,30 @@ is_kallisto_installed <- function(myKallistoMetadata) {
 #' @export
 #'
 download_kallisto <- function(myKallistoMetadata, myUserMetadata) {
-    if (dir.exists(myKallistoMetadata@kallisto_dir)) {
+    kallisto_dir <- get_kallisto_dir_path(myKallistoMetadata, myUserMetadata)
+    if (dir.exists(kallisto_dir)) {
         message("kallisto directory already present. 
             Kallisto do not need to be downloaded and installed again.")
     } else {
-        dir.create(myKallistoMetadata@kallisto_dir, recursive = TRUE)
+        dir.create(kallisto_dir, recursive = TRUE)
         os_version <- get_os()
         message(paste0("\nDownloading kallisto for ", os_version, "..."))
         
         # download .gz archive depending on the OS
         if(os_version == 'linux') {
-            temp_path <- file.path(myKallistoMetadata@kallisto_dir, "temp.gz")
+            temp_path <- file.path(kallisto_dir, "temp.gz")
             success <- download.file(url = myKallistoMetadata@kallisto_linux_url, 
                                      destfile=temp_path, mode='wb')
             untar(temp_path, exdir = myUserMetadata@working_path)
             
         } else if(os_version == 'osx') {
-            temp_path <- file.path(myKallistoMetadata@kallisto_dir, "temp.gz")
+            temp_path <- file.path(kallisto_dir, "temp.gz")
             success <- download.file(url = myKallistoMetadata@kallisto_osx_url, 
                                      destfile=temp_path, mode='wb')
             untar(temp_path, exdir = myUserMetadata@working_path)
             
         } else if (os_version == 'windows') {
-            temp_path <- file.path(myKallistoMetadata@kallisto_dir, "temp.zip")
+            temp_path <- file.path(kallisto_dir, "temp.zip")
             success <- download.file(url = myKallistoMetadata@kallisto_windows_url,
                                      destfile=temp_path, mode='wb')
             unzip(temp_path, exdir = myUserMetadata@working_path)
