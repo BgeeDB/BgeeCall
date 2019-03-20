@@ -1,0 +1,6 @@
+##gff-version 2
+##source-version rtracklayer 1.43.3
+##date 2019-03-18
+##genome-build .	WBcel235
+V	ensembl	gene	180	329	.	+	.	gene_id "WBGene00197333"; gene_name "cTel3X.2"; gene_source "ensembl"; gene_biotype "ncRNA";
+V	ensembl	transcript	180	329	.	+	.	gene_id "WBGene00197333"; gene_name "cTel3X.2"; gene_source "ensembl"; gene_biotype "ncRNA"; transcript_id "cTel3X.2"; transcript_name "cTel3X.2"; transcript_source "ensembl"; transcript_biotype "ncRNA";

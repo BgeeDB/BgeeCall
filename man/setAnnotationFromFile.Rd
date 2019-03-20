@@ -34,14 +34,11 @@ will be used to create folders.
 }
 \examples{
 {
-library(AnnotationHub)
-ah <- AnnotationHub()
-ah_annotation <- query(ah, c("GTF","Ensembl", 
-                             "Caenorhabditis elegans", 
-                             "Caenorhabditis_elegans.WBcel235.84"))
+# path to gtf annotation file
+annotation_file <- system.file("extdata", "annotation.gtf", package = "BgeeCall")
 user <- new("UserMetadata")
-user <- setAnnotationFromFile(user, ah_annotation[["AH50789"]]$path,
-                                 "annotation_name")
+user <- setAnnotationFromFile(user, annotation_file,
+                             "annotation_name")
 }
 
 }

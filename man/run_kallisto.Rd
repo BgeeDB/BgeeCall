@@ -37,16 +37,17 @@ ah <- AnnotationHub()
 ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 
 # kallisto can not deal with S4 objects. Path to transcriptome file is 
-#required
+# required
 transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 transcriptome_path <- file.path(getwd(),"transcriptome.fa")
-writeXStringSet(transcriptome_object, transcriptome_path)
+Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 
 # initialize objects needed to create destination folder
 bgee <- new("BgeeMetadata")
 user <- new("UserMetadata", species_id = "6239")
 user <- setRNASeqLibPath(user, system.file( 
-                     "extdata", "SRX099901_subset", package = "BgeeCall"))
+                     "extdata", "SRX099901_subset", 
+                     package = "BgeeCall"))
 kallisto <- new("KallistoMetadata")
 
 # generate transcriptome index

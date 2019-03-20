@@ -37,10 +37,10 @@ ah <- AnnotationHub()
 ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 
 # kallisto can not deal with S4 objects. A Path to a transcriptome file is 
-required
+# required
 transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 transcriptome_path <- file.path(getwd(),"transcriptome.fa")
-writeXStringSet(transcriptome_object, transcriptome_path)
+Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 
 
 

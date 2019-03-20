@@ -23,7 +23,14 @@ of kallisto or to download a version that will be used only by this package}
 
 \item{\code{kallisto_osx_url}}{URL to the binary of kallisto for MacOS}
 
-\item{\code{kallisto_dir}}{Name of the directory where kallisto will be installed}
+\item{\code{kallisto_windows_dir}}{Name of the directory where kallisto will be installed
+on windows}
+
+\item{\code{kallisto_linux_dir}}{Name of the directory where kallisto will be installed
+on linux}
+
+\item{\code{kallisto_osx_dir}}{Name of the directory where kallisto will be installed
+on Mac}
 
 \item{\code{unix_kallisto_name}}{Name of the kallisto executable in linux and macOS}
 

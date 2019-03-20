@@ -38,10 +38,9 @@ will be used to create folders.
 library(AnnotationHub)
 ah <- AnnotationHub()
 ah_resources <- AnnotationHub::query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-annotation_object <- ah_resources[["AH50789"]]
 transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 transcriptome_path <- file.path(getwd(), "transcriptome.fa")
-writeXStringSet(transcriptome_object, transcriptome_path)
+Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 user <- new("UserMetadata")
 user <- setTranscriptomeFromFile(user, transcriptome_path,
                                  "transcriptome_name")
