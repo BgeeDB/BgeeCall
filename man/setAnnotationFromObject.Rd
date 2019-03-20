@@ -23,15 +23,6 @@ create folders.}
 }
 \value{
 An object of the class UserMetadata
-
-#' @examples {
-library(AnnotationHub)
-ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-user <- new("UserMetadata")
-user <- setAnnotationFromObject(user, ah_resources[["AH50789"]],
-                                 "annotation_name")
-}
 }
 \description{
 Method of the class UserMetadata. Set annotation_object of one 
@@ -40,4 +31,15 @@ UserMetadata object by using one GRanges object as input.
 \details{
 If no annotationName is provided the name of the file is used to 
 create folders.
+}
+\examples{
+{
+library(AnnotationHub)
+ah <- AnnotationHub()
+ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+user <- new("UserMetadata")
+user <- setAnnotationFromObject(user, ah_resources[["AH50789"]],
+                                 "annotation_name")
+}
+
 }
