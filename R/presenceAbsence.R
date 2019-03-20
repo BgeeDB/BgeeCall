@@ -64,8 +64,9 @@ generate_presence_absence <- function(myAbundanceMetadata, myBgeeMetadata,
     #run tximport for file with intergenic regions 
     # (if myAbundanceMetadata@txOut = FALSE, 
     # then tximport will summurarize transcript level estimates at gene level)
-    tximportObject <- run_tximport(myAbundanceMetadata, myBgeeMetadata, 
-                                   myUserMetadata)
+    tximportObject <- run_tximport(myAbundanceMetadata = myAbundanceMetadata, 
+                                   myBgeeMetadata = myBgeeMetadata, 
+                                   myUserMetadata = myUserMetadata)
     
     # recalculate TPM without intergenic regions and run tximport 
     # (if myAbundanceMetadata@txOut = FALSE, then tximport will summurarize 
