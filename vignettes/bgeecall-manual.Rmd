@@ -200,7 +200,7 @@ By default kallisto is run with the same parameters that we use in the RNA-Seq B
 * paired end : "-t 1 --bias"
 
 It is possible to modify them and use your favourite kallisto parameters
-``` {r, message = FALSE, warning = FALSE}
+``` {r, eval=FALSE}
 kallisto <- new("KallistoMetadata", single_end_parameters = "-t 3 --single -l 150 -s 30", pair_end_parameters = "-t 2 -b --seed 36")
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
@@ -211,7 +211,7 @@ The default kmer size of kallisto (31) is used for libraries with reads length e
 A kmer size of 21 is used for libraries with reads length smaller than 50 nt.
 We decided not to allow to tune kmers size because the generation of the index is time consuming and index generation takes even more time with small kmers size (< 21 nt). However it is possible to modify the threshold of read length allowing to choose between default and small kmer size.
 
-``` {r, message = FALSE, warning = FALSE}
+``` {r, eval=FALSE}
 # libraries with reads smaller than 70nt will use the index with kmer size = 21
 kallisto <- new("KallistoMetadata", read_size_kmer_threshold = 70)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
@@ -219,7 +219,7 @@ calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata =
 
 ### <a name="run_ids"></a>Generate calls for a subset of RNA-Seq runs
 By default gene expression calls are generated using all runs of the RNA-Seq library. It is possible to select only a subset of these runs.
-``` {r}
+``` {r, eval=FALSE}
 # RNA-Seq run SRR350955_subsetof from the RNA-Seq library will be used to generate the calls
 user_BgeeCall@run_ids <- c("SRR350955_subset")
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
