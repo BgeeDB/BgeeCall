@@ -131,16 +131,10 @@ get_tool_transcriptome_path <- function(myAbundanceMetadata, myBgeeMetadata,
 #'
 get_tool_output_path <- function(myAbundanceMetadata, myBgeeMetadata,
                                  myUserMetadata) {
-    cat("tool output funtion\n")
     if(myUserMetadata@simple_arborescence == TRUE) {
-        cat("simple arborescence\n")
         return(file.path(get_intergenic_release_path(myBgeeMetadata, myUserMetadata), 
                          "all_results", get_output_dir(myUserMetadata)))
     }
-    cat("normal arborescence\n")
-    cat(paste0("transcriptome_path : ", get_tool_transcriptome_path(myAbundanceMetadata, 
-                                                                    myBgeeMetadata, myUserMetadata), "\n"))
-    cat(paste0("get_output_dir : ", get_output_dir(myUserMetadata), "\n"))
     return(file.path(get_tool_transcriptome_path(myAbundanceMetadata, 
                                                  myBgeeMetadata, myUserMetadata), 
                      paste0("annotation_", gsub("\\.", "_", 
@@ -212,7 +206,6 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
         for (i in seq_len(length(first_files))) { 
             run_1 <- sub("^([^_]+).*", "\\1", first_files[i], perl=TRUE)
             run_2 <- sub("^([^_]+).*", "\\1", second_files[i], perl=TRUE)
-            cat(paste0(run_1, " -> ", run_2, "\n"))
             if (run_1 == run_2) {
                 # combine all fastq_files in a character like A_1 A_2 B_1 B_2 ...
                 fastq_files_names = paste(fastq_files_names, 
