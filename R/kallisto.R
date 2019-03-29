@@ -229,7 +229,7 @@ potential already installed version of Kallisto.\n")
     
     kallisto_parameters <- myKallistoMetadata@single_end_parameters
     # if paired-end analyses
-    if (grepl("_1.", strsplit(fastq_files, " ")[1])) {
+    if (grepl("_1.", lapply(strsplit(fastq_files, " "), basename))[1]) {
         kallisto_parameters <- myKallistoMetadata@pair_end_parameters
     }
     kallisto_command <- paste(kallisto_exec_path, "quant -i", 
