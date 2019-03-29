@@ -42,7 +42,7 @@ BgeeCall pipeline allows to download reference intergenic regions resulting from
 Moreover BgeeCall allows to use these reference intergenic regions to automatically generate gene expression calls for your own RNA-Seq libraries as long as the species is integrated to [Bgee](https://bgee.org/)
 The present/absent abundance threshold is calculated for each library using the formula :
 
-            proportion of ref intergenic present / proportion of protein coding present = 0.05
+$$ \frac {proportion\ of\ reference\ intergenic\ present}{proportion\ of\ protein\ coding\ present} = 0.05 $$
 
 ## Installation
 In R:
