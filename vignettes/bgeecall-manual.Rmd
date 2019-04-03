@@ -55,6 +55,7 @@ BiocManager::install("BgeeCall", version = "3.9")
 ## How to use the BgeeCall package
 
 BgeeCall is highly tunable. Do not hesitate to have a look at the reference manual to have a precise descripton of all slots of the 4 main S4 classes (AbundanceMetadata, KallistoMetadata, BgeeMetadata and UserMetadata) or of all available functions.
+BgeeCall needs kallisto to run. If you do not have kallisto installed you will find more information how to install it [here](#install-kallisto)
 
 
 ### Load the package
@@ -184,15 +185,18 @@ calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata =
 
 ### Tune how to use kallisto
 
-#### Download or reuse your own kallisto
-By default `BgeeCall` will download the version 0.45 of kallisto and will use it to quantify abundance of transcripts. It will only be used by this package and will have no impact on your potential already existing version of kallisto.
-However, You can use a version already installed on your conputer or your cluster. It can be useful if you prefer to use an older version of kallisto.
-To do that, you only have to create one object of the class `KallistoMetadata` and edit the value of one attribute
+#### Download or reuse your own kallisto{#install-kallisto}
+By default `BgeeCall` suppose that kallisto is installed.
+If kallisto is not installed on your computer you can either :
+
+- let BgeeCall automatically download the version 0.45 of kallisto. BgeeCall will use it to quantify abundance of transcripts. It will only be used by this package and will have no impact on your potential already existing version of kallisto.
+
 ``` {r, eval=FALSE}
-kallisto <- new("KallistoMetadata", download_kallisto = FALSE)
+kallisto <- new("KallistoMetadata", install_kallisto = TRUE)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
-To download and install kallisto please follow the instructions here : http://pachterlab.github.io/kallisto/download
+
+- You can  download and install kallisto by following the instructions on the official website : http://pachterlab.github.io/kallisto/download
 
 #### Edit kallisto quant attributes
 By default kallisto is run with the same parameters that we use in the RNA-Seq Bgee pipeline:
