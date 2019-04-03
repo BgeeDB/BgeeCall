@@ -63,7 +63,7 @@ KallistoMetadata <- setClass(
         eff_length_header ="eff_length",
         read_size_kmer_threshold = 50,
         # slots specific to Class
-        download_kallisto = TRUE,
+        download_kallisto = FALSE,
         kallisto_windows_url = 
             "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_windows-v0.45.0.zip",
         kallisto_linux_url = 
