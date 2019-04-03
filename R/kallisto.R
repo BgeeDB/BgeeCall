@@ -79,6 +79,14 @@ will only be used inside of this package. It will have no impact on your
 potential already installed version of Kallisto.\n")
             download_kallisto(myKallistoMetadata, myUserMetadata)
         }
+    } else {
+        tryCatch({
+            system("kallisto", ignore.stdout = TRUE, ignore.stderr = TRUE)
+        }, warning = function(w) {
+            stop("kallisto is not installed. You should either 
+    - automatically install a version of kallisto used only by this package (see vignette for more details)
+    - install kallisto on your system following official website instructions (https://pachterlab.github.io/kallisto/download)")
+        })
     }
     
     # test existence of files/directories
