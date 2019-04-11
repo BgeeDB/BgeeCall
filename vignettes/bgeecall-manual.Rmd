@@ -49,7 +49,7 @@ In R:
 ``` {r, eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("BgeeCall", version = "3.9")
+BiocManager::install("BgeeCall")
 ```
 
 ## How to use the BgeeCall package
@@ -110,9 +110,16 @@ user_BgeeCall <- setRNASeqLibPath(user_BgeeCall,
 ```
 
 And that's it... You can run the generation of your present/absent gene expression calls
-``` {r, message = FALSE, warning = FALSE}
-calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
+``` {r, eval = FALSE}
+calls_output <- generate_calls_workflow(userMetadata = user_BgeeCall)
 ```
+
+```{r, echo=FALSE}
+user_BgeeCall@working_path <- system.file("extdata", package = "BgeeCall")
+user_BgeeCall@simple_arborescence <- TRUE
+calls_output <- generate_presence_absence(myUserMetadata = user_BgeeCall)
+```
+
 Each analyze generates 4 files and return path to each one of them.
 
 * calls_tsv_path : path to main tsv file with TPM, count, length, biotype, type, and presence/absence of expression summarized at gene level (or at the [transcript level](#transcript_level) if it was requested)
@@ -150,7 +157,7 @@ In this template each column correspond to one parameter used to generate gene e
 It is not mandatory to add a value to the `run_ids` column except if you want to generate expression calls for a subset of the runs of one RNA-Seq library as described in [Generate calls for a subset of RNA-Seq runs](#run_ids)
 Once the file has been fill in expression calls can be generated with :
 ``` {r, eval=FALSE}
-run_from_file(userMetadataFile = "path_to_your_file.tsv")
+generate_calls_workflow(userFile = "path_to_your_file.tsv")
 ```
 
 ### list species available on Bgee
@@ -180,7 +187,7 @@ In `BgeeCall` it is now possible to generate present/absent calls at the transcr
 To generate such calls you only have to create one object of the class `KallistoMetadata` and edit the value of one attribute
 ``` {r, eval=FALSE}
 kallisto <- new("KallistoMetadata", txOut = TRUE)
-calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
+calls_output <- generate_calls_workflow(myAbundanceMetadata = kallisto, userMetadata = user_BgeeCall)
 ```
 
 ### Tune how to use kallisto
@@ -193,7 +200,7 @@ If kallisto is not installed on your computer you can either :
 
 ``` {r, eval=FALSE}
 kallisto <- new("KallistoMetadata", install_kallisto = TRUE)
-calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
+calls_output <- generate_calls_workflow(myAbundanceMetadata = kallisto, userMetadata = user_BgeeCall)
 ```
 
 - You can  download and install kallisto by following the instructions on the official website : http://pachterlab.github.io/kallisto/download
@@ -207,7 +214,7 @@ By default kallisto is run with the same parameters that we use in the RNA-Seq B
 It is possible to modify them and use your favourite kallisto parameters
 ``` {r, eval=FALSE}
 kallisto <- new("KallistoMetadata", single_end_parameters = "-t 3 --single -l 150 -s 30", pair_end_parameters = "-t 2 -b --seed 36")
-calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
+calls_output <- generate_calls_workflow(myAbundanceMetadata = kallisto, userMetadata = user_BgeeCall)
 ```
 
 #### Choose between two kmer size
@@ -219,7 +226,7 @@ We decided not to allow to tune kmers size because the generation of the index i
 ``` {r, eval=FALSE}
 # libraries with reads smaller than 70nt will use the index with kmer size = 21
 kallisto <- new("KallistoMetadata", read_size_kmer_threshold = 70)
-calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
+calls_output <- generate_calls_workflow(myAbundanceMetadata = kallisto, userMetadata = user_BgeeCall)
 ```
 
 ### <a name="run_ids"></a>Generate calls for a subset of RNA-Seq runs
