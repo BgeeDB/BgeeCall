@@ -341,8 +341,7 @@ download_kallisto <- function(myKallistoMetadata, myUserMetadata) {
         } else {
             stop("kallisto can not be downloaded on your computer. 
 Only linux, OSX, and windows OS are compatible with this functionality.\n
-If you want to use this package please install your own version of Kallisto 
-and run this command :\n\tmyKallistoMetadata@download_kallisto <- FALSE\n")
+If you want to use this package please install your own version of Kallisto ")
         }
         
         # delete downloaded archive of kallisto
