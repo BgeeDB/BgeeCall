@@ -12,6 +12,7 @@
 #' @return A dataframe containing reference intergenic ids
 #' 
 #' @noMd
+#' @noRd
 #'
 get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
     bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
@@ -30,8 +31,9 @@ get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
 #'
 #' @description Generate presence absence calls
 #'
-#' @param myAbundanceMetadata A descendant object of the Class myAbundanceMetadata.
-#' @param myBgeeMetadata A Class BgeeMetadata object.
+#' @param myAbundanceMetadata A descendant object of the Class myAbundanceMetadata
+#' (optional).
+#' @param myBgeeMetadata A Class BgeeMetadata object (optional).
 #' @param myUserMetadata A Class UserMetadata object.
 #'
 #' @author Julien Wollbrett
@@ -40,8 +42,15 @@ get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
 #' @return path to the 4 output files
 #'
 #' @export
+#' 
+#' @examples {
+#' user <- new("UserMetadata, working_path = system.file(getwd(), "extdata"),
+#' simple_arborescence = TRUE)
+#' calls_output <- generate_presence_absence(myUserMetadata = user)
+#' }
 #'
-generate_presence_absence <- function(myAbundanceMetadata, myBgeeMetadata, 
+generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"),
+                                      myBgeeMetadata = new("BgeeMetadata"), 
                                       myUserMetadata) {
     
     # load data

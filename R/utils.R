@@ -41,6 +41,9 @@ get_os <- function(){
 #' @param myUserMetadata A Reference Class UserMetadata object.
 #' 
 #' @return path to the file containing details about intergenic releases
+#' 
+#' @noMd
+#' @noRd
 #'
 get_intergenic_release_path <- function(myBgeeMetadata, myUserMetadata) {
     return(file.path(myUserMetadata@working_path, 
@@ -144,13 +147,22 @@ get_tool_output_path <- function(myAbundanceMetadata, myBgeeMetadata,
 
 #' @title Download fasta intergenic
 #'
-#' @description Check if fasta intergenic file has already been downloaded. 
-#' If not the file is downloaded.
+#' @description Check if Bgee reference intergenic fasta file has already 
+#' been downloaded. If not the file is downloaded.
+#' 
+#' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
+#' @param myUserMetadata A Reference Class UserMetadata object.
+#' @param bgee_intergenic_file path where intergenic file will be saved
 #'
-#' @noMd
-#' @noRd
+#' @export
+#' 
+#' @examples {
+#' bgee_intergenic_file <- file.path(getwd(), "intergenic.fasta")
+#' userMetadata <- new("UserMetadata", species_id = "7227")
+#' }
 #'
-download_fasta_intergenic <- function(myBgeeMetadata, myUserMetadata, 
+download_fasta_intergenic <- function(myBgeeMetadata = new("BgeeMetadata"), 
+                                      myUserMetadata, 
                                       bgee_intergenic_file) {
     bgee_intergenic_url <- gsub("SPECIES_ID", myUserMetadata@species_id, 
                                 myBgeeMetadata@fasta_intergenic_url)
@@ -283,6 +295,7 @@ is_pair_end <- function(fastq_files) {
 #' @return Name of the output directory
 #'
 #' @noMd
+#' @noRd
 #'
 get_output_dir <- function(myUserMetadata) {
     if(length(myUserMetadata@rnaseq_lib_path) == 0) {
@@ -344,6 +357,9 @@ get_kallisto_dir_path <- function(myAbundanceMetadata, myUserMetadata) {
 #' @noRd
 #'
 get_kallisto_program_path <- function(myAbundanceMetadata, myUserMetadata) {
+    if( !myAbundanceMetadata@download_kallisto ) {
+        return(myAbundanceMetadata@tool_name)
+    }
     os_version <- get_os()
     kallisto_dir <- get_kallisto_dir_path(myAbundanceMetadata, myUserMetadata)
     if (os_version == 'linux' || os_version == 'osx') {
