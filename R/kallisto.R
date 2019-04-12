@@ -21,7 +21,8 @@
 #'
 #' @export
 #' 
-#' @examples {
+#' @examples 
+#' \dontrun{
 #' # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()
@@ -154,7 +155,8 @@ for species ", myUserMetadata@species_id, ".\n"))
 #'
 #' @export
 #' 
-#' @examples {
+#' @examples 
+#' \dontrun{
 #' # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()

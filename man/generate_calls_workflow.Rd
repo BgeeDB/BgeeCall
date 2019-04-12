@@ -51,7 +51,7 @@ a look at the vignette and the documentation of the classes
 KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
 }
 \examples{
-/dontrun{
+\dontrun{
 # import gene annotation and transcriptome from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()

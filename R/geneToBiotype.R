@@ -18,7 +18,8 @@
 #' @noMd
 #' @noRd
 #'
-load_gene_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, 
+load_gene_to_biotype <- function(myAbundanceMetadata = new("AbundanceMetadata"),
+                                 myBgeeMetadata = new("BgeeMetadata"), 
                                  myUserMetadata) {
     column_names <- c("id", "biotype", "type")
     annotation_path <- get_annotation_path(myBgeeMetadata, myUserMetadata)

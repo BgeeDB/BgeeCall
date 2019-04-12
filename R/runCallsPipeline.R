@@ -46,7 +46,8 @@
 #' 
 #' @seealso AbundanceMetadata, KallistoMetadata, BgeeMetadata, UserMetadata
 #' 
-#' @examples /dontrun{
+#' @examples 
+#' \dontrun{
 #' # import gene annotation and transcriptome from AnnotationHub
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()

@@ -4,7 +4,7 @@ author: "Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{BgeeCall, a R package for automatic gene expression calls generation}
+  %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
