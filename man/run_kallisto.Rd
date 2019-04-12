@@ -30,7 +30,7 @@ Run kallisto and all preliminary steps if needed like :
 - run kallisto quantification
 }
 \examples{
-{
+\dontrun{
 # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()

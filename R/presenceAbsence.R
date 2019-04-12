@@ -20,7 +20,8 @@ get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
                                       myBgeeMetadata@fasta_intergenic_name)
     if (!file.exists(bgee_intergenic_file)) {
         # Download fasta file from Bgee FTP
-        download_fasta_intergenic(myBgeeMetadata, myUserMetadata, bgee_intergenic_file)
+        download_fasta_intergenic(myBgeeMetadata, myUserMetadata, 
+                                  bgee_intergenic_file)
     }
     bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
     #keep only intergenic ids from fasta file
@@ -29,7 +30,16 @@ get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
 
 #' @title Generate presence absence
 #'
-#' @description Generate presence absence calls
+#' @description Generate presence absence calls. It correponds to 
+#' the last part of the generation of the expression calls workflow. 
+#' It runs the last part of the workflow generating presetn/absent 
+#' expression calls. 
+#' This function should only be used by advanced user who already 
+#' manually run all previous parts of the pipeline.
+#' If you are not an advanced user it is safer to run the function 
+#' ``generate_calls_workflow`` that run all steps of the worklow
+#'
+#'@seealso generate_calls_workflow
 #'
 #' @param myAbundanceMetadata A descendant object of the Class myAbundanceMetadata
 #' (optional).
@@ -44,15 +54,20 @@ get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
 #' @export
 #' 
 #' @examples {
-#' user <- new("UserMetadata, working_path = system.file(getwd(), "extdata"),
-#' simple_arborescence = TRUE)
+#' # this example reuse data present in the directory "extdata" of the package.
+#' user <- new("UserMetadata", working_path = system.file("extdata", 
+#' package = "BgeeCall"), species_id = "6239", rnaseq_lib_path = system.file(
+#' "extdata", "SRX099901_subset", package = "BgeeCall"), 
+#' annotation_name = "WBcel235_84", simple_arborescence = TRUE)
 #' calls_output <- generate_presence_absence(myUserMetadata = user)
+#' 
+#' #
 #' }
 #'
 generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"),
                                       myBgeeMetadata = new("BgeeMetadata"), 
                                       myUserMetadata) {
-    
+    system.file()
     # load data
     ref_intergenic <- get_ref_intergenic_ids(myBgeeMetadata, myUserMetadata)
     tool_path <- get_tool_path(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)

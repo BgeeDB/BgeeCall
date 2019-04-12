@@ -30,7 +30,7 @@ for more information). One with default kmer value (31 nt) and one with
 kmer size of 21 nt. In order to generate.
 }
 \examples{
-{
+\dontrun{
 # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()
