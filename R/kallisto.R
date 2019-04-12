@@ -26,54 +26,54 @@
 #' # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()
-#' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+#' ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
 #' 
 #' # kallisto can not deal with S4 objects. A Path to a transcriptome file is 
 #' # required
-#' transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
-#' transcriptome_path <- file.path(getwd(),"transcriptome.fa")
+#' transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
+#' transcriptome_path <- file.path(getwd(),'transcriptome.fa')
 #' Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 #' 
 #' 
 #' 
 #' # initialize objects needed to create destination folder
-#' bgee <- new("BgeeMetadata")
-#' user <- new("UserMetadata", species_id = "6239")
-#' kallisto <- new("KallistoMetadata")
+#' bgee <- new('BgeeMetadata')
+#' user <- new('UserMetadata', species_id = '6239')
+#' kallisto <- new('KallistoMetadata')
 #' 
 #' # generate transcriptome index
 #' create_kallisto_index(kallisto, bgee, user, transcriptome_path)
 #' }
 #'
 #'
-create_kallisto_index <- function (myKallistoMetadata, 
-                                   myBgeeMetadata, 
-                                   myUserMetadata, 
-                                   transcriptome_path = "") {
+create_kallisto_index <- function(myKallistoMetadata, 
+    myBgeeMetadata, myUserMetadata, transcriptome_path = "") {
     
     # define needed path
-    species_path <- get_species_path(myBgeeMetadata, myUserMetadata)
-    kallisto_path <- get_tool_path(myKallistoMetadata, myBgeeMetadata, 
-                                   myUserMetadata)
+    species_path <- get_species_path(myBgeeMetadata, 
+        myUserMetadata)
+    kallisto_path <- get_tool_path(myKallistoMetadata, 
+        myBgeeMetadata, myUserMetadata)
     index_path <- get_tool_transcriptome_path(myKallistoMetadata, 
-                                              myBgeeMetadata, myUserMetadata)
+        myBgeeMetadata, myUserMetadata)
     transcriptome_index_path <- file.path(index_path, 
-                                          myKallistoMetadata@index_file)
+        myKallistoMetadata@index_file)
     transcriptome_k21_index_path <- file.path(index_path, 
-                                              myKallistoMetadata@k21_index_file)
-    kallisto_exec <- get_kallisto_program_path(myKallistoMetadata, myUserMetadata)
+        myKallistoMetadata@k21_index_file)
+    kallisto_exec <- get_kallisto_program_path(myKallistoMetadata, 
+        myUserMetadata)
     
-    # If no transcriptome path is provided the default path is used for 
-    # index creation
-    if(transcriptome_path == "") {
-        transcriptome_path <- file.path(
-            get_transcriptome_path(myBgeeMetadata, myUserMetadata), 
-            myKallistoMetadata@full_transcriptome_file)
+    # If no transcriptome path is provided the default
+    # path is used for index creation
+    if (transcriptome_path == "") {
+        transcriptome_path <- file.path(get_transcriptome_path(myBgeeMetadata, 
+            myUserMetadata), myKallistoMetadata@full_transcriptome_file)
     }
     
     # test if kallisto has to be installed
-    if(myKallistoMetadata@download_kallisto) {
-        if (is_kallisto_installed(myKallistoMetadata, myUserMetadata) == 1) {
+    if (myKallistoMetadata@download_kallisto) {
+        if (is_kallisto_installed(myKallistoMetadata, 
+            myUserMetadata) == 1) {
             cat("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
@@ -82,7 +82,8 @@ potential already installed version of Kallisto.\n")
         }
     } else {
         tryCatch({
-            system("kallisto", ignore.stdout = TRUE, ignore.stderr = TRUE)
+            system("kallisto", ignore.stdout = TRUE, 
+                ignore.stderr = TRUE)
         }, warning = function(w) {
             stop("kallisto is not installed. You should either 
     - automatically install a version of kallisto used only by this package (see vignette for more details)
@@ -94,39 +95,35 @@ potential already installed version of Kallisto.\n")
     if (!dir.exists(index_path)) {
         dir.create(index_path, recursive = TRUE)
     }
-    if ( (myUserMetadata@reads_size >= 
-          myKallistoMetadata@read_size_kmer_threshold && 
-          file.exists(transcriptome_index_path)) 
-         || 
-         (myUserMetadata@reads_size < 
-          myKallistoMetadata@read_size_kmer_threshold && 
-          file.exists(transcriptome_k21_index_path))) {
+    if ((myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
+        file.exists(transcriptome_index_path)) || (myUserMetadata@reads_size < 
+        myKallistoMetadata@read_size_kmer_threshold && 
+        file.exists(transcriptome_k21_index_path))) {
         cat("Index file already exist. No need to create a new one.\n")
     } else {
         
         cat("Start generation of kallisto index files.\n")
         
-        #create kallisto index with default kmer size
-        if (myUserMetadata@reads_size >= 
-            myKallistoMetadata@read_size_kmer_threshold && 
+        # create kallisto index with default kmer size
+        if (myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
             !file.exists(transcriptome_index_path)) {
-            kallisto_command <- paste0(kallisto_exec, " index -i ", 
-                                       transcriptome_index_path, " ", 
-                                       transcriptome_path)
+            kallisto_command <- paste0(kallisto_exec, 
+                " index -i ", transcriptome_index_path, 
+                " ", transcriptome_path)
             system(kallisto_command)
         }
         
-        #create kallisto index with kmer size equal to 21
-        if (myUserMetadata@reads_size < 
-            myKallistoMetadata@read_size_kmer_threshold && 
+        # create kallisto index with kmer size equal to 21
+        if (myUserMetadata@reads_size < myKallistoMetadata@read_size_kmer_threshold && 
             !file.exists(transcriptome_k21_index_path)) {
-            kallisto_k21_command <- 
-                paste0(kallisto_exec, " index -k 21 -i ", 
-                       transcriptome_k21_index_path, " ", transcriptome_path)
+            kallisto_k21_command <- paste0(kallisto_exec, 
+                " index -k 21 -i ", transcriptome_k21_index_path, 
+                " ", transcriptome_path)
             system(kallisto_k21_command)
         }
         cat(paste0("kallisto index files have been succesfully created 
-for species ", myUserMetadata@species_id, ".\n"))
+for species ", 
+            myUserMetadata@species_id, ".\n"))
     }
 }
 
@@ -160,56 +157,59 @@ for species ", myUserMetadata@species_id, ".\n"))
 #' # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()
-#' ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-#, 
+#' ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
+# ,
 #' 
 #' # kallisto can not deal with S4 objects. Path to transcriptome file is 
 #' # required
-#' transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
-#' transcriptome_path <- file.path(getwd(),"transcriptome.fa")
+#' transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
+#' transcriptome_path <- file.path(getwd(),'transcriptome.fa')
 #' Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 #' 
 #' # initialize objects needed to create destination folder
-#' bgee <- new("BgeeMetadata")
-#' user <- new("UserMetadata", species_id = "6239")
+#' bgee <- new('BgeeMetadata')
+#' user <- new('UserMetadata', species_id = '6239')
 #' user <- setRNASeqLibPath(user, system.file( 
-#'                      "extdata", "SRX099901_subset", 
-#'                      package = "BgeeCall"))
-#' kallisto <- new("KallistoMetadata")
+#'                      'extdata', 'SRX099901_subset', 
+#'                      package = 'BgeeCall'))
+#' kallisto <- new('KallistoMetadata')
 #' 
 #' # generate transcriptome index
 #' run_kallisto(kallisto, bgee, user, transcriptome_path)
 #' }
 #'
-run_kallisto <- function (myKallistoMetadata, myBgeeMetadata, 
-                          myUserMetadata, transcriptome_path = "") {
+run_kallisto <- function(myKallistoMetadata, myBgeeMetadata, 
+    myUserMetadata, transcriptome_path = "") {
     
     # define path needed in this function
-    kallisto_exec_path <- get_kallisto_program_path(myKallistoMetadata, myUserMetadata)
+    kallisto_exec_path <- get_kallisto_program_path(myKallistoMetadata, 
+        myUserMetadata)
     kallisto_index_dir <- get_tool_transcriptome_path(myKallistoMetadata, 
-                                                      myBgeeMetadata, myUserMetadata)
+        myBgeeMetadata, myUserMetadata)
     kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
-                                               myKallistoMetadata@index_file))
+        myKallistoMetadata@index_file))
     kallisto_output_path <- get_tool_output_path(myKallistoMetadata, 
-                                                 myBgeeMetadata, myUserMetadata)
+        myBgeeMetadata, myUserMetadata)
     output_abundance_file <- file.path(kallisto_output_path, 
-                                       myKallistoMetadata@abundance_file)
+        myKallistoMetadata@abundance_file)
     
     # test if kallisto has to be run
     if (file.exists(output_abundance_file)) {
         cat(paste0("kallisto abundance file already exists for library ", 
-                   basename(myUserMetadata@rnaseq_lib_path), 
-                   ". Abundance file will be overwritten.\n"))
+            basename(myUserMetadata@rnaseq_lib_path), 
+            ". Abundance file will be overwritten.\n"))
     }
-    #create transcriptome containing bgee intergenic regions
-    if(transcriptome_path == "") {
+    # create transcriptome containing bgee intergenic
+    # regions
+    if (transcriptome_path == "") {
         merge_transcriptome_and_intergenic(myKallistoMetadata, 
-                                           myBgeeMetadata, myUserMetadata)
+            myBgeeMetadata, myUserMetadata)
     }
     
     # test if kallisto has to be installed
-    if(myKallistoMetadata@download_kallisto) {
-        if (is_kallisto_installed(myKallistoMetadata, myUserMetadata) == 1) {
+    if (myKallistoMetadata@download_kallisto) {
+        if (is_kallisto_installed(myKallistoMetadata, 
+            myUserMetadata) == 1) {
             cat("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
@@ -218,47 +218,46 @@ potential already installed version of Kallisto.\n")
         }
     }
     
-    #create index
+    # create index
     create_kallisto_index(myKallistoMetadata, myBgeeMetadata, 
-                          myUserMetadata, transcriptome_path)
+        myUserMetadata, transcriptome_path)
     
     # create output directory if not already existing
     if (!dir.exists(kallisto_output_path)) {
         dir.create(kallisto_output_path, recursive = TRUE)
     }
     
-    # if read size < 50nt use transcriptome index with small kmer size
+    # if read size < 50nt use transcriptome index with
+    # small kmer size
     if (myUserMetadata@reads_size < 50) {
-        kallisto_index_path <- 
-            file.path(file.path(kallisto_index_dir, 
-                                myKallistoMetadata@k21_index_file))
+        kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
+            myKallistoMetadata@k21_index_file))
     }
     
-    # check library folder and test if _1 and _2 files are present
+    # check library folder and test if _1 and _2 files
+    # are present
     fastq_files <- get_merged_fastq_file_names(myUserMetadata)
     
     kallisto_parameters <- myKallistoMetadata@single_end_parameters
     # if paired-end analyses
-    if (grepl("_1.", lapply(strsplit(fastq_files, " "), basename))[1]) {
+    if (grepl("_1.", lapply(strsplit(fastq_files, " "), 
+        basename))[1]) {
         kallisto_parameters <- myKallistoMetadata@pair_end_parameters
     }
     kallisto_command <- paste(kallisto_exec_path, "quant -i", 
-                              kallisto_index_path, 
-                              "-o", kallisto_output_path, 
-                              kallisto_parameters, 
-                              fastq_files, sep = " ")
+        kallisto_index_path, "-o", kallisto_output_path, 
+        kallisto_parameters, fastq_files, sep = " ")
     
     message("Will run kallisto using this command line : ", 
-            kallisto_command)
+        kallisto_command)
     system(kallisto_command)
     
-    if(myKallistoMetadata@ignoreTxVersion) {
+    if (myKallistoMetadata@ignoreTxVersion) {
         cat(paste0("remove transcript version info in ", 
-                   myKallistoMetadata@abundance_file," ", 
-                   myKallistoMetadata@tool_name, 
-                   " abundance file.\n"))
+            myKallistoMetadata@abundance_file, " ", 
+            myKallistoMetadata@tool_name, " abundance file.\n"))
         removeTxVersionFromAbundance(myKallistoMetadata, 
-                                     myBgeeMetadata, myUserMetadata)
+            myBgeeMetadata, myUserMetadata)
     }
 }
 
@@ -275,7 +274,7 @@ potential already installed version of Kallisto.\n")
 #' @return a boolean
 #'
 #' @examples{
-#' myKallistoMetadata <- new("KallistoMetadata")
+#' myKallistoMetadata <- new('KallistoMetadata')
 #' logical <- is_kallisto_installed(myKallistoMetadata)
 #' }
 #' 
@@ -283,11 +282,13 @@ potential already installed version of Kallisto.\n")
 #' @noRd
 #' 
 
-is_kallisto_installed <- function(myKallistoMetadata, myUserMetadata) {
-    if ( file.exists(get_kallisto_program_path(myKallistoMetadata, myUserMetadata))) {
+is_kallisto_installed <- function(myKallistoMetadata, 
+    myUserMetadata) {
+    if (file.exists(get_kallisto_program_path(myKallistoMetadata, 
+        myUserMetadata))) {
         return(0)
     } else {
-        return (1)
+        return(1)
     }
 }
 
@@ -304,40 +305,42 @@ is_kallisto_installed <- function(myKallistoMetadata, myUserMetadata) {
 #' @return NULL
 #' 
 #' @examples {
-#'   kallisto <- new("KallistoMetadata")
-#'   user <- new("UserMetadata")
+#'   kallisto <- new('KallistoMetadata')
+#'   user <- new('UserMetadata')
 #'   download_kallisto(kallisto, user)
 #' }
 #' 
 #' @export
 #'
 download_kallisto <- function(myKallistoMetadata, myUserMetadata) {
-    kallisto_dir <- get_kallisto_dir_path(myKallistoMetadata, myUserMetadata)
+    kallisto_dir <- get_kallisto_dir_path(myKallistoMetadata, 
+        myUserMetadata)
     if (dir.exists(kallisto_dir)) {
         message("kallisto directory already present. 
             Kallisto do not need to be downloaded and installed again.")
     } else {
         dir.create(kallisto_dir, recursive = TRUE)
         os_version <- get_os()
-        message(paste0("\nDownloading kallisto for ", os_version, "..."))
+        message(paste0("\nDownloading kallisto for ", 
+            os_version, "..."))
         
         # download .gz archive depending on the OS
-        if(os_version == 'linux') {
+        if (os_version == "linux") {
             temp_path <- file.path(kallisto_dir, "temp.gz")
             success <- download.file(url = myKallistoMetadata@kallisto_linux_url, 
-                                     destfile=temp_path, mode='wb')
+                destfile = temp_path, mode = "wb")
             untar(temp_path, exdir = myUserMetadata@working_path)
             
-        } else if(os_version == 'osx') {
+        } else if (os_version == "osx") {
             temp_path <- file.path(kallisto_dir, "temp.gz")
             success <- download.file(url = myKallistoMetadata@kallisto_osx_url, 
-                                     destfile=temp_path, mode='wb')
+                destfile = temp_path, mode = "wb")
             untar(temp_path, exdir = myUserMetadata@working_path)
             
-        } else if (os_version == 'windows') {
+        } else if (os_version == "windows") {
             temp_path <- file.path(kallisto_dir, "temp.zip")
-            success <- download.file(url = myKallistoMetadata@kallisto_windows_url,
-                                     destfile=temp_path, mode='wb')
+            success <- download.file(url = myKallistoMetadata@kallisto_windows_url, 
+                destfile = temp_path, mode = "wb")
             unzip(temp_path, exdir = myUserMetadata@working_path)
             
         } else {

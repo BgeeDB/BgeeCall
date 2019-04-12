@@ -22,48 +22,53 @@
 #' @noMd
 #' @noRd
 #'
-load_transcript_to_biotype <- function(myAbundanceMetadata, myBgeeMetadata, 
-                                       myUserMetadata) {
+load_transcript_to_biotype <- function(myAbundanceMetadata, 
+    myBgeeMetadata, myUserMetadata) {
     column_names <- c("id", "biotype", "type")
-    annotation_path <- get_annotation_path(myBgeeMetadata, myUserMetadata)
+    annotation_path <- get_annotation_path(myBgeeMetadata, 
+        myUserMetadata)
     transcript_to_biotype_file <- file.path(annotation_path, 
-                                            myAbundanceMetadata@tx2biotype_file)
+        myAbundanceMetadata@tx2biotype_file)
     
-    #check if file already exist
+    # check if file already exist
     if (!file.exists(transcript_to_biotype_file)) {
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
-        cat(paste0("Generate file ", myAbundanceMetadata@tx2biotype_file, ".\n"))
-        #retrieve tx2biotype data frame from annotation file
-        gtf=as.data.frame(myUserMetadata@annotation_object)
-        gtf_transcript <- gtf[gtf$type == "transcript",]
-        transcript_to_biotype <- 
-            as.data.frame(unique(cbind(gtf_transcript$transcript_id, 
-                                       gtf_transcript$transcript_biotype)))
-        transcript_to_biotype[,3] <- "genic"
+        cat(paste0("Generate file ", myAbundanceMetadata@tx2biotype_file, 
+            ".\n"))
+        # retrieve tx2biotype data frame from annotation
+        # file
+        gtf = as.data.frame(myUserMetadata@annotation_object)
+        gtf_transcript <- gtf[gtf$type == "transcript", 
+            ]
+        transcript_to_biotype <- as.data.frame(unique(cbind(gtf_transcript$transcript_id, 
+            gtf_transcript$transcript_biotype)))
+        transcript_to_biotype[, 3] <- "genic"
         names(transcript_to_biotype) <- column_names
         
-        #retrieve gene2biotype information from intergenic fasta file
+        # retrieve gene2biotype information from intergenic
+        # fasta file
         bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
-                                                           myUserMetadata), 
-                                          myBgeeMetadata@fasta_intergenic_name)
+            myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
         if (!file.exists(bgee_intergenic_file)) {
-            download_fasta_intergenic(myBgeeMetadata, myUserMetadata, 
-                                      bgee_intergenic_file)
+            download_fasta_intergenic(myBgeeMetadata, 
+                myUserMetadata, bgee_intergenic_file)
         }
         bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
-        #intergenic ID correspond to part of the header before the first space character
-        intergenic_to_biotype <- as.data.frame(sub("^([^ ]+).*", "\\1", 
-                                                   names(bgee_intergenic)))
-        intergenic_to_biotype[,2] <- NA
-        intergenic_to_biotype[,3] <- "intergenic"
+        # intergenic ID correspond to part of the header
+        # before the first space character
+        intergenic_to_biotype <- as.data.frame(sub("^([^ ]+).*", 
+            "\\1", names(bgee_intergenic)))
+        intergenic_to_biotype[, 2] <- NA
+        intergenic_to_biotype[, 3] <- "intergenic"
         names(intergenic_to_biotype) <- column_names
         
         # merge both data frame and write file
-        transcript_to_biotype <- rbind(transcript_to_biotype, intergenic_to_biotype)
-        write.table(transcript_to_biotype, transcript_to_biotype_file, sep = "\t", 
-                    row.names = FALSE, quote = FALSE)
+        transcript_to_biotype <- rbind(transcript_to_biotype, 
+            intergenic_to_biotype)
+        write.table(transcript_to_biotype, transcript_to_biotype_file, 
+            sep = "\t", row.names = FALSE, quote = FALSE)
     }
     return(read.table(transcript_to_biotype_file, header = TRUE))
 }
