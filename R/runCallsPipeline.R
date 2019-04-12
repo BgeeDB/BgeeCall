@@ -94,7 +94,7 @@ generate_calls_workflow <- function (myAbundanceMetadata = new("KallistoMetadata
                                    myUserMetadata = userMetadata))
         } else if (typeof(userMetadata) == "list" && 
                    typeof(userMetadata[[1]]) == "S4") {
-            for (i in 1:length(userMetadata)) {
+            for (i in seq_len(length(userMetadata))) {
                 results[i] <- run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
                                               myBgeeMetadata = myBgeeMetadata, 
                                               myUserMetadata = userMetadata[[i]])
