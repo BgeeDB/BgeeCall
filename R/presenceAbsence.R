@@ -14,17 +14,17 @@
 #' @noMd
 #' @noRd
 #'
-get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
+get_ref_intergenic_ids <- function(myBgeeMetadata, 
+    myUserMetadata) {
     bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
-                                                       myUserMetadata), 
-                                      myBgeeMetadata@fasta_intergenic_name)
+        myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
     if (!file.exists(bgee_intergenic_file)) {
         # Download fasta file from Bgee FTP
         download_fasta_intergenic(myBgeeMetadata, myUserMetadata, 
-                                  bgee_intergenic_file)
+            bgee_intergenic_file)
     }
     bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
-    #keep only intergenic ids from fasta file
+    # keep only intergenic ids from fasta file
     return(as.data.frame(sub("^([^ ]+).*", "\\1", names(bgee_intergenic))))
 }
 
@@ -54,70 +54,72 @@ get_ref_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
 #' @export
 #' 
 #' @examples {
-#' # this example reuse data present in the directory "extdata" of the package.
-#' user <- new("UserMetadata", working_path = system.file("extdata", 
-#' package = "BgeeCall"), species_id = "6239", rnaseq_lib_path = system.file(
-#' "extdata", "SRX099901_subset", package = "BgeeCall"), 
-#' annotation_name = "WBcel235_84", simple_arborescence = TRUE)
+#' # this example reuse data present in the directory 'extdata' of the package.
+#' user <- new('UserMetadata', working_path = system.file('extdata', 
+#' package = 'BgeeCall'), species_id = '6239', rnaseq_lib_path = system.file(
+#' 'extdata', 'SRX099901_subset', package = 'BgeeCall'), 
+#' annotation_name = 'WBcel235_84', simple_arborescence = TRUE)
 #' calls_output <- generate_presence_absence(myUserMetadata = user)
 #' 
 #' #
 #' }
 #'
-generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"),
-                                      myBgeeMetadata = new("BgeeMetadata"), 
-                                      myUserMetadata) {
+generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"), 
+    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata) {
     system.file()
     # load data
-    ref_intergenic <- get_ref_intergenic_ids(myBgeeMetadata, myUserMetadata)
-    tool_path <- get_tool_path(myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
-    output_path <- get_tool_output_path(myAbundanceMetadata, myBgeeMetadata, 
-                                        myUserMetadata)
+    ref_intergenic <- get_ref_intergenic_ids(myBgeeMetadata, 
+        myUserMetadata)
+    tool_path <- get_tool_path(myAbundanceMetadata, 
+        myBgeeMetadata, myUserMetadata)
+    output_path <- get_tool_output_path(myAbundanceMetadata, 
+        myBgeeMetadata, myUserMetadata)
     
-    # biotype mapping information will depend on summarization at gene level or not 
+    # biotype mapping information will depend on
+    # summarization at gene level or not
     biotype_mapping <- ""
     if (myAbundanceMetadata@txOut) {
         biotype_mapping <- load_transcript_to_biotype(myAbundanceMetadata, 
-                                                      myBgeeMetadata, 
-                                                      myUserMetadata)
+            myBgeeMetadata, myUserMetadata)
     } else {
-        biotype_mapping <- load_gene_to_biotype(myAbundanceMetadata, myBgeeMetadata, 
-                                                myUserMetadata)
+        biotype_mapping <- load_gene_to_biotype(myAbundanceMetadata, 
+            myBgeeMetadata, myUserMetadata)
     }
     
-    #run tximport for file with intergenic regions 
-    # (if myAbundanceMetadata@txOut = FALSE, 
-    # then tximport will summurarize transcript level estimates at gene level)
+    # run tximport for file with intergenic regions (if
+    # myAbundanceMetadata@txOut = FALSE, then tximport
+    # will summurarize transcript level estimates at
+    # gene level)
     tximportObject <- run_tximport(myAbundanceMetadata = myAbundanceMetadata, 
-                                   myBgeeMetadata = myBgeeMetadata, 
-                                   myUserMetadata = myUserMetadata)
+        myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
     
-    # recalculate TPM without intergenic regions and run tximport 
-    # (if myAbundanceMetadata@txOut = FALSE, then tximport will summurarize 
-    # at transcript level 
-    # estimates at gene level)
+    # recalculate TPM without intergenic regions and
+    # run tximport (if myAbundanceMetadata@txOut =
+    # FALSE, then tximport will summurarize at
+    # transcript level estimates at gene level)
     
-    #remove intergenic
-    tximportObject_without_intergenic <- abundance_without_intergenic(
-        myAbundanceMetadata, myBgeeMetadata, myUserMetadata)
+    # remove intergenic
+    tximportObject_without_intergenic <- abundance_without_intergenic(myAbundanceMetadata, 
+        myBgeeMetadata, myUserMetadata)
     
-    # transform tximportObect in order to easily process information
-    abundance <- transform_tximport(tximportObject, biotype_mapping)
-    # transform tximportObject without intergenic  in order to easily 
+    # transform tximportObect in order to easily
     # process information
-    abundance_without_intergenic <- transform_tximport(
-        tximportObject_without_intergenic, biotype_mapping)
+    abundance <- transform_tximport(tximportObject, 
+        biotype_mapping)
+    # transform tximportObject without intergenic in
+    # order to easily process information
+    abundance_without_intergenic <- transform_tximport(tximportObject_without_intergenic, 
+        biotype_mapping)
     
     # define coding and intergenic abundance subset
     selected_coding <- abundance$biotype %in% "protein_coding"
     selected_intergenic <- (abundance$type == "intergenic" & 
-                                abundance$id %in% biotype_mapping$id)
+        abundance$id %in% biotype_mapping$id)
     
-    #calculate TPM cutoff
+    # calculate TPM cutoff
     cat("Generate present/absent expression calls.\n")
-    results <- calculate_abundance_cutoff(abundance, selected_coding, 
-                                          selected_intergenic, 
-                                          myAbundanceMetadata@cutoff)
+    results <- calculate_abundance_cutoff(abundance, 
+        selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
     abundance_cutoff <- results[1]
     r_cutoff <- results[2]
     
@@ -132,41 +134,45 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     }
     
     # generate pdf plot
-    pdf(file = file.path(output_path, distribution_file_name), width = 6, height = 5)
-    plot_distributions(abundance, selected_coding, selected_intergenic,
-                       abundance_cutoff, myUserMetadata)
+    pdf(file = file.path(output_path, distribution_file_name), 
+        width = 6, height = 5)
+    plot_distributions(abundance, selected_coding, 
+        selected_intergenic, abundance_cutoff, myUserMetadata)
     
     # add presence/absence information
-    abundance$call <- ifelse(abundance$abundance >= abundance_cutoff, 
-                             "present", "absent")
+    abundance$call <- ifelse(abundance$abundance >= 
+        abundance_cutoff, "present", "absent")
     
     # generate cutoff info file
-    cutoff_info_file <- cutoff_info(abundance, "call", abundance_cutoff,
-                                    r_cutoff, myUserMetadata)
+    cutoff_info_file <- cutoff_info(abundance, "call", 
+        abundance_cutoff, r_cutoff, myUserMetadata)
     dev.off()
     
-    # transfert presence/absence annotations to the abundances without intergenic
+    # transfert presence/absence annotations to the
+    # abundances without intergenic
     abundance_without_intergenic <- merge(abundance_without_intergenic, 
-                                          abundance[, c("id", "call")], by="id")
+        abundance[, c("id", "call")], by = "id")
     
     # Save calls and stats to output folder
     calls_file_path <- file.path(output_path, calls_file_name)
-    cutoff_info_file_path <- file.path(output_path, cutoff_info_file_name)
-    write.table(abundance_without_intergenic,
-                file = calls_file_path,
-                quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
-    write.table(t(t(cutoff_info_file)),
-                file = cutoff_info_file_path,
-                quote = FALSE, sep = "\t", col.names = FALSE, row.names = TRUE)
+    cutoff_info_file_path <- file.path(output_path, 
+        cutoff_info_file_name)
+    write.table(abundance_without_intergenic, file = calls_file_path, 
+        quote = FALSE, sep = "\t", col.names = TRUE, 
+        row.names = FALSE)
+    write.table(t(t(cutoff_info_file)), file = cutoff_info_file_path, 
+        quote = FALSE, sep = "\t", col.names = FALSE, 
+        row.names = TRUE)
     calls_result <- list()
     calls_result$calls_tsv_path <- calls_file_path
     calls_result$cutoff_info_file_path <- cutoff_info_file_path
     calls_result$abundance_tsv <- file.path(output_path, 
-                                            myAbundanceMetadata@abundance_file)
+        myAbundanceMetadata@abundance_file)
     calls_result$TPM_distribution_path <- file.path(output_path, 
-                                                    distribution_file_name)
+        distribution_file_name)
     return(calls_result)
-    ## t(t(cutoff_info_file)) is a solution to export a vector vertically
+    ## t(t(cutoff_info_file)) is a solution to export a
+    ## vector vertically
 }
 
 #' @title Transform txinport object
@@ -182,10 +188,11 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
 #' @noMd
 #' @noRd
 #'
-transform_tximport <- function (tximportObject, biotype_mapping) {
+transform_tximport <- function(tximportObject, biotype_mapping) {
     tx_df <- as.data.frame(tximportObject)
     tx_df$id <- rownames(tx_df)
     tx_df$countsFromAbundance <- NULL
-    abundance <- merge(tx_df, biotype_mapping, by = "id", all = FALSE)
+    abundance <- merge(tx_df, biotype_mapping, by = "id", 
+        all = FALSE)
 }
 
