@@ -29,6 +29,8 @@
 #'                                 'WBcel235')
 #' merge_transcriptome_and_intergenic(kallisto, bgee, user)
 #' }
+#' 
+#' @return save merged file on the hard drive
 
 merge_transcriptome_and_intergenic <- function(myKallistoMetadata, 
     myBgeeMetadata, myUserMetadata) {
