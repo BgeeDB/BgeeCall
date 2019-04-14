@@ -11,14 +11,17 @@ download_kallisto(myKallistoMetadata, myUserMetadata)
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
+\value{
+save uncompressed executable of kallisto on the hard drive
+}
 \description{
 Check your OS and download correct binary 
 version of kallisto.
 }
 \examples{
 {
-  kallisto <- new("KallistoMetadata")
-  user <- new("UserMetadata")
+  kallisto <- new('KallistoMetadata')
+  user <- new('UserMetadata')
   download_kallisto(kallisto, user)
 }
 

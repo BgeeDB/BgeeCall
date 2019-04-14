@@ -4,7 +4,8 @@
 \alias{run_tximport}
 \title{Run tximport}
 \usage{
-run_tximport(myAbundanceMetadata, myBgeeMetadata, myUserMetadata,
+run_tximport(myAbundanceMetadata = new("KallistoMetadata"),
+  myBgeeMetadata = new("BgeeMetadata"), myUserMetadata,
   abundanceFile = "")
 }
 \arguments{
@@ -20,6 +21,9 @@ If not NULL, the file located at `abundanceFile` will be used to run tximport.
 Otherwise (Default) the path to the abundance file is deduced fom attributes of
 classes `BgeeMetadata`, `UserMetadata` and `AbundanceMetadata`}
 }
+\value{
+a tximport object
+}
 \description{
 Run tximport. Will summarize abundance estimation from transcript 
 level to gene level if `myAbundanceMetadata@txout == FALSE`. 
@@ -27,20 +31,13 @@ Otherwise keep abundance estimation at transcript level.
 }
 \examples{
 {
-library(AnnotationHub)
-ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-annotation_object <- ah_resources[["AH50789"]]
-user <- new("UserMetadata", species_id = "6239")
-user <- setAnnotationFromObject(user, annotation_object, "WBcel235_84")
-user <- setRNASeqLibPath(user, 
-                        system.file("extdata", 
-                        "SRX099901_subset", 
-                        package = "BgeeCall"))
-bgee <- new("BgeeMetadata", intergenic_release = "0.1")
-kallisto <- new("KallistoMetadata")
-abundance_file <- system.file("extdata", "abundance.tsv", package = "BgeeCall")
-tx_import <- run_tximport(kallisto, bgee, user, abundance_file)
+user <- new("UserMetadata", working_path = system.file("extdata", 
+    package = "BgeeCall"), species_id = "6239", 
+  rnaseq_lib_path = system.file("extdata", 
+    "SRX099901_subset", package = "BgeeCall"), 
+  annotation_name = "WBcel235_84", simple_arborescence = TRUE)
+abundance_file <- system.file('extdata', 'abundance.tsv', package = 'BgeeCall')
+tx_import <- run_tximport(user, abundance_file)
 }
 
 }

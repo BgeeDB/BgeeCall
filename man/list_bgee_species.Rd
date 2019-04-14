@@ -9,8 +9,8 @@ list_bgee_species(release = NULL, ordering = NULL,
 }
 \arguments{
 \item{release}{A character specifying a targeted release number. 
-In the form "Release.subrelease" or "Release_subrelease", 
-e.g., "14.0" or 14_0". If not specified, the latest release is used.}
+In the form 'Release.subrelease' or 'Release_subrelease', 
+e.g., '14.0' or 14_0'. If not specified, the latest release is used.}
 
 \item{ordering}{A numeric indicating the number of the column which should 
 be used to sort the data frame. Default NULL, returning unsorted data frame.}
@@ -33,7 +33,7 @@ presence absence of datatypes in Bgee. This function call the
 \examples{
 {
 list_bgee_species()
-list_bgee_species(release = "14")
+list_bgee_species(release = '14')
 }
 
 }

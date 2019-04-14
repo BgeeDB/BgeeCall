@@ -14,14 +14,17 @@ download_fasta_intergenic(myBgeeMetadata = new("BgeeMetadata"),
 
 \item{bgee_intergenic_file}{path where intergenic file will be saved}
 }
+\value{
+download fasta intergenic from Bgee FTP and save it on the hard drive
+}
 \description{
 Check if Bgee reference intergenic fasta file has already 
 been downloaded. If not the file is downloaded.
 }
 \examples{
 {
-bgee_intergenic_file <- file.path(getwd(), "intergenic.fasta")
-userMetadata <- new("UserMetadata", species_id = "7227")
+bgee_intergenic_file <- file.path(getwd(), 'intergenic.fasta')
+userMetadata <- new('UserMetadata', species_id = '7227')
 }
 
 }

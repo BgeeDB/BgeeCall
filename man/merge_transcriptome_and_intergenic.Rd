@@ -15,6 +15,9 @@ merge_transcriptome_and_intergenic(myKallistoMetadata, myBgeeMetadata,
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 }
+\value{
+save merged file on the hard drive
+}
 \description{
 This function will create a file corresponding to the concatenation 
 of the transcriptome fasta file provided by the user and the corresponding 
@@ -22,18 +25,19 @@ intergenic fasta file created by Bgee.
 }
 \examples{
 {
-bgee <- new("BgeeMetadata", intergenic_release = "0.1")
-user <- new ("UserMetadata", species_id = "6239")
-kallisto <- new("KallistoMetadata")
+bgee <- new('BgeeMetadata', intergenic_release = '0.1')
+user <- new ('UserMetadata', species_id = '6239')
+kallisto <- new('KallistoMetadata')
 # load transcriptome from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
+ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
+transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
 user <- setTranscriptomeFromObject(user, transcriptome_object,
-                                "WBcel235")
+                                'WBcel235')
 merge_transcriptome_and_intergenic(kallisto, bgee, user)
 }
+
 }
 \author{
 Julien Wollbrett.
