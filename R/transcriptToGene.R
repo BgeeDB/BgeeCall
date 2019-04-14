@@ -153,7 +153,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #'     "SRX099901_subset", package = "BgeeCall"), 
 #'   annotation_name = "WBcel235_84", simple_arborescence = TRUE)
 #' abundance_file <- system.file('extdata', 'abundance.tsv', package = 'BgeeCall')
-#' tx_import <- run_tximport(user, abundance_file)
+#' tx_import <- run_tximport(myUserMetadata = user, 
+#' abundanceFile = abundance_file)
 #' }
 #' 
 #' @return a tximport object
