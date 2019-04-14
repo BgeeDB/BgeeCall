@@ -18,7 +18,7 @@ test_that("test creation of transcript to gene file", {
   user <- new("UserMetadata")
   user@species_id <- "6239" # C. elegans
   user@working_path <- getwd()
-  ah = AnnotationHub()
+  ah <- AnnotationHub()
   # query the annotation hub
   potential_datasets <- query(ah, c("GTF","Ensembl", "Caenorhabditis elegans", "Caenorhabditis_elegans.WBcel235.84"))
   # retrieve dataset locally and keep path to local file
