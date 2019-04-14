@@ -30,11 +30,11 @@ If you are not an advanced user it is safer to run the function
 }
 \examples{
 {
-# this example reuse data present in the directory "extdata" of the package.
-user <- new("UserMetadata", working_path = system.file("extdata", 
-package = "BgeeCall"), species_id = "6239", rnaseq_lib_path = system.file(
-"extdata", "SRX099901_subset", package = "BgeeCall"), 
-annotation_name = "WBcel235_84", simple_arborescence = TRUE)
+# this example reuse data present in the directory 'extdata' of the package.
+user <- new('UserMetadata', working_path = system.file('extdata', 
+package = 'BgeeCall'), species_id = '6239', rnaseq_lib_path = system.file(
+'extdata', 'SRX099901_subset', package = 'BgeeCall'), 
+annotation_name = 'WBcel235_84', simple_arborescence = TRUE)
 calls_output <- generate_presence_absence(myUserMetadata = user)
 
 #

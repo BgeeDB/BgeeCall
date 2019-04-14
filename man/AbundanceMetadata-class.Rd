@@ -9,32 +9,34 @@
 An S4 class that is the parent class of all abundance tool 
 Classes. 
 It contains information needed to all abundance tools.
-This class can be seen as an abstract class, you should never instanciate it.
+This class can be seen as an abstract class, you should never instanciate 
+it.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{txOut}}{Similar to tximport txOut parameter. Allows to keep abundance at 
+\item{\code{txOut}}{Similar to tximport txOut parameter. Allows to keep abundance at
 transcript level if TRUE (default = FALSE)}
 
-\item{\code{ignoreTxVersion}}{logical used to remove transcript version in transcript ID
-if TRUE (default = FALSE)}
+\item{\code{ignoreTxVersion}}{logical used to remove transcript version in 
+transcript ID if TRUE (default = FALSE)}
 
 \item{\code{cutoff}}{numeric corresponding to the proportion of intergenic present 
-divided by proportion of protein coding present (default = 0.05). In the Bgee 
-pipeline this cutoff is fixed and its value is 0.05. Be careful when changing 
-this parameter as it could have a huge impact on your present/absent calls.}
+divided by proportion of protein coding present (default = 0.05). In the 
+Bgee pipeline this cutoff is fixed and its value is 0.05. Be careful when 
+changing this parameter as it could have a huge impact on your 
+present/absent calls.}
 
 \item{\code{full_transcriptome_file}}{Name of the fasta file containing both 
-transcriptomic and intergenic regions. This file is created by the pipeline. 
-You should edit this slot only if you already have such a file with a different
-name.}
+transcriptomic and intergenic regions. This file is created by the pipeline.
+You should edit this slot only if you already have such a file with a 
+different name.}
 
-\item{\code{tx2gene_file}}{Name of the file containing the mapping between transcript 
-IDs and gene IDs (See the tximport package vignette for more details). 
-This file is created by the pipeline. You should edit this slot only if you 
-already have such a file with a different name. This file must be store at 
-get_species_path()}
+\item{\code{tx2gene_file}}{Name of the file containing the mapping between 
+transcript IDs and gene IDs (See the tximport package vignette for more 
+details). This file is created by the pipeline. You should edit this 
+slot only if you already have such a file with a different name. This 
+file must be store at get_species_path()}
 
 \item{\code{tx2gene_file_without_version}}{Name of the file containing the mapping 
 between transcript IDs and gene IDs if ignoreTxVersion == TRUE (See the 
@@ -42,49 +44,51 @@ tximport package vignette for more details). This file is created by the
 pipeline. You should edit this slot only if you already have such a file 
 with a different name. This file must be store at get_species_path()}
 
-\item{\code{gene2biotype_file}}{Name of the file containing the mapping between gene IDs
-and biotypes. This file is created by the pipeline. You should edit this slot 
-only if you already have such a file with a different name.}
+\item{\code{gene2biotype_file}}{Name of the file containing the mapping between 
+gene IDs and biotypes. This file is created by the pipeline. You should 
+edit this slot only if you already have such a file with a different name.}
 
 \item{\code{tool_name}}{Name of the tool that will be use to generate transcript 
 abundance estimation. All descendant of this class have to define a value 
 for this slot (in the prototype section)}
 
-\item{\code{abundance_file}}{Name of the transcript-level abundance file. All descendant
-of this class have to define a value for this slot (in the prototype section)}
+\item{\code{abundance_file}}{Name of the transcript-level abundance file. All 
+descendant of this class have to define a value for this slot (in the 
+prototype section)}
 
-\item{\code{read_size_kmer_threshold}}{read size of the library below which transcript 
-index is created using a smaller kmer size}
+\item{\code{read_size_kmer_threshold}}{read size of the library below which 
+transcript index is created using a smaller kmer size}
 
 \item{\code{transcript_id_header}}{Name of the header of the column that contains 
 transcript ID}
 
 \item{\code{count_header}}{Name of the header of the column that contains count}
 
-\item{\code{abundance_header}}{Name of the header of the column that contains abundance}
+\item{\code{abundance_header}}{Name of the header of the column that contains 
+abundance}
 
-\item{\code{eff_length_header}}{Name of the header of the column that contains effective
-length}
+\item{\code{eff_length_header}}{Name of the header of the column that contains 
+effective length}
 
-\item{\code{transcript_calls_file_name}}{default name of file containing all transcript 
-ids and calls (if calls created at transcript level)}
+\item{\code{transcript_calls_file_name}}{default name of file containing all 
+transcript ids and calls (if calls created at transcript level)}
 
 \item{\code{gene_calls_file_name}}{default name of file containing all gene ids and 
-calls
-(if calls created at gene level)}
+calls (if calls created at gene level)}
 
-\item{\code{transcript_cutoff_file_name}}{default name of file containing summary of 
-cutoff used to generate transcript expression calls (if calls created at 
-transcript level)}
+\item{\code{transcript_cutoff_file_name}}{default name of file containing summary 
+of cutoff used to generate transcript expression calls (if calls created 
+at transcript level)}
 
-\item{\code{gene_cutoff_file_name}}{default name of file containing summary of cutoff 
-used to generate gene expression calls (if calls created at gene level)}
-
-\item{\code{transcript_distribution_file_name}}{default name of density plot file 
-containing TPM distribution of all transcripts  (if calls created at transcript 
+\item{\code{gene_cutoff_file_name}}{default name of file containing summary of 
+cutoff used to generate gene expression calls (if calls created at gene 
 level)}
 
-\item{\code{gene_distribution_file_name}}{default name of density plot file containing 
-TPM distribution of all genes (if calls created at gene level)}
+\item{\code{transcript_distribution_file_name}}{default name of density plot file 
+containing TPM distribution of all transcripts  (if calls created at 
+transcript level)}
+
+\item{\code{gene_distribution_file_name}}{default name of density plot file 
+containing TPM distribution of all genes (if calls created at gene level)}
 }}
 

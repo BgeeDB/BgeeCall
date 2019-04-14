@@ -22,6 +22,9 @@ downloaded from Bgee and the reference transcriptome. If this
 function is run to generate present/absent then 'transcriptome_path' 
 has to be empty}
 }
+\value{
+create kallisto index and save it on the hard drive
+}
 \description{
 This function creates kallisto indexes. 
 Two indexes can be created depending on the reads size (see 
@@ -34,25 +37,24 @@ kmer size of 21 nt. In order to generate.
 # first a transcriptome is needed. Here it is downloaded from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
 
 # kallisto can not deal with S4 objects. A Path to a transcriptome file is 
 # required
-transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
-transcriptome_path <- file.path(getwd(),"transcriptome.fa")
+transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
+transcriptome_path <- file.path(getwd(),'transcriptome.fa')
 Biostrings::writeXStringSet(transcriptome_object, transcriptome_path)
 
 
 
 # initialize objects needed to create destination folder
-bgee <- new("BgeeMetadata")
-user <- new("UserMetadata", species_id = "6239")
-kallisto <- new("KallistoMetadata")
+bgee <- new('BgeeMetadata')
+user <- new('UserMetadata', species_id = '6239')
+kallisto <- new('KallistoMetadata')
 
 # generate transcriptome index
 create_kallisto_index(kallisto, bgee, user, transcriptome_path)
 }
-
 
 }
 \author{

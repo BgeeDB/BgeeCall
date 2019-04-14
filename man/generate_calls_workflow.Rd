@@ -36,7 +36,7 @@ a smaller kmer size
 \item{userFile}{path to a tsv file containing 7 columns. these columns are
 the same than for userDataFrame (see above). a template of this file is 
 available at the root of the package and accessible with the command
-system.file("userMetadataTemplate.tsv", package = "BgeeCall")}
+system.file('userMetadataTemplate.tsv', package = 'BgeeCall')}
 }
 \value{
 paths to the 4 results files (see vignette for more details)
@@ -55,9 +55,9 @@ KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
 # import gene annotation and transcriptome from AnnotationHub
 library(AnnotationHub)
 ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
-annotation_object <- ah_resources[["AH50789"]]
-transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
+ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
+annotation_object <- ah_resources[['AH50789']]
+transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
 
 # instanciate BgeeCall object
 # add annotation and transcriptome in the user_BgeeCall object
@@ -66,14 +66,14 @@ transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 # setTranscriptomeFromFile()
 user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, 
                                          annotation_object, 
-                                         "WBcel235_84")
+                                         'WBcel235_84')
 user_BgeeCall <- setTranscriptomeFromObject(user_BgeeCall, 
                                           transcriptome_object, 
-                                          "WBcel235")
+                                          'WBcel235')
 # provide path to the directory of your RNA-Seq library
 user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
-                 system.file("extdata", "SRX099901_subset", 
-                 package = "BgeeCall"))
+                 system.file('extdata', 'SRX099901_subset', 
+                 package = 'BgeeCall'))
 
 # run the full BgeeCall workflow
 calls_output <- generate_calls_workflow(

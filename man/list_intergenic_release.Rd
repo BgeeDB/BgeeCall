@@ -7,7 +7,7 @@
 list_intergenic_release(release = NULL)
 }
 \arguments{
-\item{release}{A character specifying a targeted release number (e.g., "14"). 
+\item{release}{A character specifying a targeted release number (e.g., '14'). 
 If not specified, all available releases are shown.}
 }
 \value{
