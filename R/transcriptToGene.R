@@ -147,24 +147,18 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #' @export
 #' 
 #' @examples {
-#' library(AnnotationHub)
-#' ah <- AnnotationHub()
-#' ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
-#' annotation_object <- ah_resources[['AH50789']]
-#' user <- new('UserMetadata', species_id = '6239')
-#' user <- setAnnotationFromObject(user, annotation_object, 'WBcel235_84')
-#' user <- setRNASeqLibPath(user, 
-#'                         system.file('extdata', 
-#'                         'SRX099901_subset', 
-#'                         package = 'BgeeCall'))
-#' bgee <- new('BgeeMetadata', intergenic_release = '0.1')
-#' kallisto <- new('KallistoMetadata')
+#' user <- new("UserMetadata", working_path = system.file("extdata", 
+#'     package = "BgeeCall"), species_id = "6239", 
+#'   rnaseq_lib_path = system.file("extdata", 
+#'     "SRX099901_subset", package = "BgeeCall"), 
+#'   annotation_name = "WBcel235_84", simple_arborescence = TRUE)
 #' abundance_file <- system.file('extdata', 'abundance.tsv', package = 'BgeeCall')
-#' tx_import <- run_tximport(kallisto, bgee, user, abundance_file)
+#' tx_import <- run_tximport(user, abundance_file)
 #' }
 #'
-run_tximport <- function(myAbundanceMetadata, myBgeeMetadata, 
-    myUserMetadata, abundanceFile = "") {
+run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"), 
+                         myBgeeMetadata = new("BgeeMetadata"), 
+                         myUserMetadata, abundanceFile = "") {
     tx2gene_path <- create_tx2gene(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
     tx2gene <- read.table(tx2gene_path, header = TRUE, 
