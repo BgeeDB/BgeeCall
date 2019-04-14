@@ -162,6 +162,8 @@ get_tool_output_path <- function(myAbundanceMetadata,
 #' bgee_intergenic_file <- file.path(getwd(), 'intergenic.fasta')
 #' userMetadata <- new('UserMetadata', species_id = '7227')
 #' }
+#' 
+#' @return download fasta intergenic from Bgee FTP and save it on the hard drive
 #'
 download_fasta_intergenic <- function(myBgeeMetadata = new("BgeeMetadata"), 
     myUserMetadata, bgee_intergenic_file) {

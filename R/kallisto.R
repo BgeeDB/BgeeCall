@@ -45,6 +45,7 @@
 #' create_kallisto_index(kallisto, bgee, user, transcriptome_path)
 #' }
 #'
+#' @return create kallisto index and save it on the hard drive
 #'
 create_kallisto_index <- function(myKallistoMetadata, 
     myBgeeMetadata, myUserMetadata, transcriptome_path = "") {
@@ -177,6 +178,8 @@ for species ",
 #' # generate transcriptome index
 #' run_kallisto(kallisto, bgee, user, transcriptome_path)
 #' }
+#' 
+#' @return create kallisto output files and save them on the hard drive
 #'
 run_kallisto <- function(myKallistoMetadata, myBgeeMetadata, 
     myUserMetadata, transcriptome_path = "") {
@@ -311,6 +314,8 @@ is_kallisto_installed <- function(myKallistoMetadata,
 #' }
 #' 
 #' @export
+#' 
+#' @return save uncompressed executable of kallisto on the hard drive
 #'
 download_kallisto <- function(myKallistoMetadata, myUserMetadata) {
     kallisto_dir <- get_kallisto_dir_path(myKallistoMetadata, 

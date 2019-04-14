@@ -155,6 +155,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #' abundance_file <- system.file('extdata', 'abundance.tsv', package = 'BgeeCall')
 #' tx_import <- run_tximport(user, abundance_file)
 #' }
+#' 
+#' @return a tximport object
 #'
 run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"), 
                          myBgeeMetadata = new("BgeeMetadata"), 
