@@ -28,12 +28,7 @@ intergenic fasta file created by Bgee.
 bgee <- new('BgeeMetadata', intergenic_release = '0.1')
 user <- new ('UserMetadata', species_id = '6239')
 kallisto <- new('KallistoMetadata')
-# load transcriptome from AnnotationHub
-library(AnnotationHub)
-ah <- AnnotationHub()
-ah_resources <- query(ah, c('Ensembl', 'Caenorhabditis elegans', '84'))
-transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
-user <- setTranscriptomeFromObject(user, transcriptome_object,
+user <- setTranscriptomeFromFile(user, system.file("extdata", "transcriptome.fa", package = "BgeeCall"),
                                 'WBcel235')
 merge_transcriptome_and_intergenic(kallisto, bgee, user)
 }
