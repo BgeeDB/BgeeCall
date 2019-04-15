@@ -1,7 +1,7 @@
 Package: BgeeCall
 Type: Package
 Title: BgeeCall, a R package for automatic gene expression calls generation
-Version: 0.99.16
+Version: 0.99.17
 Date: 2019-03
 Author: Julien Wollbrett [aut, cre], Julien Roux [aut, cre], Sara Fonseca Costa[ctb], Frederic Bastien [aut]
 Maintainer: Julien Wollbrett <julien.wollbrett@unil.ch>
