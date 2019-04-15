@@ -37,7 +37,8 @@ in the Biostrings package
 \examples{
 {
 user <- new("UserMetadata")
-transcriptome_object <- readDNAStringSet(system.file("extdata", "transcriptome.fa", package = "BgeeCall"))
+transcriptome_object <- Biostrings::readDNAStringSet(
+    system.file("extdata", "transcriptome.fa", package = "BgeeCall"))
 user <- setTranscriptomeFromObject(user, 
                  transcriptome_object,
                  "transcriptome_name")
