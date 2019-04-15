@@ -34,11 +34,10 @@ create folders.
 }
 \examples{
 {
-library(AnnotationHub)
-ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 user <- new("UserMetadata")
-user <- setAnnotationFromObject(user, ah_resources[["AH50789"]],
+annotation_object <- rtracklayer::import(system.file("extdata", 
+"annotation.gtf", package = "BgeeCall"))
+user <- setAnnotationFromObject(user, annotation_object,
                                  "annotation_name")
 }
 

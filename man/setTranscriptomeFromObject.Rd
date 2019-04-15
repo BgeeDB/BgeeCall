@@ -36,12 +36,10 @@ in the Biostrings package
 }
 \examples{
 {
-library(AnnotationHub)
-ah <- AnnotationHub()
-ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 user <- new("UserMetadata")
+transcriptome_object <- readDNAStringSet(system.file("extdata", "transcriptome.fa", package = "BgeeCall"))
 user <- setTranscriptomeFromObject(user, 
-                 rtracklayer::import.2bit(ah_resources[["AH50453"]]),
+                 transcriptome_object,
                  "transcriptome_name")
 }
 
