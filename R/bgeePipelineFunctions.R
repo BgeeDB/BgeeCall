@@ -40,7 +40,6 @@ calculate_abundance_cutoff <- function(counts, selected_coding,
     ## What is value of x (cutoff)? calculate the
     ## distribution of r for a range of TPMs, then
     ## select the closest value to `cutoff`
-    
     ## Counting how many intergenic regions have equal
     ## or higher value of TPM for every value of TPM For
     ## each gene's TPM (sorted), calculate r
@@ -51,7 +50,6 @@ calculate_abundance_cutoff <- function(counts, selected_coding,
         }, numeric(1))
     ## It is not necessary to do the same for coding
     ## regions: for a sorted vector the number of
-    ## greater elements is equal to lenght(vector) -
     ## position + 1.  Here, it is a bit trickier since
     ## we do not consider all coding TPM values, but the
     ## unique ones, so we use the rle function to know
@@ -72,21 +70,21 @@ calculate_abundance_cutoff <- function(counts, selected_coding,
     ## `intergenic_cutoff` or lower (first test if at
     ## least 1 TPM value has this property):
     if (sum(r < intergenic_cutoff) == 0) {
-        TPM_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r == 
-            min(r))[1]]
+        TPM_cutoff <- sort(unique(
+            counts$abundance[selected_coding]))[which(r ==  min(r))[1]]
         r_cutoff <- min(r)
         cat(paste0("There is no TPM cutoff for which ", 
-            prot_coding_present, "% of the expressed genes would be coding. TPM cutoff is fixed at 
+prot_coding_present, "% of the expressed genes would be coding. TPM cutoff is fixed at 
 the first value with maximum coding/intergenic ratio. r=", 
-            r_cutoff, "at TPM=", TPM_cutoff, "\n"))
-    } else {
-        TPM_cutoff <- sort(unique(counts$abundance[selected_coding]))[which(r < 
-            intergenic_cutoff)[1]]
-        r_cutoff <- intergenic_cutoff
-        cat(paste0("TPM cutoff for which ", prot_coding_present, 
-            "% of the expressed genes are coding found at TPM = ", 
-            TPM_cutoff, "\n"))
-    }
+r_cutoff, "at TPM=", TPM_cutoff, "\n"))
+        } else {
+            TPM_cutoff <- sort(unique(
+                counts$abundance[selected_coding]))[which(r < intergenic_cutoff)[1]]
+            r_cutoff <- intergenic_cutoff
+            cat(paste0("TPM cutoff for which ", prot_coding_present, 
+                       "% of the expressed genes are coding found at TPM = ", 
+                       TPM_cutoff, "\n"))
+            }
     return(c(TPM_cutoff, r_cutoff))
 }
 
