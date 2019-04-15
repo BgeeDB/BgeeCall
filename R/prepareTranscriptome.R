@@ -20,8 +20,8 @@
 #' bgee <- new('BgeeMetadata', intergenic_release = '0.1')
 #' user <- new ('UserMetadata', species_id = '6239')
 #' kallisto <- new('KallistoMetadata')
-#' user <- setTranscriptomeFromFile(user, system.file("extdata", "transcriptome.fa", package = "BgeeCall"),
-#'                                 'WBcel235')
+#' user <- setTranscriptomeFromFile(user, system.file("extdata", 
+#' "transcriptome.fa", package = "BgeeCall"), 'WBcel235')
 #' merge_transcriptome_and_intergenic(kallisto, bgee, user)
 #' }
 #' 
