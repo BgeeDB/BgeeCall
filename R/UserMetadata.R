@@ -288,13 +288,25 @@ setMethod(f="setRNASeqLibPath",
           })
 
 #' @rdname setTranscriptomeFromFile
+#' @aliases setTranscriptomeFromFile,userMetadata,character,missing
+setMethod(f="setTranscriptomeFromFile", 
+signature=c(userObject = "UserMetadata", 
+            transcriptomePath = "character", 
+            transcriptomeName = "missing"), 
+definition=function(userObject, transcriptomePath, 
+                    transcriptomeName) {
+    return(setTranscriptomeFromFile(userObject, transcriptomePath, ""))   
+})
+    
+
+#' @rdname setTranscriptomeFromFile
 #' @aliases setTranscriptomeFromFile,userMetadata,character,character
 setMethod(f="setTranscriptomeFromFile", 
           signature=c(userObject = "UserMetadata", 
                       transcriptomePath = "character", 
                       transcriptomeName = "character"), 
           definition=function(userObject, transcriptomePath, 
-                              transcriptomeName = "") {
+                              transcriptomeName) {
               if(typeof(transcriptomePath) == "character") {
                   if(file.exists(transcriptomePath)) {
                       userObject@transcriptome_object <- 
@@ -305,7 +317,7 @@ setMethod(f="setTranscriptomeFromFile",
                             transcriptome file"))
                   }
               }
-              if (length(transcriptomeName) == 0) {
+              if (nchar(transcriptomeName) == 0) {
                   userObject@transcriptome_name <- basename(transcriptomePath)
               } else {
                   userObject@transcriptome_name <- transcriptomeName
@@ -317,8 +329,17 @@ setMethod(f="setTranscriptomeFromFile",
 #' @aliases setAnnotationFromFile,userMetadata,character,character
 setMethod(f="setAnnotationFromFile", 
           signature=c(userObject = "UserMetadata", 
+                      annotationPath = "character", annotationName = "missing"),
+          definition=function(userObject, annotationPath, annotationName) {
+              return(setAnnotationFromFile(userObject, annotationPath, ""))
+          })
+
+#' @rdname setAnnotationFromFile
+#' @aliases setAnnotationFromFile,userMetadata,character,character
+setMethod(f="setAnnotationFromFile", 
+          signature=c(userObject = "UserMetadata", 
                       annotationPath = "character", annotationName = "character"),
-          definition=function(userObject, annotationPath, annotationName = "") {
+          definition=function(userObject, annotationPath, annotationName) {
               if(typeof(annotationPath) == "character") {
                   if(file.exists(annotationPath)) {
                       userObject@annotation_object <- rtracklayer::import(annotationPath)
@@ -327,7 +348,7 @@ setMethod(f="setAnnotationFromFile",
                                   Should be the full path to your annotation file"))
                   }
                   }
-              if (length(annotationName) == 0) {
+              if (nchar(annotationName) == 0) {
                   userObject@annotation_name <- basename(annotationPath)
               } else {
                   userObject@annotation_name <- annotationName
@@ -361,7 +382,7 @@ setMethod(f="setAnnotationFromObject",
                       annotationName = "character"),
           definition=function(userObject, annotationObject, annotationName = "") {
               if(typeof(annotationObject) == "S4" &&
-                 (length(annotationName) != 0)) {
+                 (nchar(annotationName) != 0)) {
                   userObject@annotation_object <- annotationObject
                   userObject@annotation_name <- annotationName
               } else {

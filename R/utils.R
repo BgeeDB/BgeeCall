@@ -417,6 +417,44 @@ removeTxVersionFromAbundance <- function(myAbundanceMetadata,
         quote = FALSE)
 }
 
+#' Generate a summary of the Slots of the S4 objects used to 
+#' generate present / absent calls
+#' 
+#' @noMd
+#' @noRd
+#' 
+generate_S4_object_properties_output <- function(myAbundanceMetadata,
+                                                 myBgeeMetadata,
+                                                 myUserMetadata) {
+    output <- matrix(nrow = 12, ncol = 2)
+    colnames(output) <- c("Slot name", "Slot value")
+    output[1,] <- c("AbundanceMetadata@tool_name", 
+                    myAbundanceMetadata@tool_name)
+    output[2,] <- c("AbundanceMetadata@txOut", 
+                    myAbundanceMetadata@txOut)
+    output[3,] <- c("AbundanceMetadata@ignoreTxVersion", 
+                    myAbundanceMetadata@ignoreTxVersion)
+    output[4,] <- c("AbundanceMetadata@cutoff", 
+                    myAbundanceMetadata@cutoff)
+    output[5,] <- c("AbundanceMetadata@read_size_kmer_threshold", 
+                    myAbundanceMetadata@read_size_kmer_threshold)
+    output[6,] <- c("BgeeMetadata@intergenic_release", 
+                    myBgeeMetadata@intergenic_release)
+    output[7,] <- c("UserMetadata@species_id", 
+                    myUserMetadata@species_id)
+    output[8,] <- c("UserMetadata@reads_size", 
+                    myUserMetadata@reads_size)
+    output[9,] <- c("UserMetadata@rnaseq_lib_path", 
+                    myUserMetadata@rnaseq_lib_path)
+    output[10,] <- c("UserMetadata@transcriptome_name", 
+                    myUserMetadata@transcriptome_name)
+    output[11,] <- c("UserMetadata@annotation_name", 
+                    myUserMetadata@annotation_name)
+    output[12,] <- c("UserMetadata@simple_arborescence", 
+                     myUserMetadata@simple_arborescence)
+    return(output)
+}
+
 #' @title List species present in Bgee
 #'
 #' @description Call a webservice that returns all species present in Bgee.
