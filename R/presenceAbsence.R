@@ -163,6 +163,14 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     write.table(t(t(cutoff_info_file)), file = cutoff_info_file_path, 
         quote = FALSE, sep = "\t", col.names = FALSE, 
         row.names = TRUE)
+    #save values of the Slots of the BgeeCall internal S4 objects
+    s4_summary_df <- as.data.frame(
+        generate_S4_object_properties_output(myAbundanceMetadata,
+                                             myBgeeMetadata,
+                                             myUserMetadata))
+    s4_slots_path <- file.path(output_path, "S4_slots_summary.tsv")
+    write.table(s4_summary_df, file = s4_slots_path, quote = F, sep = "\t",
+                col.names = T, row.names = F)    
     calls_result <- list()
     calls_result$calls_tsv_path <- calls_file_path
     calls_result$cutoff_info_file_path <- cutoff_info_file_path
@@ -170,6 +178,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         myAbundanceMetadata@abundance_file)
     calls_result$TPM_distribution_path <- file.path(output_path, 
         distribution_file_name)
+    calls_result$S4_slots_summary <- s4_slots_path
     return(calls_result)
     ## t(t(cutoff_info_file)) is a solution to export a
     ## vector vertically

@@ -221,7 +221,7 @@ run_from_dataframe <-
              myBgeeMetadata = new("BgeeMetadata"), 
              userMetadataDataFrame) {
     
-    for (row_number in seq_len(userMetadataDataFrame)) {
+    for (row_number in seq_len(nrow(userMetadataDataFrame))) {
         
         # init myUserMetadata object
         myUserMetadata <- new("UserMetadata")
@@ -247,12 +247,11 @@ run_from_dataframe <-
         myUserMetadata@rnaseq_lib_path <- 
             as.character(userMetadataDataFrame[["rnaseq_lib_path"]][row_number])
         myUserMetadata <- setTranscriptomeFromFile(userObject = myUserMetadata, 
-            transcriptomePath = as.character(userMetadataDataFrame[["transcriptome_path"]][row_number]), 
-            transcriptomeName = "")
+            transcriptomePath = as.character(
+                userMetadataDataFrame[["transcriptome_path"]][row_number]))
         myUserMetadata <- setAnnotationFromFile(userObject = myUserMetadata, 
-            annotationPath = 
-                as.character(userMetadataDataFrame[["annotation_path"]][row_number]), 
-            annotationName = "")
+            annotationPath = as.character(
+                userMetadataDataFrame[["annotation_path"]][row_number]))
         myUserMetadata@working_path <- 
             as.character(userMetadataDataFrame[["working_path"]][row_number])
         
