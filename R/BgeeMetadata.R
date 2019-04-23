@@ -88,10 +88,10 @@ or is not available for BgeeCall.")
               } else {
                   stop("ERROR: The specified release number is invalid.")
               }
-              #if(message_to_users != "") {
-              #  message("IMPORTANT : ", message_to_users)
-              #}
-              #validObject(object)
+              if(message_to_users != "") {
+                  message("IMPORTANT : ", message_to_users)
+              }
+              validObject(.Object)
               .Object
           })
 
