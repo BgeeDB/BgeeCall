@@ -73,17 +73,17 @@ calculate_abundance_cutoff <- function(counts, selected_coding,
         TPM_cutoff <- sort(unique(
             counts$abundance[selected_coding]))[which(r ==  min(r))[1]]
         r_cutoff <- min(r)
-        cat(paste0("There is no TPM cutoff for which ", 
+        message("There is no TPM cutoff for which ", 
 prot_coding_present, "% of the expressed genes would be coding. TPM cutoff is fixed at 
 the first value with maximum coding/intergenic ratio. r=", 
-r_cutoff, "at TPM=", TPM_cutoff, "\n"))
+r_cutoff, "at TPM=", TPM_cutoff, "\n")
         } else {
             TPM_cutoff <- sort(unique(
                 counts$abundance[selected_coding]))[which(r < intergenic_cutoff)[1]]
             r_cutoff <- intergenic_cutoff
-            cat(paste0("TPM cutoff for which ", prot_coding_present, 
+            message("TPM cutoff for which ", prot_coding_present, 
                        "% of the expressed genes are coding found at TPM = ", 
-                       TPM_cutoff, "\n"))
+                       TPM_cutoff, "\n")
             }
     return(c(TPM_cutoff, r_cutoff))
 }

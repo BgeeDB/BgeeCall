@@ -75,7 +75,7 @@ create_kallisto_index <- function(myKallistoMetadata,
     if (myKallistoMetadata@download_kallisto) {
         if (is_kallisto_installed(myKallistoMetadata, 
             myUserMetadata) == 1) {
-            cat("It is the first time you try to use Kallisto downloaded 
+            message("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
 potential already installed version of Kallisto.\n")
@@ -100,10 +100,10 @@ potential already installed version of Kallisto.\n")
         file.exists(transcriptome_index_path)) || (myUserMetadata@reads_size < 
         myKallistoMetadata@read_size_kmer_threshold && 
         file.exists(transcriptome_k21_index_path))) {
-        cat("Index file already exist. No need to create a new one.\n")
+        message("Index file already exist. No need to create a new one.\n")
     } else {
         
-        cat("Start generation of kallisto index files.\n")
+        message("Start generation of kallisto index files.\n")
         
         # create kallisto index with default kmer size
         if (myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
@@ -122,9 +122,8 @@ potential already installed version of Kallisto.\n")
                 " ", transcriptome_path)
             system(kallisto_k21_command)
         }
-        cat(paste0("kallisto index files have been succesfully created 
-for species ", 
-            myUserMetadata@species_id, ".\n"))
+        message("kallisto index files have been succesfully created 
+                for species ", myUserMetadata@species_id, ".\n")
     }
 }
 
@@ -198,9 +197,9 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
     
     # test if kallisto has to be run
     if (file.exists(output_abundance_file)) {
-        cat(paste0("kallisto abundance file already exists for library ", 
+        message("kallisto abundance file already exists for library ", 
             basename(myUserMetadata@rnaseq_lib_path), 
-            ". Abundance file will be overwritten.\n"))
+            ". Abundance file will be overwritten.\n")
     }
     # create transcriptome containing bgee intergenic
     # regions
@@ -213,7 +212,7 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
     if (myKallistoMetadata@download_kallisto) {
         if (is_kallisto_installed(myKallistoMetadata, 
             myUserMetadata) == 1) {
-            cat("It is the first time you try to use Kallisto downloaded 
+            message("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
 potential already installed version of Kallisto.\n")
@@ -256,9 +255,9 @@ potential already installed version of Kallisto.\n")
     system(kallisto_command)
     
     if (myKallistoMetadata@ignoreTxVersion) {
-        cat(paste0("remove transcript version info in ", 
+        message("remove transcript version info in ", 
             myKallistoMetadata@abundance_file, " ", 
-            myKallistoMetadata@tool_name, " abundance file.\n"))
+            myKallistoMetadata@tool_name, " abundance file.\n")
         removeTxVersionFromAbundance(myKallistoMetadata, 
             myBgeeMetadata, myUserMetadata)
     }
