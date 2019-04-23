@@ -364,7 +364,7 @@ setMethod(f="setTranscriptomeFromObject",
                       transcriptomeName = "character"),
           definition=function(userObject, transcriptomeObject, 
                               transcriptomeName) {
-              if(typeof(transcriptomeObject) == "S4") {
+              if(isS4(transcriptomeObject)) {
                   userObject@transcriptome_object <- transcriptomeObject
                   userObject@transcriptome_name <- transcriptomeName
               } else {
@@ -381,8 +381,7 @@ setMethod(f="setAnnotationFromObject",
                       annotationObject = "GRanges", 
                       annotationName = "character"),
           definition=function(userObject, annotationObject, annotationName = "") {
-              if(typeof(annotationObject) == "S4" &&
-                 (nchar(annotationName) != 0)) {
+              if(isS4(annotationObject) && (nchar(annotationName) != 0)) {
                   userObject@annotation_object <- annotationObject
                   userObject@annotation_name <- annotationName
               } else {

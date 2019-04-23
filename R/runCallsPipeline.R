@@ -88,11 +88,11 @@ generate_calls_workflow <- function(
         # run workflow when userMetadata is not null
     } else if (!is.null(userMetadata) && is.null(userDataFrame) && 
         is.null(userFile)) {
-        if (typeof(userMetadata) == "S4") {
+        if (isS4(userMetadata)) {
             return(run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
                 myBgeeMetadata = myBgeeMetadata, myUserMetadata = userMetadata))
         } else if (typeof(userMetadata) == "list" && 
-            typeof(userMetadata[[1]]) == "S4") {
+            isS4(userMetadata[[1]])) {
             for (i in seq_len(length(userMetadata))) {
                 results[i] <- 
                     run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
