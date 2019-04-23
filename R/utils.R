@@ -222,7 +222,7 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                   fastq file names end with _1 or _2... In library ", 
                 basename(myUserMetadata@rnaseq_lib_path)))
         }
-        for (i in seq_len(length(first_files))) {
+        for (i in seq_along(first_files)) {
             run_1 <- sub("^([^_]+).*", "\\1", first_files[i], 
                 perl = TRUE)
             run_2 <- sub("^([^_]+).*", "\\1", second_files[i], 
@@ -245,7 +245,7 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 basename(myUserMetadata@rnaseq_lib_path), 
                 ".\n"))
         }
-        for (i in seq_len(length(fastq_files))) {
+        for (i in seq_along(fastq_files)) {
             fastq_files_names = paste(fastq_files_names, 
                 file.path(myUserMetadata@rnaseq_lib_path, 
                   fastq_files[i]), sep = " ")
