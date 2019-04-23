@@ -93,7 +93,7 @@ generate_calls_workflow <- function(
                 myBgeeMetadata = myBgeeMetadata, myUserMetadata = userMetadata))
         } else if (typeof(userMetadata) == "list" && 
             isS4(userMetadata[[1]])) {
-            for (i in seq_along(userMetadata))) {
+            for (i in seq_along(userMetadata)) {
                 results[i] <- 
                     run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
                                     myBgeeMetadata = myBgeeMetadata, 
