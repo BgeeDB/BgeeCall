@@ -267,5 +267,5 @@ sessionInfo()
 
 ``` {r cleanup_after, echo=FALSE, message=FALSE, warning=FALSE}
 unlink(BgeeCall:::get_kallisto_dir_path(kallisto, user_BgeeCall), recursive = TRUE)
-unlink(file.path(user_BgeeCall@working_path, paste0(bgee@intergenic_prefix, "*")), recursive = TRUE)
+unlink(file.path(user_BgeeCall@working_path, paste0(getIntergenicPrefix(bgee), "*")), recursive = TRUE)
 ```

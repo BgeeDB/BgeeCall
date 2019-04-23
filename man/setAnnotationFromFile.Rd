@@ -3,15 +3,20 @@
 \docType{methods}
 \name{setAnnotationFromFile}
 \alias{setAnnotationFromFile}
-\alias{setAnnotationFromFile,UserMetadata,character,character-method}
+\alias{setAnnotationFromFile,UserMetadata,character,missing-method}
 \alias{setAnnotationFromFile,userMetadata,character,character}
+\alias{setAnnotationFromFile,UserMetadata,character,character-method}
 \title{Set annotation_object of one UserMetadata object}
 \usage{
 setAnnotationFromFile(userObject, annotationPath, annotationName)
 
 
+  \S4method{setAnnotationFromFile}{UserMetadata,character,missing}(userObject,
+  annotationPath, annotationName)
+
+
   \S4method{setAnnotationFromFile}{UserMetadata,character,character}(userObject,
-  annotationPath, annotationName = "")
+  annotationPath, annotationName)
 }
 \arguments{
 \item{userObject}{The UserMetadata object}
