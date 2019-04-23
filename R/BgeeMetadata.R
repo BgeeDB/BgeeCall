@@ -100,7 +100,7 @@ or is not available for BgeeCall.")
 #' @description Set value of the `intergenic_release` slot
 #' 
 #' @param bgeeObject The BgeeMetadata object
-#' @param intergenic_release character corresponding to the `intergenic_release`
+#' @param intergenicRelease character corresponding to the `intergenic_release`
 #' 
 #' @return An object of the class BgeeMetadata with new `intergenic_release`
 #'  value

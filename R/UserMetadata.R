@@ -190,6 +190,97 @@ setGeneric(name="setTranscriptomeFromFile",
     standardGeneric("setTranscriptomeFromFile")
 })
 
+#' @title `simple_arborescence` Setter
+#' 
+#' @description Set value of the `simple_arborescence` slot
+#' 
+#' @param userObject The UserMetadata object
+#' @param simpleArborescence boolean defining if output files will be
+#' created a simple arborescence (TRUE) or not (FALSE)
+#' 
+#' @return An object of the class UserMetadata with new `simple_arborescence`
+#'  value
+#' 
+#' @export
+#' @docType methods
+#' @rdname setSimpleArborescence
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' user <- setSimpleArborescence(user, FALSE)
+#' }
+#'
+setGeneric(name="setSimpleArborescence", 
+           def=function(userObject, simpleArborescence) {
+               standardGeneric("setSimpleArborescence")
+           })
+
+#' @title `simple_arborescence` Getter
+#' 
+#' @description Get value of the `simple_arborescence` slot
+#' 
+#' @param userObject The UserMetadata object
+#' 
+#' @return the value of the `simple_arborescence` slot of the object
+#' 
+#' @export
+#' @docType methods
+#' @rdname getSimpleArborescence
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' simple_arborescence <- getSimpleArborescence(user)
+#' }
+#'
+setGeneric(name="getSimpleArborescence", def=function(userObject) {
+    standardGeneric("getSimpleArborescence")
+})
+
+#' @title `run_ids` Setter
+#' 
+#' @description Method of the class UserMetadata. Set run_ids of 
+#' one UserMetadata object by providing the id of all wanted runs
+#' 
+#' @param userObject The UserMetadata object
+#' @param runIds id of all wanted runs
+#' 
+#' @return An object of the class UserMetadata
+#' 
+#' @export
+#' @docType methods
+#' @rdname setRunIds
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' user <- setRunIds(user, c("RUN_1", "RUN_2"))
+#' }
+#'
+setGeneric(name="setRunIds", 
+           def=function(userObject, runIds) {
+               standardGeneric("setRunIds")
+           })
+
+#' @title `run_ids` Getter
+#' 
+#' @description Get value of the `run_ids` slot
+#' 
+#' @param userObject The UserMetadata object
+#' 
+#' @return the value of the `run_ids` slot of the object
+#' 
+#' @export
+#' @docType methods
+#' @rdname getRunIds
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' run_ids <- getRunIds(user)
+#' }
+#'
+setGeneric(name="getRunIds", def=function(userObject) {
+    standardGeneric("getRunIds")
+})
+
 #' @title `working_path` Setter
 #' 
 #' @description Set value of the `working_path` slot
@@ -213,6 +304,7 @@ setGeneric(name="setWorkingPath",
            def=function(userObject, workingPath) {
     standardGeneric("setWorkingPath")
 })
+
 
 #' @title `working_path` Getter
 #' 
@@ -259,6 +351,7 @@ setGeneric(name="setRNASeqLibPath",
     standardGeneric("setRNASeqLibPath")
 })
 
+
 #' @rdname setWorkingPath
 #' @aliases setWorkingPath,userMetadata,character
 setMethod(f="setWorkingPath",
@@ -268,6 +361,7 @@ setMethod(f="setWorkingPath",
               userObject@working_path <- workingPath
               return(userObject)
           })
+
 
 #' @rdname getWorkingPath
 #' @aliases getWorkingPath,userMetadata
@@ -390,3 +484,40 @@ setMethod(f="setAnnotationFromObject",
               }
               return(userObject)
               })
+
+#' @rdname setRunIds
+#' @aliases setRunIds,userMetadata,character
+setMethod(f="setRunIds",
+          signature=c(userObject = "UserMetadata", 
+                      runIds = "character"), 
+          definition=function(userObject, runIds) {
+              userObject@run_ids <- runIds
+              return(userObject)
+          })
+
+#' @rdname getRunIds
+#' @aliases getRunIds,userMetadata
+setMethod(f="getRunIds", 
+          signature=c(userObject = "UserMetadata"), 
+          definition=function(userObject) {
+              return(userObject@run_ids)
+          })
+
+
+#' @rdname setSimpleArborescence
+#' @aliases setSimpleArborescence,userMetadata,logical
+setMethod(f="setSimpleArborescence",
+          signature=c(userObject = "UserMetadata", 
+                      simpleArborescence = "logical"), 
+          definition=function(userObject, simpleArborescence) {
+              userObject@simple_arborescence <- simpleArborescence
+              return(userObject)
+          })
+
+#' @rdname getSimpleArborescence
+#' @aliases getSimpleArborescence,userMetadata
+setMethod(f="getSimpleArborescence", 
+          signature=c(userObject = "UserMetadata"), 
+          definition=function(userObject) {
+              return(userObject@simple_arborescence)
+          })

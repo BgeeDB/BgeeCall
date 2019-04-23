@@ -115,8 +115,8 @@ calls_output <- generate_calls_workflow(userMetadata = user_BgeeCall)
 ```
 
 ```{r, echo=FALSE}
-user_BgeeCall@working_path <- system.file("extdata", package = "BgeeCall")
-user_BgeeCall@simple_arborescence <- TRUE
+user_BgeeCall <- setWorkingPath(user_BgeeCall, system.file("extdata", package = "BgeeCall"))
+user_BgeeCall<- setSimpleArborescence(user_BgeeCall, TRUE)
 calls_output <- generate_presence_absence(myUserMetadata = user_BgeeCall)
 ```
 
@@ -233,7 +233,7 @@ calls_output <- generate_calls_workflow(myAbundanceMetadata = kallisto, userMeta
 By default gene expression calls are generated using all runs of the RNA-Seq library. It is possible to select only a subset of these runs.
 ``` {r, eval=FALSE}
 # RNA-Seq run SRR350955_subsetof from the RNA-Seq library will be used to generate the calls
-user_BgeeCall@run_ids <- c("SRR350955_subset")
+user_BgeeCall <- setRunIds(user_BgeeCall, c("SRR350955_subset"))
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 When run IDs are selected, the name output directory combine the library ID and all selected run IDs. In our example the expression calls will be stored in the directory `SRX099901_SRR350955_subset`.
@@ -254,8 +254,8 @@ kallisto <- new("KallistoMetadata", cutoff = 0.1)
 By default the arborescence of directories created by `BgeeCall` is complex. This complexity allows to generate gene expression calls for the same RNA-Seq library using different transcriptomes or gene annotations.
 The `UserMetadata` class has an attribute allowing to simplify this arborescence and store the result of all libraries in the same directory.
 ``` {r, eval=FALSE}
-user_BgeeCall@run_ids <- ""
-user_BgeeCall@simple_arborescence <- TRUE
+user_BgeeCall <- setRunIds(user_BgeeCall, "")
+user_BgeeCall <- setSimpleArborescence(user_BgeeCall, TRUE)
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 Be careful when you use this option. If you run different analysis for the same RNA-Seq library the results will be overwritten.
@@ -267,5 +267,5 @@ sessionInfo()
 
 ``` {r cleanup_after, echo=FALSE, message=FALSE, warning=FALSE}
 unlink(BgeeCall:::get_kallisto_dir_path(kallisto, user_BgeeCall), recursive = TRUE)
-unlink(file.path(user_BgeeCall@working_path, paste0(getIntergenicPrefix(bgee), "*")), recursive = TRUE)
+unlink(file.path(getWorkingPath(user_BgeeCall), paste0(getIntergenicPrefix(bgee), "*")), recursive = TRUE)
 ```
