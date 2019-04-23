@@ -94,3 +94,95 @@ or is not available for BgeeCall.")
               #validObject(object)
               .Object
           })
+
+#' @title `intergenic_release` Setter
+#' 
+#' @description Set value of the `intergenic_release` slot
+#' 
+#' @param bgeeObject The BgeeMetadata object
+#' @param intergenic_release character corresponding to the `intergenic_release`
+#' 
+#' @return An object of the class BgeeMetadata with new `intergenic_release`
+#'  value
+#' 
+#' @export
+#' @docType methods
+#' @rdname setIntergenicRelease
+#' 
+#' @examples {
+#' bgee <- new("BgeeMetadata")
+#' bgee <- setIntergenicRelease(bgee, "0.1")
+#' }
+#'
+setGeneric(name="setIntergenicRelease", 
+           def=function(bgeeObject, intergenicRelease) {
+               standardGeneric("setIntergenicRelease")
+           })
+
+#' @title `intergenic_release` Getter
+#' 
+#' @description Get value of the `intergenic_release` slot
+#' 
+#' @param bgeeObject The BgeeMetadata object
+#' 
+#' @return the value of the `intergenic_release` slot of the object
+#' 
+#' @export
+#' @docType methods
+#' @rdname getIntergenicRelease
+#' 
+#' @examples {
+#' bgee <- new("BgeeMetadata")
+#' intergenic_release <- getIntergenicRelease(bgee)
+#' }
+#'
+setGeneric(name="getIntergenicRelease", def=function(bgeeObject) {
+    standardGeneric("getIntergenicRelease")
+})
+
+#' @title `intergenic_prefix` Getter
+#' 
+#' @description Get value of the `intergenic_prefix` slot
+#' 
+#' @param bgeeObject The BgeeMetadata object
+#' 
+#' @return the value of the `intergenic_prefix` slot of the object
+#' 
+#' @export
+#' @docType methods
+#' @rdname getIntergenicPrefix
+#' 
+#' @examples {
+#' bgee <- new("BgeeMetadata")
+#' intergenic_prefix <- getIntergenicPrefix(bgee)
+#' }
+#'
+setGeneric(name="getIntergenicPrefix", def=function(bgeeObject) {
+    standardGeneric("getIntergenicPrefix")
+})
+
+#' @rdname setIntergenicRelease
+#' @aliases setIntergenicRelease,bgeeMetadata,character
+setMethod(f="setIntergenicRelease",
+          signature=c(bgeeObject = "BgeeMetadata", 
+                      intergenicRelease = "character"), 
+          definition=function(bgeeObject, intergenicRelease) {
+              bgeeObject@intergenic_release <- intergenicRelease
+              return(bgeeObject)
+          })
+
+#' @rdname getIntergenicRelease
+#' @aliases getIntergenicRelease,bgeeMetadata
+setMethod(f="getIntergenicRelease", 
+          signature=c(bgeeObject = "BgeeMetadata"), 
+          definition=function(bgeeObject) {
+              return(bgeeObject@intergenic_release)
+          })
+
+#' @rdname getIntergenicPrefix
+#' @aliases getIntergenicPrefix,bgeeMetadata
+setMethod(f="getIntergenicPrefix", 
+          signature=c(bgeeObject = "BgeeMetadata"), 
+          definition=function(bgeeObject) {
+              return(bgeeObject@intergenic_prefix)
+          })

@@ -3,6 +3,8 @@
 \docType{methods}
 \name{setTranscriptomeFromFile}
 \alias{setTranscriptomeFromFile}
+\alias{setTranscriptomeFromFile,UserMetadata,character,missing-method}
+\alias{setTranscriptomeFromFile,userMetadata,character,missing}
 \alias{setTranscriptomeFromFile,UserMetadata,character,character-method}
 \alias{setTranscriptomeFromFile,userMetadata,character,character}
 \title{Set transcriptome_object of one UserMetadata object}
@@ -10,8 +12,12 @@
 setTranscriptomeFromFile(userObject, transcriptomePath, transcriptomeName)
 
 
+  \S4method{setTranscriptomeFromFile}{UserMetadata,character,missing}(userObject,
+  transcriptomePath, transcriptomeName)
+
+
   \S4method{setTranscriptomeFromFile}{UserMetadata,character,character}(userObject,
-  transcriptomePath, transcriptomeName = "")
+  transcriptomePath, transcriptomeName)
 }
 \arguments{
 \item{userObject}{The UserMetadata object}
