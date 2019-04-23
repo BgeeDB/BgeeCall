@@ -98,8 +98,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
     }
     tx2gene_path <- file.path(annotation_path, tx2gene_file)
     if (!file.exists(tx2gene_path)) {
-        cat(paste0("Generate file ", tx2gene_file, 
-            ".\n"))
+        message("Generate file ", tx2gene_file, ".\n")
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
@@ -113,8 +112,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         # Remove the transcript version that can be present
         # in transcript id of gtf files
         if (myAbundanceMetadata@ignoreTxVersion) {
-            cat(paste0("remove transcript version info in ", 
-                tx2gene_file, " file.\n"))
+            message("remove transcript version info in ", 
+                tx2gene_file, " file.\n")
             tx2gene$TXNAME <- gsub(pattern = "\\..*", 
                 "", tx2gene$TXNAME)
         }

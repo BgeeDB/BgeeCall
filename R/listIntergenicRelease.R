@@ -20,12 +20,12 @@
 # describing all intergenic releases available for
 # the BgeeCall package
 list_intergenic_release <- function(release = NULL) {
-    cat("Downloading release information of Bgee intergenic regions...\n")
+    message("Downloading release information of Bgee intergenic regions...\n")
     allReleases <- .getIntergenicRelease(removeFile = TRUE)
     if (length(release) == 1) {
         if (sum(allReleases$release == 1)) {
-            cat(paste0("Only displaying information from targeted release ", 
-                release, "\n"))
+            message("Only displaying information from targeted release ", 
+                release, "\n")
             allReleases <- allReleases[allReleases$release == 
                 release, ]
         } else {

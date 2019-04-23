@@ -117,7 +117,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         abundance$id %in% biotype_mapping$id)
     
     # calculate TPM cutoff
-    cat("Generate present/absent expression calls.\n")
+    message("Generate present/absent expression calls.\n")
     results <- calculate_abundance_cutoff(abundance, 
         selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
     abundance_cutoff <- results[1]
