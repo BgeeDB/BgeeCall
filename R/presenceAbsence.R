@@ -169,8 +169,8 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                              myBgeeMetadata,
                                              myUserMetadata))
     s4_slots_path <- file.path(output_path, "S4_slots_summary.tsv")
-    write.table(s4_summary_df, file = s4_slots_path, quote = F, sep = "\t",
-                col.names = T, row.names = F)    
+    write.table(s4_summary_df, file = s4_slots_path, quote = FALSE, sep = "\t",
+                col.names = TRUE, row.names = FALSE)    
     calls_result <- list()
     calls_result$calls_tsv_path <- calls_file_path
     calls_result$cutoff_info_file_path <- cutoff_info_file_path
