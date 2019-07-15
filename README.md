@@ -219,12 +219,11 @@ This 0.05 corresponds to the ratio used in the Bgee pipeline. However it is poss
 kallisto <- new("KallistoMetadata", cutoff = 0.1)
 ```
 
-### Generate calls with a simple arborescence of directories
-By default the arborescence of directories created by `BgeeCall` is complex. This complexity allows to generate gene expression calls for the same RNA-Seq library using different transcriptomes or gene annotations.
-The `UserMetadata` class has an attribute allowing to simplify this arborescence and store the result of all libraries in the same directory.
+### Generate calls for same library using different transcriptome or annotation versions
+By default the arborescence of directories created by `BgeeCall` is as simple as possible. the results will be created using the path `working_path/intergenic_release/all_results/libraryId`. Generating present/absent gene expression calls for the same RNA-Seq library using different transcriptome or annotation versions using this arborescence will overwrite previous results. 
+The `UserMetadata` class has an attribute `simple_arborescence` that is `TRUE` by default. If `FALSE`, a complexe arborescence of directories containing the name of the annotation and transcriptome files will be created. This complex arborescence will then allow to generate present/absent calls for the same library using different version of transcriptome or annotaiton.
 ``` {r, eval=FALSE}
 user_BgeeCall@run_ids <- ""
-user_BgeeCall@simple_arborescence <- TRUE
+user_BgeeCall@simple_arborescence <- FALSE
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
-Be careful when you use this option. If you run different analysis for the same RNA-Seq library the results will be overwritten.

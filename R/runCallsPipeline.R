@@ -220,14 +220,18 @@ run_from_dataframe <-
     function(myAbundanceMetadata = new("KallistoMetadata"), 
              myBgeeMetadata = new("BgeeMetadata"), 
              userMetadataDataFrame) {
+        
+    # test if optional columns are present in the data.frame
+    output_dir_column <- match("output_dir", names(userMetadataDataFrame))
     
     for (row_number in seq_len(nrow(userMetadataDataFrame))) {
         
-        # init myUserMetadata object
+        ## init myUserMetadata object
         myUserMetadata <- new("UserMetadata")
         myUserMetadata@species_id <- 
             as.character(userMetadataDataFrame[["species_id"]][row_number])
         
+        # check if subset of run ids has to be used to generate present/absent
         ids <- as.character(userMetadataDataFrame[["run_ids"]][row_number])
         if (length(ids) == 0) {
             myUserMetadata@run_ids <- character(0)
@@ -242,6 +246,20 @@ run_from_dataframe <-
         } else {
             myUserMetadata@run_ids <- ids
         }
+        
+        # check if user provided an output_dir or if the default one will be used
+        if(output_dir_column) {
+            output_dir <- userMetadataDataFrame[["output_dir"]][row_number]
+            if (length(output_dir) != 0) {
+                if(!dir.exists(output_dir)) {
+                    dir.create(path = output_dir, recursive = TRUE, 
+                               showWarnings =TRUE) 
+                }
+                myUserMetadata@output_dir <- output_dir
+            }
+        }
+        
+        
         myUserMetadata@reads_size <- 
             as.numeric(userMetadataDataFrame[["reads_size"]][row_number])
         myUserMetadata@rnaseq_lib_path <- 
