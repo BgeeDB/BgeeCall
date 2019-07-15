@@ -188,12 +188,12 @@ calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata =
 
 #### Choose between two kmer size
 By default 2 indexes with 2 different kmer sizes can be used by `BgeeCall`
-The default kmer size of kallisto (31) is used for libraries with reads length equal or larger than 50 nt.
-A kmer size of 21 is used for libraries with reads length smaller than 50 nt.
-We decided not to allow to tune kmers size because the generation of the index is time consuming and index generation takes even more time with small kmers size (< 21 nt). However it is possible to modify the threshold of read length allowing to choose between default and small kmer size.
+The default kmer size of kallisto (31) is used for libraries with reads length equal or larger than 50 bp.
+A kmer size of 15 is used for libraries with reads length smaller than 50 bp.
+We decided not to allow to tune kmers size because the generation of the index is time consuming and index generation takes even more time with small kmers size (< 15 bp). However it is possible to modify the threshold of read length allowing to choose between default and small kmer size.
 
 ``` {r, message = FALSE, warning = FALSE}
-# libraries with reads smaller than 70nt will use the index with kmer size = 21
+# libraries with reads smaller than 70bp will use the index with kmer size = 15
 kallisto <- new("KallistoMetadata", read_size_kmer_threshold = 70)
 calls_output <- run_from_object(myAbundanceMetadata = kallisto, myUserMetadata = user_BgeeCall)
 ```
