@@ -12,7 +12,7 @@
 #' replicates and merged to run one transcript expression estimation analyse.
 #' @slot reads_size The size of the reads. If smaller than 
 #' `KallistoMetadata@read_size_kmer_threshold`, 
-#' an index with a kmer size of 21 nt will be used.
+#' an index with a kmer size of 15 bp will be used.
 #' @slot rnaseq_lib_path Path to the directory of the RNA-Seq library that 
 #' contains fastq files. 
 #' @slot transcriptome_name Name of the transcriptome used to generate 
