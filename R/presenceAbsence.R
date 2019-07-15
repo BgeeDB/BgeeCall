@@ -72,9 +72,15 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         myUserMetadata)
     tool_path <- get_tool_path(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
-    output_path <- get_tool_output_path(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata)
     
+    # use the standard output dir or the one defined by the user
+    if(is.null(myUserMetadata@output_dir)) {
+        output_path <- get_tool_output_path(myAbundanceMetadata, 
+                                            myBgeeMetadata, myUserMetadata)
+    } else {
+        output_path <- myUserMetadata@output_dir
+    }
+
     # biotype mapping information will depend on
     # summarization at gene level or not
     biotype_mapping <- ""

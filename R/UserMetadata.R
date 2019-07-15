@@ -52,6 +52,7 @@ UserMetadata <- setClass(
         working_path = getwd(),
         reads_size = 51,
         simple_arborescence = FALSE
+        output_dir = NULL
     )
 )
 

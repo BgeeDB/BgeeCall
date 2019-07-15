@@ -190,8 +190,15 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
         myBgeeMetadata, myUserMetadata)
     kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
         myKallistoMetadata@index_file))
-    kallisto_output_path <- get_tool_output_path(myKallistoMetadata, 
-        myBgeeMetadata, myUserMetadata)
+    
+    # use the standard output dir or the one defined by the user
+    if(is.null(myUserMetadata@output_dir)) {
+        kallisto_output_path <- get_tool_output_path(myKallistoMetadata, 
+                                                     myBgeeMetadata, myUserMetadata)
+    } else {
+        kallisto_output_path <- myUserMetadata@output_dir
+    }
+    
     output_abundance_file <- file.path(kallisto_output_path, 
         myKallistoMetadata@abundance_file)
     
