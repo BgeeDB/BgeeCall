@@ -12,9 +12,9 @@
 #' KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
 #' 
 #'
-#' @param myAbundanceMetadata A Reference Class BgeeMetadata object (optional)
+#' @param abundanceMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze
-#' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
+#' @param bgeeMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to choose the version of reference intergenic sequences
 #' @param userMetadata A Reference Class UserMetadata object (optional).
 #' generate present/allows calls using objects of the UserMetadata class.
@@ -77,8 +77,8 @@
 #' }
 #' 
 generate_calls_workflow <- function(
-    myAbundanceMetadata = new("KallistoMetadata"), 
-    myBgeeMetadata = new("BgeeMetadata"), userMetadata = NULL, 
+    abundanceMetadata = new("KallistoMetadata"), 
+    bgeeMetadata = new("BgeeMetadata"), userMetadata = NULL, 
     userDataFrame = NULL, userFile = NULL) {
     if (is.null(userMetadata) && is.null(userDataFrame) && 
         is.null(userFile)) {
@@ -89,14 +89,14 @@ generate_calls_workflow <- function(
     } else if (!is.null(userMetadata) && is.null(userDataFrame) && 
         is.null(userFile)) {
         if (isS4(userMetadata)) {
-            return(run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
-                myBgeeMetadata = myBgeeMetadata, myUserMetadata = userMetadata))
+            return(run_from_object(myAbundanceMetadata = abundanceMetadata, 
+                myBgeeMetadata = bgeeMetadata, myUserMetadata = userMetadata))
         } else if (typeof(userMetadata) == "list" && 
             isS4(userMetadata[[1]])) {
             for (i in seq_along(userMetadata)) {
                 results[i] <- 
-                    run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
-                                    myBgeeMetadata = myBgeeMetadata, 
+                    run_from_object(myAbundanceMetadata = abundanceMetadata, 
+                                    myBgeeMetadata = bgeeMetadata, 
                                     myUserMetadata = userMetadata[[i]])
             }
             return(results)
@@ -107,8 +107,8 @@ generate_calls_workflow <- function(
         # run workflow when userDataFrame is not null
     } else if (is.null(userMetadata) && !is.null(userDataFrame) && 
         is.null(userFile)) {
-        return(run_from_dataframe(myAbundanceMetadata = myAbundanceMetadata, 
-            myBgeeMetadata = myBgeeMetadata, 
+        return(run_from_dataframe(myAbundanceMetadata = abundanceMetadata, 
+            myBgeeMetadata = bgeeMetadata, 
             userMetadataDataFrame = userDataFrame))
         # run workflow when userDataFrame is not null
     } else if (is.null(userMetadata) && is.null(userDataFrame) && 
@@ -118,8 +118,8 @@ generate_calls_workflow <- function(
             stop("Please provide a path to the file that contains all 
 information allowing to generate UserMetadata objects")
         }
-        return(run_from_file(myAbundanceMetadata = myAbundanceMetadata, 
-            myBgeeMetadata = myBgeeMetadata, userMetadataFile = userFile))
+        return(run_from_file(myAbundanceMetadata = abundanceMetadata, 
+            myBgeeMetadata = bgeeMetadata, userMetadataFile = userFile))
     } else {
         stop("Please use only 1 of the 3 follwowing attributs : 
              userMetadata, userDataFrame, userFile")
