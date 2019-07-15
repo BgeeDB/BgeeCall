@@ -4,15 +4,15 @@
 \alias{generate_calls_workflow}
 \title{generate present/absent calls}
 \usage{
-generate_calls_workflow(myAbundanceMetadata = new("KallistoMetadata"),
-  myBgeeMetadata = new("BgeeMetadata"), userMetadata = NULL,
+generate_calls_workflow(abundanceMetadata = new("KallistoMetadata"),
+  bgeeMetadata = new("BgeeMetadata"), userMetadata = NULL,
   userDataFrame = NULL, userFile = NULL)
 }
 \arguments{
-\item{myAbundanceMetadata}{A Reference Class BgeeMetadata object (optional)
+\item{abundanceMetadata}{A Reference Class BgeeMetadata object (optional)
 allowing to tune your gene quantification abundance analyze}
 
-\item{myBgeeMetadata}{A Reference Class BgeeMetadata object (optional)
+\item{bgeeMetadata}{A Reference Class BgeeMetadata object (optional)
 allowing to choose the version of reference intergenic sequences}
 
 \item{userMetadata}{A Reference Class UserMetadata object (optional).
