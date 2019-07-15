@@ -23,15 +23,12 @@ BgeeMetadata <- setClass(
         intergenic_release = "character",
         intergenic_prefix = "character",
         fasta_intergenic_url = "character",
-        fasta_intergenic_name = "character",
-        ref_intergenic_ids_name = "character"
-        
+        fasta_intergenic_name = "character"
     ),
     
     prototype = prototype(
         intergenic_prefix = "intergenic_",
-        fasta_intergenic_name = "bgee_intergenic.fa.gz",
-        ref_intergenic_ids_name = "bgee_ref_intergenic.tsv"
+        fasta_intergenic_name = "bgee_intergenic.fa.gz"
     )
 )
 
