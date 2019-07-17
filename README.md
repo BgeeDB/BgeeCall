@@ -6,7 +6,7 @@ The `BgeeCall` package allows to:
 * Download reference intergenic sequences for species available in Bgee.
 * Generate calls of presence/absence of expression at the transcript level (beta version)
 
-If you find a bug or have any issues with `BgeeCall` please write a bug report in our GitHub issues manager available at (URL).
+If you find a bug or have any issues with `BgeeCall` please write a bug report in our [GitHub issues manager](https://github.com/BgeeDB/BgeeCall/issues).
 
 ## How present/absent calls are generated
 
