@@ -24,14 +24,14 @@ The `BgeeCall` package allows to:
 * Download reference intergenic sequences for species available in Bgee.
 * Generate calls of presence/absence of expression at the transcript level (beta version)
 
-If you find a bug or have any issues with `BgeeCall` please write a bug report in our GitHub issues manager available at (URL).
+If you find a bug or have any issues with `BgeeCall` please write a bug report in our [GitHub issues manager](https://github.com/BgeeDB/BgeeCall/issues).
 
 ## How present/absent calls are generated
 
-In Bgee present/absent gene expression calls for RNA-seq are generated using a threshold specific of each RNA-Seq library, calculated using reads mapped to reference intergenic regions. This is unlike the more usual use of an arbitrary threshold below which a gene is not considered as expressed (e.g log2(TPM) = 1). 
+In Bgee present/absent gene expression calls for RNA-seq are generated using a threshold specific to each RNA-Seq library, calculated using reads mapped to reference intergenic regions. This is unlike the more usual use of an arbitrary threshold below which a gene is not considered as expressed (e.g log2(TPM) = 1). 
 
 ### Bgee database
-Bgee is a database to retrieve and compare gene expression patterns in multiple animal species, produced from multiple data types (RNA-Seq, Affymetrix, in situ hybridization, and EST data). It notably integrates RNA-Seq libraries for 29 species. 
+Bgee is a database to retrieve and compare gene expression patterns in multiple animal species and produced from multiple data types (RNA-Seq, Affymetrix, in situ hybridization, and EST data). It notably integrates RNA-Seq libraries for 29 species. 
 
 ### Reference intergenic regions
 Reference intergenic regions are defined in the [Bgee RNA-Seq pipeline](https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq).
