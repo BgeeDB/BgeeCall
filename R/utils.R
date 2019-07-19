@@ -137,14 +137,18 @@ get_tool_transcriptome_path <- function(myAbundanceMetadata,
 #'
 get_tool_output_path <- function(myAbundanceMetadata, 
     myBgeeMetadata, myUserMetadata) {
-    if (myUserMetadata@simple_arborescence == TRUE) {
-        return(file.path(get_intergenic_release_path(myBgeeMetadata, 
-            myUserMetadata), "all_results", get_output_dir(myUserMetadata)))
+    if(myUserMetadata@output_dir == "") {
+        if (myUserMetadata@simple_arborescence == TRUE) {
+            return(file.path(get_intergenic_release_path(myBgeeMetadata, 
+                myUserMetadata), "all_results", get_output_dir(myUserMetadata)))
+        }
+        return(file.path(get_tool_transcriptome_path(myAbundanceMetadata, 
+            myBgeeMetadata, myUserMetadata), paste0("annotation_", 
+            gsub("\\.", "_", myUserMetadata@annotation_name)), 
+            get_output_dir(myUserMetadata)))
+    } else {
+        return(myUserMetadata@output_dir)
     }
-    return(file.path(get_tool_transcriptome_path(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata), paste0("annotation_", 
-        gsub("\\.", "_", myUserMetadata@annotation_name)), 
-        get_output_dir(myUserMetadata)))
 }
 
 #' @title Download fasta intergenic
@@ -161,7 +165,7 @@ get_tool_output_path <- function(myAbundanceMetadata,
 #' 
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
 #' @param myUserMetadata A Reference Class UserMetadata object.
-#' @param bgee_intergenic_file path where intergenic file will be saved
+#' @param intergenic_file path where intergenic file will be saved
 #'
 #' @export
 #' 
@@ -174,17 +178,15 @@ get_tool_output_path <- function(myAbundanceMetadata,
 #' locally
 #'
 download_fasta_intergenic <- function(myBgeeMetadata = new("BgeeMetadata"), 
-    myUserMetadata, bgee_intergenic_file) {
+    myUserMetadata, intergenic_file) {
     if(myBgeeMetadata@intergenic_release == "community") {
-        url <- retrieve_community_ref_intergenic_url(myUserMetadata@speciesId)
-        success <- download.file(url = bgee_intergenic_url, 
-                                 destfile = bgee_intergenic_file)
+        intergenic_url <- retrieve_community_ref_intergenic_url(myUserMetadata@species_id)
     } else {
-        bgee_intergenic_url <- gsub("SPECIES_ID", myUserMetadata@species_id, 
+        intergenic_url <- gsub("SPECIES_ID", myUserMetadata@species_id, 
             myBgeeMetadata@fasta_intergenic_url)
-        success <- download.file(url = bgee_intergenic_url, 
-            destfile = bgee_intergenic_file)
     }
+    success <- download.file(url = intergenic_url, 
+                             destfile = intergenic_file)
     if (success != 0) {
         stop("ERROR: Downloading Bgee intergenic regions from FTP was not successful.")
     }
@@ -440,7 +442,7 @@ removeTxVersionFromAbundance <- function(myAbundanceMetadata,
 generate_S4_object_properties_output <- function(myAbundanceMetadata,
                                                  myBgeeMetadata,
                                                  myUserMetadata) {
-    output <- matrix(nrow = 12, ncol = 2)
+    output <- matrix(nrow = 13, ncol = 2)
     colnames(output) <- c("Slot name", "Slot value")
     output[1,] <- c("AbundanceMetadata@tool_name", 
                     myAbundanceMetadata@tool_name)
@@ -466,6 +468,10 @@ generate_S4_object_properties_output <- function(myAbundanceMetadata,
                     myUserMetadata@annotation_name)
     output[12,] <- c("UserMetadata@simple_arborescence", 
                      myUserMetadata@simple_arborescence)
+    output[13,] <- c("output_dir", 
+                     get_tool_output_path(myAbundanceMetadata, 
+                                          myBgeeMetadata, 
+                                          myUserMetadata))
     return(output)
 }
 
@@ -500,3 +506,22 @@ list_bgee_species <- function(release = NULL, ordering = NULL,
         allReleases, removeFile))
 }
 
+#' potentially download reference intergenic sequences and retrieve path to the
+#' corresponding fasta file
+#' 
+#' @noMd
+#' @noRd
+#' 
+retrieve_intergenic_path <- function(myBgeeMetadata, myUserMetadata) {
+    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
+        myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
+    if (!file.exists(bgee_intergenic_file)) {
+        if(!(myBgeeMetadata@custom_intergenic_path == "")) {
+            bgee_intergenic_file <- myBgeeMetadata@custom_intergenic_path
+        }else {
+            download_fasta_intergenic(myBgeeMetadata, 
+                                      myUserMetadata, bgee_intergenic_file)
+        }
+    }
+    return(bgee_intergenic_file)
+}

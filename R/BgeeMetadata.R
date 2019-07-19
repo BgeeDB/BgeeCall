@@ -29,13 +29,13 @@ BgeeMetadata <- setClass(
         intergenic_prefix = "character",
         fasta_intergenic_url = "character",
         fasta_intergenic_name = "character",
-        custom_intergenic_path == "character"
+        custom_intergenic_path = "character"
     ),
     
     prototype = prototype(
         intergenic_prefix = "intergenic_",
         fasta_intergenic_name = "bgee_intergenic.fa.gz",
-        custom_intergenic_path = NULL
+        custom_intergenic_path = ""
     )
 )
 

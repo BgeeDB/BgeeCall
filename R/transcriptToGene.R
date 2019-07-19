@@ -21,15 +21,8 @@
 intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
     species_path <- get_species_path(myBgeeMetadata, 
         myUserMetadata)
-    bgee_intergenic_file <- file.path(species_path, 
-        myBgeeMetadata@fasta_intergenic_name)
-    if (!file.exists(bgee_intergenic_file)) {
-        if (!dir.exists(species_path)) {
-            dir.create(species_path, recursive = TRUE)
-        }
-        download_fasta_intergenic(myBgeeMetadata, myUserMetadata, 
-            bgee_intergenic_file)
-    }
+    # retrieve path to reference intergenic file
+    bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
     bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
     # intergenic ID correspond to part of the header
     # before the first space character

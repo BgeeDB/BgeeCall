@@ -33,8 +33,6 @@ merge_transcriptome_and_intergenic <- function(myKallistoMetadata,
     # define needed path
     species_dir <- get_species_path(myBgeeMetadata, 
         myUserMetadata)
-    bgee_intergenic_file <- file.path(species_dir, 
-        myBgeeMetadata@fasta_intergenic_name)
     transcriptome_dir <- get_transcriptome_path(myBgeeMetadata, 
         myUserMetadata)
     transcriptome_with_intergenic_path <- file.path(transcriptome_dir, 
@@ -52,16 +50,8 @@ merge_transcriptome_and_intergenic <- function(myKallistoMetadata,
             dir.create(transcriptome_dir, recursive = TRUE)
         }
         
-        # read Bgee fasta intergenic file
-        if (!file.exists(bgee_intergenic_file)) {
-            if(!is.null(myBgeeMetadata@custom_intergenic_path)) {
-                bgee_intergenic_file <- myBgeeMetadata@custom_intergenic_path
-            }else {
-                download_fasta_intergenic(myBgeeMetadata, 
-                                          myUserMetadata, bgee_intergenic_file)
-            }
-            
-        }
+        # read fasta reference intergenic file
+        bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
         bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
         
         # combine transcriptome and intergenic fasta files
