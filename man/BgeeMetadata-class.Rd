@@ -26,5 +26,11 @@ intergenic regions that will be download to get_species_path()}
 
 \item{\code{ref_intergenic_ids_name}}{Name of the file containing the list of true 
 intergenic regions that will be download to get_species_path()}
+
+\item{\code{custom_intergenic_path}}{path to a local version of reference intergenic
+fasta file. If NULL (by default) the reference intergenic fasta file will be 
+downloaded. If not NULL BgeeCall will merge this local reference intergenic 
+file with the transcriptome. Except if you generated your own intergenic 
+regions always keep it NULL.}
 }}
 

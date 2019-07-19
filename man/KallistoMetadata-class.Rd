@@ -43,7 +43,7 @@ outside of this package. This file is created by the pipeline.
 You should edit this slot only if you already have such a file with a 
 different name. This file must be store at get_tool_path()}
 
-\item{\code{k21_index_file}}{same as index_file. This index is generated with smallest 
+\item{\code{k15_index_file}}{same as index_file. This index is generated with smallest 
 kmers and will be used only for libraries containing reads smallest than 50nt.}
 
 \item{\code{single_end_parameters}}{kallisto parameters used to run a single end mapping}
