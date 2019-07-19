@@ -54,8 +54,13 @@ merge_transcriptome_and_intergenic <- function(myKallistoMetadata,
         
         # read Bgee fasta intergenic file
         if (!file.exists(bgee_intergenic_file)) {
-            download_fasta_intergenic(myBgeeMetadata, 
-                myUserMetadata, bgee_intergenic_file)
+            if(!is.null(myBgeeMetadata@custom_intergenic_path)) {
+                bgee_intergenic_file <- myBgeeMetadata@custom_intergenic_path
+            }else {
+                download_fasta_intergenic(myBgeeMetadata, 
+                                          myUserMetadata, bgee_intergenic_file)
+            }
+            
         }
         bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
         

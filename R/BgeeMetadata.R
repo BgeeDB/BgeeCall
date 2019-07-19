@@ -13,6 +13,11 @@
 #' intergenic regions that will be download to get_species_path()
 #' @slot ref_intergenic_ids_name Name of the file containing the list of true 
 #' intergenic regions that will be download to get_species_path()
+#' @slot custom_intergenic_path path to a local version of reference intergenic
+#' fasta file. If NULL (by default) the reference intergenic fasta file will be 
+#' downloaded. If not NULL BgeeCall will merge this local reference intergenic 
+#' file with the transcriptome. Except if you generated your own intergenic 
+#' regions always keep it NULL.
 #'
 BgeeMetadata <- setClass(
     # Set the name for the class
@@ -23,12 +28,14 @@ BgeeMetadata <- setClass(
         intergenic_release = "character",
         intergenic_prefix = "character",
         fasta_intergenic_url = "character",
-        fasta_intergenic_name = "character"
+        fasta_intergenic_name = "character",
+        custom_intergenic_path == "character"
     ),
     
     prototype = prototype(
         intergenic_prefix = "intergenic_",
-        fasta_intergenic_name = "bgee_intergenic.fa.gz"
+        fasta_intergenic_name = "bgee_intergenic.fa.gz",
+        custom_intergenic_path = NULL
     )
 )
 
