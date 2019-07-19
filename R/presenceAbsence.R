@@ -16,13 +16,7 @@
 #'
 get_ref_intergenic_ids <- function(myBgeeMetadata, 
     myUserMetadata) {
-    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
-        myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
-    if (!file.exists(bgee_intergenic_file)) {
-        # Download fasta file from Bgee FTP
-        download_fasta_intergenic(myBgeeMetadata, myUserMetadata, 
-            bgee_intergenic_file)
-    }
+    bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
     bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
     # keep only intergenic ids from fasta file
     return(as.data.frame(sub("^([^ ]+).*", "\\1", names(bgee_intergenic))))
@@ -74,12 +68,8 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         myBgeeMetadata, myUserMetadata)
     
     # use the standard output dir or the one defined by the user
-    if(is.null(myUserMetadata@output_dir)) {
-        output_path <- get_tool_output_path(myAbundanceMetadata, 
-                                            myBgeeMetadata, myUserMetadata)
-    } else {
-        output_path <- myUserMetadata@output_dir
-    }
+    output_path <- get_tool_output_path(myAbundanceMetadata, 
+                                        myBgeeMetadata, myUserMetadata)
 
     # biotype mapping information will depend on
     # summarization at gene level or not
