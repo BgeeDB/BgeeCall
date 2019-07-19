@@ -202,14 +202,13 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
     output_abundance_file <- file.path(kallisto_output_path, 
         myKallistoMetadata@abundance_file)
     
-    # test if kallisto has to be run
+    # test if abundance file already exists
     if (file.exists(output_abundance_file)) {
         message("kallisto abundance file already exists for library ", 
             basename(myUserMetadata@rnaseq_lib_path), 
             ". Abundance file will be overwritten.\n")
     }
-    # create transcriptome containing bgee intergenic
-    # regions
+    # create transcriptome containing bgee intergenic regions
     if (transcriptome_path == "") {
         merge_transcriptome_and_intergenic(myKallistoMetadata, 
             myBgeeMetadata, myUserMetadata)
