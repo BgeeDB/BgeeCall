@@ -33,7 +33,7 @@ In R:
 ``` {r, message = FALSE, warning = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("BgeeCall", version = "3.9")
+BiocManager::install("BgeeCall")
 ```
 
 ## How to use the BgeeCall package
@@ -171,7 +171,7 @@ list_bgee_ref_intergenic_species(myBgeeMetadata = bgee)
 
 #### Community reference intergenic
 
-If you want to use BgeeCall on a species for which Bgee does not provide reference intergenic sequences you have the possibility to create them by yourself and share them with the Bgee community by following all steps of [this tutorial] (https://github.com/BgeeDB/reference_intergenic_standalone#protocol-to-generate-reference-intergenic-sequences). Do not forget that the number of RNA-Seq libraries is a key point to the generation of precise reference intergenic sequences.
+If you want to use BgeeCall on a species for which Bgee does not provide reference intergenic sequences you have the possibility to create them by yourself and share them with the Bgee community by following all steps of [this tutorial](https://github.com/BgeeDB/reference_intergenic_standalone#protocol-to-generate-reference-intergenic-sequences). Do not forget that the number of RNA-Seq libraries is a key point to the generation of precise reference intergenic sequences.
 It is possible to list in R all species for which reference intergenic sequences have been created by the community using the following code
 ```{r}
 list_community_ref_intergenic_species()
