@@ -180,7 +180,7 @@ get_tool_output_path <- function(myAbundanceMetadata,
 download_fasta_intergenic <- function(myBgeeMetadata = new("BgeeMetadata"), 
     myUserMetadata, intergenic_file) {
     if(myBgeeMetadata@intergenic_release == "community") {
-        intergenic_url <- retrieve_community_ref_intergenic_url(myUserMetadata@species_id)
+        intergenic_url <- list_community_ref_intergenic_url(myUserMetadata@species_id)
     } else {
         intergenic_url <- gsub("SPECIES_ID", myUserMetadata@species_id, 
             myBgeeMetadata@fasta_intergenic_url)
@@ -188,7 +188,7 @@ download_fasta_intergenic <- function(myBgeeMetadata = new("BgeeMetadata"),
     success <- download.file(url = intergenic_url, 
                              destfile = intergenic_file)
     if (success != 0) {
-        stop("ERROR: Downloading Bgee intergenic regions from FTP was not successful.")
+        stop("ERROR: Downloading reference intergenic sequences from FTP was not successful.")
     }
 }
 
@@ -475,37 +475,6 @@ generate_S4_object_properties_output <- function(myAbundanceMetadata,
     return(output)
 }
 
-#' @title List species present in Bgee
-#'
-#' @description Call a webservice that returns all species present in Bgee.
-#' Retrieved information are species ID, genus, species name, common name and 
-#' presence absence of datatypes in Bgee. This function call the 
-#' `listBgeeSpecies()` function from the BgeeDB R package
-#'
-#' @param release A character specifying a targeted release number. 
-#' In the form 'Release.subrelease' or 'Release_subrelease', 
-#' e.g., '14.0' or 14_0'. If not specified, the latest release is used.
-#' @param ordering A numeric indicating the number of the column which should 
-#' be used to sort the data frame. Default NULL, returning unsorted data frame.
-#' @param allReleases A data frame with information on all releases. 
-#' Avoid redownloading this information if .getBgeeRelease() already called.
-#' @param removeFile Boolean indicating whether the downloaded file should be 
-#' deleted. Default to TRUE.
-#' @export
-#' 
-#' @return information about species available in Bgee
-#' 
-#' @examples{
-#' list_bgee_species()
-#' list_bgee_species(release = '14')
-#' }
-#'
-list_bgee_species <- function(release = NULL, ordering = NULL, 
-    allReleases = NULL, removeFile = TRUE) {
-    return(BgeeDB::listBgeeSpecies(release, ordering, 
-        allReleases, removeFile))
-}
-
 #' potentially download reference intergenic sequences and retrieve path to the
 #' corresponding fasta file
 #' 
@@ -516,9 +485,23 @@ retrieve_intergenic_path <- function(myBgeeMetadata, myUserMetadata) {
     bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
         myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
     if (!file.exists(bgee_intergenic_file)) {
+        # Check if custom reference intergenic path has to be used
         if(!(myBgeeMetadata@custom_intergenic_path == "")) {
+            if(myBgeeMetadata@intergenic_release != "custom") {
+                stop("You selected a custom intergenic path (BgeeMetadata@custom_intergenic_path)
+                    but the intergenic release (BgeeMetadata@intergenic_release) was not defined
+                    as `custom`. In order to use custom reference intergenic sequences please
+                    provide the path to your custom_intergenic_path AND update the 
+                    intergenic_release to `custom`.")
+            }
             bgee_intergenic_file <- myBgeeMetadata@custom_intergenic_path
         }else {
+            if(myBgeeMetadata@intergenic_release == "custom") {
+                stop("You selected a `custom`` intergenic release (BgeeMetadata@intergenic_release)
+                    but the intergenic path (BgeeMetadata@custom_intergenic_path) was not defined. In 
+                    order to use custom reference intergenic sequences please both provide the path 
+                    to your custom_intergenic_path AND update the intergenic_release to `custom`.")
+            }
             download_fasta_intergenic(myBgeeMetadata, 
                                       myUserMetadata, bgee_intergenic_file)
         }
