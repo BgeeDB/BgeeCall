@@ -1,3 +1,5 @@
+# BgeeCall, a R package for automatic RNA-Seq present/absent gene expression calls generation
+
 `BgeeCall` is a collection of functions that uses [Bgee](https://bgee.org/) expertise to create gene expression present/absent calls
 
 The `BgeeCall` package allows to: 
@@ -63,7 +65,9 @@ library("ShortRead")
 # keep 48.000 reads
 sampler <- FastqSampler(file.path("absolute_path","/SRX099901/SRR350955.fastq.gz"), 48000)
 set.seed(1); SRR350955 <- yield(sampler)
-writeFastq(object = SRR350955, file =file.path( "absolute_path","SRX099901_subset", "SRR350955_subset.fastq.gz"), mode = "w", full = FALSE, compress = TRUE)
+writeFastq(object = SRR350955, 
+          file =file.path( "absolute_path","SRX099901_subset", "SRR350955_subset.fastq.gz"),
+          mode = "w", full = FALSE, compress = TRUE)
 ```
 
 In this example we used the Bioconductor AnnotationHub to load transcriptome and gene annotations but you can load them from wherever you want.
@@ -153,10 +157,6 @@ bgee <- new("BgeeMetadata", intergenic_release = "0.1")
 bgee <- setIntergenicRelease(bgee, "0.2")
 ```
 By default the reference intergenic release used when a `BgeeMetadata` object is created is the last stable one created by the Bgee team.
-
-#### Three categories of reference intergenic releases
-Among all available reference intergenic releases it is possible to distinguish 3 different categories.
-
 
 #### Core reference intergenic from Bgee
 
