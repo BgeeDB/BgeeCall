@@ -2,12 +2,12 @@
 % Please edit documentation in R/listIntergenicRelease.R
 \name{list_intergenic_release}
 \alias{list_intergenic_release}
-\title{List Bgee intergenic releases available to use with the BgeeCall package}
+\title{List reference intergenic releases usable with the BgeeCall package}
 \usage{
 list_intergenic_release(release = NULL)
 }
 \arguments{
-\item{release}{A character specifying a targeted release number (e.g., '14'). 
+\item{release}{A character specifying a targeted release number (e.g., '0.1'). 
 If not specified, all available releases are shown.}
 }
 \value{
@@ -25,5 +25,5 @@ the access URL for FTP, and the date of release
 
 }
 \author{
-Julien Roux, Julien Wollbrett
+Julien Wollbrett
 }
