@@ -5,14 +5,14 @@
 \title{Download fasta intergenic}
 \usage{
 download_fasta_intergenic(myBgeeMetadata = new("BgeeMetadata"),
-  myUserMetadata, bgee_intergenic_file)
+  myUserMetadata, intergenic_file)
 }
 \arguments{
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object (optional)}
 
 \item{myUserMetadata}{A Reference Class UserMetadata object.}
 
-\item{bgee_intergenic_file}{path where intergenic file will be saved}
+\item{intergenic_file}{path where intergenic file will be saved}
 }
 \value{
 download fasta intergenic from Bgee FTP or from the Zenodo community and save it
