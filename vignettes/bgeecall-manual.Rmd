@@ -142,7 +142,7 @@ openPDF(calls_output$TPM_distribution_path)
 ```
 * S4_slots_summary : path to tsv file containing a summary of values used for the most important slots of the three S4 classes (UserMetadata, KallistoMetadata, and BgeeMetadata).
 ``` {r, message = FALSE, warning = FALSE}
-read.table(S4_slots_summary, header = TRUE)
+read.table(calls_output$S4_slots_summary, header = TRUE, sep = "\t")
 ```
 
 ###  Generate present/absent calls for more than one RNA-Seq library
