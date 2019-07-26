@@ -7,7 +7,7 @@
 list_community_ref_intergenic_species()
 }
 \value{
-list all species having reference intergenic seauences created by the community
+list all species having reference intergenic sequences created by the community
 }
 \description{
 Return information related to species having reference intergenic 
@@ -21,6 +21,7 @@ sequences
 {
 list_community_ref_intergenic_species()
 }
+
 
 }
 \author{

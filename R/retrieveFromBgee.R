@@ -22,14 +22,13 @@
 #' bgee <- new("BgeeMetadata")
 #' list_bgee_ref_intergenic_species(myBgeeMetadata = bgee)
 #' list_bgee_ref_intergenic_species(release = '0.2')
-#' list_bgee_ref_intergenic_species()
 #' }
 #'
 #' @author Julien Wollbrett
 #' @export
 #'
 
-list_bgee_ref_intergenic_species <- function(myBgeeMetadata = NULL, release = NULL, speciesId = NULL) {
+list_bgee_ref_intergenic_species <- function(myBgeeMetadata = NULL, release = NULL) {
     non_bgee_releases <- c("community", "custom")
     species_info_file <- "species_info.tsv"
     if (!is.null(myBgeeMetadata)) {

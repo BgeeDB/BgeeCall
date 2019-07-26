@@ -4,8 +4,7 @@
 \alias{list_bgee_ref_intergenic_species}
 \title{List species having Bgee reference intergenic sequences}
 \usage{
-list_bgee_ref_intergenic_species(myBgeeMetadata = NULL, release = NULL,
-  speciesId = NULL)
+list_bgee_ref_intergenic_species(myBgeeMetadata = NULL, release = NULL)
 }
 \arguments{
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object}
@@ -33,7 +32,6 @@ If none of them are provided the default Bgee reference intergenic release will 
 bgee <- new("BgeeMetadata")
 list_bgee_ref_intergenic_species(myBgeeMetadata = bgee)
 list_bgee_ref_intergenic_species(release = '0.2')
-list_bgee_ref_intergenic_species()
 }
 
 }

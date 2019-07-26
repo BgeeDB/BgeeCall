@@ -180,10 +180,14 @@ get_tool_output_path <- function(myAbundanceMetadata,
 download_fasta_intergenic <- function(myBgeeMetadata = new("BgeeMetadata"), 
     myUserMetadata, intergenic_file) {
     if(myBgeeMetadata@intergenic_release == "community") {
-        intergenic_url <- list_community_ref_intergenic_url(myUserMetadata@species_id)
+        intergenic_url <- retrieve_community_ref_intergenic_url(myUserMetadata@species_id)
     } else {
+        all_releases <- myBgeeMetadata@all_releases
+        intergenic_url <- as.character(
+            all_releases$referenceIntergenicFastaURL[all_releases$release 
+                                                     == myBgeeMetadata@intergenic_release])
         intergenic_url <- gsub("SPECIES_ID", myUserMetadata@species_id, 
-            myBgeeMetadata@fasta_intergenic_url)
+                               intergenic_url)
     }
     success <- download.file(url = intergenic_url, 
                              destfile = intergenic_file)
@@ -502,9 +506,12 @@ retrieve_intergenic_path <- function(myBgeeMetadata, myUserMetadata) {
                     order to use custom reference intergenic sequences please both provide the path 
                     to your custom_intergenic_path AND update the intergenic_release to `custom`.")
             }
-            download_fasta_intergenic(myBgeeMetadata, 
-                                      myUserMetadata, bgee_intergenic_file)
         }
+        if(!dir.exists(dirname(bgee_intergenic_file))) {
+            dir.create(dirname(bgee_intergenic_file), recursive = TRUE)
+        }
+        download_fasta_intergenic(myBgeeMetadata, 
+                                  myUserMetadata, bgee_intergenic_file)
     }
     return(bgee_intergenic_file)
 }
