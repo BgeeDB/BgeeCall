@@ -57,10 +57,10 @@ KallistoMetadata <- setClass(
         # slots defined in parent AbundanceMetadata Class
         tool_name = "kallisto",
         abundance_file = "abundance.tsv",
-        transcript_id_header ="target_id",
-        count_header ="est_counts",
-        abundance_header ="tpm",
-        eff_length_header ="eff_length",
+        transcript_id_header = "target_id",
+        count_header = "est_counts",
+        abundance_header = "tpm",
+        eff_length_header = "eff_length",
         read_size_kmer_threshold = 50,
         # slots specific to Class
         download_kallisto = FALSE,
@@ -83,5 +83,5 @@ KallistoMetadata <- setClass(
     ),
     
     # This class also have attributs/methods of AbundanceMetadata class (inheritence)
-    contains="AbundanceMetadata"
+    contains = "AbundanceMetadata"
 )
