@@ -1,1 +1,1 @@
-species_id	run_ids	reads_size	rnaseq_lib_path	transcriptome_path	annotation_path	working_path    output_directory
+species_id	run_ids	reads_size	rnaseq_lib_path	transcriptome_path	annotation_path	working_path    output_directory    simple_arborescence
