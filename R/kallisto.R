@@ -86,7 +86,7 @@ potential already installed version of Kallisto.\n")
             system("kallisto", ignore.stdout = TRUE, 
                 ignore.stderr = TRUE)
         }, warning = function(w) {
-            stop("kallisto is not installed. You should either 
+stop("kallisto is not installed. You should either 
     - automatically install a version of kallisto used only by this package (see vignette for more details)
     - install kallisto on your system following official website instructions (https://pachterlab.github.io/kallisto/download)")
         })
@@ -255,14 +255,6 @@ potential already installed version of Kallisto.\n")
     message("Will run kallisto using this command line : ", 
         kallisto_command)
     system(kallisto_command)
-    
-    if (myKallistoMetadata@ignoreTxVersion) {
-        message("remove transcript version info in ", 
-            myKallistoMetadata@abundance_file, " ", 
-            myKallistoMetadata@tool_name, " abundance file.\n")
-        removeTxVersionFromAbundance(myKallistoMetadata, 
-            myBgeeMetadata, myUserMetadata)
-    }
 }
 
 

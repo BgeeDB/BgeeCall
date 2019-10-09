@@ -291,15 +291,14 @@ kallisto <- new("KallistoMetadata", cutoff = 0.1)
 By default the arborescence of directories created by `BgeeCall` is as simple as possible. the results will be created using the path `working_path/intergenic_release/all_results/libraryId`. Generating present/absent gene expression calls for the same RNA-Seq library using different transcriptome or annotation versions using this arborescence will overwrite previous results. 
 The `UserMetadata` class has an attribute `simple_arborescence` that is `TRUE` by default. If `FALSE`, a complexe arborescence of directories containing the name of the annotation and transcriptome files will be created. This complex arborescence will then allow to generate present/absent calls for the same library using different version of transcriptome or annotaiton.
 ``` {r, eval=FALSE}
-user_BgeeCall@run_ids <- ""
-user_BgeeCall@simple_arborescence <- FALSE
+user_BgeeCall <- setSimpleArborescence(userObject = user_BgeeCall, simpleArborescence = FALSE)
 calls_output <- run_from_object(myUserMetadata = user_BgeeCall)
 ```
 
 ### Change directory where calls are saved
 By default directories used to save present/absent calls are subdirectories of `UserMetadata@working_path`. However it is possible to select the directory where you want the calls to be generated.
 ```{r}
-user_BgeeCall@output_dir <- "path/to/calls/for/this/library/"
+user_BgeeCall <- setOutputDir(user_BgeeCall, "path/to/calls/for/this/library/")
 ```
 This output directory will only contains results generated at the RNA-Seq library level. All data generated at species level are still stored using the `UserMetadata@working_path`. They can then still be reused to generate calls from other libraries of the same species. 
 
