@@ -27,18 +27,21 @@ load_transcript_to_biotype <- function(myAbundanceMetadata,
     column_names <- c("id", "biotype", "type")
     annotation_path <- get_annotation_path(myBgeeMetadata, 
         myUserMetadata)
-    transcript_to_biotype_file <- file.path(annotation_path, 
-        myAbundanceMetadata@tx2biotype_file)
-    
+    if (myAbundanceMetadata@ignoreTxVersion) {
+        transcript_to_biotype_file <- file.path(annotation_path, 
+            myAbundanceMetadata@tx2biotype_file_without_tx_version)
+    } else {
+        transcript_to_biotype_file <- file.path(annotation_path, 
+            myAbundanceMetadata@tx2biotype_file)
+    }
     # check if file already exist
     if (!file.exists(transcript_to_biotype_file)) {
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
-        message("Generate file ", myAbundanceMetadata@tx2biotype_file, 
+        message("Generate file ", basename(transcript_to_biotype_file), 
             ".\n")
-        # retrieve tx2biotype data frame from annotation
-        # file
+        # retrieve tx2biotype data frame from annotation file
         gtf = as.data.frame(myUserMetadata@annotation_object)
         gtf_transcript <- gtf[gtf$type == "transcript", 
             ]
@@ -46,6 +49,10 @@ load_transcript_to_biotype <- function(myAbundanceMetadata,
             gtf_transcript$transcript_biotype)))
         transcript_to_biotype[, 3] <- "genic"
         names(transcript_to_biotype) <- column_names
+        if (myAbundanceMetadata@ignoreTxVersion) {
+            transcript_to_biotype$id <- gsub(pattern = "\\..*", 
+                                   "", transcript_to_biotype$id)
+        }
         
         # retrieve gene2biotype information from intergenic
         # fasta file

@@ -180,7 +180,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     ## vector vertically
 }
 
-#' @title Transform txinport object
+#' @title Transform tximport object
 #'
 #' @description transform tximport object in order to easily process information
 #'

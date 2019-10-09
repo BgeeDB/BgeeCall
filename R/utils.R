@@ -358,7 +358,7 @@ get_output_dir <- function(myUserMetadata) {
 get_kallisto_dir_path <- function(myAbundanceMetadata, 
     myUserMetadata) {
     os_version <- get_os()
-    kallisto_dir <- if (os_version == "linux") {
+    if (os_version == "linux") {
         return(file.path(myUserMetadata@working_path, 
             myAbundanceMetadata@kallisto_linux_dir))
     } else if (os_version == "osx") {
@@ -410,10 +410,14 @@ get_kallisto_program_path <- function(myAbundanceMetadata,
 #' @description Remove the transcript version that can be present in transcript 
 #' id of transcriptome files.
 #' Removing the transcript version means detecting a dot in transcript id and 
-#' removing the dot and all caracters following it. This function has been develop 
-#' because in some case the ignoreTxVersion attribut of the tximport package with 
-#' kallisto was not working. It is called if the logical 'ignoreTxVersion' 
-#' attribut of the AbundanceMetadata class is set to TRUE.
+#' removing the dot and all caracters following it. This function will not affect
+#' the transcript ID of intergenic regions because the name these intergenic 
+#' sequences can contain dot that do not correspond to transcript version (e.g 
+#' KN149689.1_73093_93092).
+#' This function has been develop because the ignoreTxVersion parameter of tximport
+#' do not allow to remove the dot only in a subset of transcript IDs.
+#' It is called if the logical 'ignoreTxVersion' attribut of the AbundanceMetadata 
+#' class is set to TRUE.
 #'
 #' @noMd
 #' @noRd
@@ -423,16 +427,24 @@ removeTxVersionFromAbundance <- function(myAbundanceMetadata,
     output_path <- get_tool_output_path(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
     abundance_path <- file.path(output_path, myAbundanceMetadata@abundance_file)
+    abundance_path_without_tx_version <- 
+        file.path(output_path, myAbundanceMetadata@abundance_file_without_tx_version)
     abundance_data <- read.table(file = abundance_path, 
         header = TRUE, sep = "\t")
+    intergenic_ids <- get_intergenic_ids(myBgeeMetadata, myUserMetadata)
     if (myAbundanceMetadata@tool_name == "kallisto") {
-        abundance_data$target_id <- gsub(pattern = "\\..*", 
-            "", abundance_data$target_id)
+        ref_intergenic_transcripts <- abundance_data[abundance_data$target_id 
+                                                     %in% intergenic_ids$intergenic_ids,]
+        gtf_transcripts <- abundance_data[!(abundance_data$target_id 
+                                          %in% intergenic_ids$intergenic_ids),]
+        gtf_transcripts$target_id <- gsub(pattern = "\\..*", 
+                                          "", gtf_transcripts$target_id)
+        abundance_data <- rbind(gtf_transcripts, ref_intergenic_transcripts)
     } else {
         stop(paste0("Removing transcript version for tool ", 
             myAbundanceMetadata$tool_name, " is not implemented."))
     }
-    write.table(x = abundance_data, file = abundance_path, 
+    write.table(x = abundance_data, file = abundance_path_without_tx_version, 
         sep = "\t", row.names = FALSE, col.names = TRUE, 
         quote = FALSE)
 }
@@ -490,8 +502,8 @@ retrieve_intergenic_path <- function(myBgeeMetadata, myUserMetadata) {
         myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
     if (!file.exists(bgee_intergenic_file)) {
         # Check if custom reference intergenic path has to be used
-        if(!(myBgeeMetadata@custom_intergenic_path == "")) {
-            if(myBgeeMetadata@intergenic_release != "custom") {
+        if (!(myBgeeMetadata@custom_intergenic_path == "")) {
+            if (myBgeeMetadata@intergenic_release != "custom") {
                 stop("You selected a custom intergenic path (BgeeMetadata@custom_intergenic_path)
                     but the intergenic release (BgeeMetadata@intergenic_release) was not defined
                     as `custom`. In order to use custom reference intergenic sequences please
@@ -500,18 +512,69 @@ retrieve_intergenic_path <- function(myBgeeMetadata, myUserMetadata) {
             }
             bgee_intergenic_file <- myBgeeMetadata@custom_intergenic_path
         }else {
-            if(myBgeeMetadata@intergenic_release == "custom") {
+            if (myBgeeMetadata@intergenic_release == "custom") {
                 stop("You selected a `custom`` intergenic release (BgeeMetadata@intergenic_release)
                     but the intergenic path (BgeeMetadata@custom_intergenic_path) was not defined. In 
                     order to use custom reference intergenic sequences please both provide the path 
                     to your custom_intergenic_path AND update the intergenic_release to `custom`.")
             }
         }
-        if(!dir.exists(dirname(bgee_intergenic_file))) {
+        if (!dir.exists(dirname(bgee_intergenic_file))) {
             dir.create(dirname(bgee_intergenic_file), recursive = TRUE)
         }
         download_fasta_intergenic(myBgeeMetadata, 
                                   myUserMetadata, bgee_intergenic_file)
     }
     return(bgee_intergenic_file)
+}
+
+#' @title Retireve intergenic IDs
+#'
+#' @description Check if an intergenic IDs file is already present for the
+#' wanted intergenic_release and species ID.
+#' - if not create the file
+#' - else read the file
+#' 
+#' @return A data frame containing the ID of all intergenic sequences
+#'
+#' @noMd
+#' @noRd
+#'
+get_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
+    species_path <- get_species_path(myBgeeMetadata, myUserMetadata)
+    intergenic_ids_file_name <- "intergenic_ids.txt"
+    intergenic_ids_file <- file.path(species_path, intergenic_ids_file_name)
+    # generate file if it does not exist
+    intergenic_ids <- ""
+    if (!file.exists(intergenic_ids_file)) {
+        bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
+        bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
+        # intergenic ID correspond to part of the header
+        # before the first space character
+        intergenic_ids <- as.data.frame(sub("^([^ ]+) .*", 
+                                             "\\1", names(bgee_intergenic)))
+        colnames(intergenic_ids) <- "intergenic_ids"
+        write.table(x = intergenic_ids, file = intergenic_ids_file, quote = FALSE, 
+                    row.names = TRUE)
+    } else {
+        intergenic_ids <- read.table(file = intergenic_ids_file, header = TRUE)
+    }
+    return(intergenic_ids)
+}
+
+get_abundance_file_path <- function(myAbundanceMetadata, 
+                                    myBgeeMetadata, myUserMetadata) {
+    output_path <- get_tool_output_path(myAbundanceMetadata, 
+                   myBgeeMetadata, myUserMetadata)
+    if (myAbundanceMetadata@ignoreTxVersion) {
+        abundance_file <- file.path(output_path, 
+                          myAbundanceMetadata@abundance_file_without_tx_version)
+        if (!file.exists(abundance_file)) {
+            removeTxVersionFromAbundance(myAbundanceMetadata, 
+                   myBgeeMetadata, myUserMetadata)
+        }
+    } else {
+        abundance_file <- file.path(output_path, myAbundanceMetadata@abundance_file)
+    }
+    return(abundance_file)
 }
