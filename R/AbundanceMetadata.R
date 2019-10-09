@@ -81,7 +81,6 @@ AbundanceMetadata <- setClass(
         gene2biotype_file = "character",
         tool_name = "character",
         abundance_file = "character",
-        abundance_file_without_tx_version = "character",
         read_size_kmer_threshold = "numeric",
         transcript_id_header = "character",
         count_header = "character",
