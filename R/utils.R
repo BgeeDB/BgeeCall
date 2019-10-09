@@ -137,7 +137,7 @@ get_tool_transcriptome_path <- function(myAbundanceMetadata,
 #'
 get_tool_output_path <- function(myAbundanceMetadata, 
     myBgeeMetadata, myUserMetadata) {
-    if(myUserMetadata@output_dir == "") {
+    if (is.na(myUserMetadata@output_dir) || myUserMetadata@output_dir == "") {
         if (myUserMetadata@simple_arborescence == TRUE) {
             return(file.path(get_intergenic_release_path(myBgeeMetadata, 
                 myUserMetadata), "all_results", get_output_dir(myUserMetadata)))

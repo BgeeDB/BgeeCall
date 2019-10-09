@@ -57,6 +57,7 @@ KallistoMetadata <- setClass(
         # slots defined in parent AbundanceMetadata Class
         tool_name = "kallisto",
         abundance_file = "abundance.tsv",
+        abundance_file_without_tx_version = "abundance_without_tx_version.tsv",
         transcript_id_header = "target_id",
         count_header = "est_counts",
         abundance_header = "tpm",

@@ -337,3 +337,4 @@ init_userMetadata_from_dataframe <- function(userMetadataDataFrame,
     
     return(myUserMetadata)
 }
+    

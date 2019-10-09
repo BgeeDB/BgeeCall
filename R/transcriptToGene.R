@@ -19,15 +19,8 @@
 #' intergenic_tx2gene(bgee, user)
 #' }
 intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
-    species_path <- get_species_path(myBgeeMetadata, 
-        myUserMetadata)
-    # retrieve path to reference intergenic file
-    bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
-    bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
-    # intergenic ID correspond to part of the header
-    # before the first space character
-    all_transcripts <- as.data.frame(sub("^([^ ]+).*", 
-        "\\1", names(bgee_intergenic)))
+    # retrieve intergenic IDs
+    all_transcripts <- get_intergenic_ids(myBgeeMetadata, myUserMetadata)
     # Create a second column idantical to the first
     # one.  Then each intergenic region will be
     # consider as a gene (of the same name) for
@@ -101,15 +94,17 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
             k, "GENEID", "TXNAME"))
         intergenic_tx2gene <- intergenic_tx2gene(myBgeeMetadata, 
             myUserMetadata)
-        tx2gene <- rbind(tx2gene, intergenic_tx2gene)
+        
         # Remove the transcript version that can be present
         # in transcript id of gtf files
         if (myAbundanceMetadata@ignoreTxVersion) {
             message("remove transcript version info in ", 
-                tx2gene_file, " file.\n")
+                    tx2gene_file, " file.\n")
             tx2gene$TXNAME <- gsub(pattern = "\\..*", 
-                "", tx2gene$TXNAME)
+                                   "", tx2gene$TXNAME)
         }
+        tx2gene <- rbind(tx2gene, intergenic_tx2gene)
+        
         write.table(x = tx2gene, file = tx2gene_path, 
             sep = "\t", row.names = FALSE, quote = FALSE)
     }
@@ -158,11 +153,11 @@ run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"),
         myBgeeMetadata, myUserMetadata)
     tx2gene <- read.table(tx2gene_path, header = TRUE, 
         sep = "\t")
-    output_path <- get_tool_output_path(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata)
+    
     abundance_file <- abundanceFile
     if (nchar(abundance_file) == 0) {
-        abundance_file <- file.path(output_path, myAbundanceMetadata@abundance_file)
+        abundance_file <- get_abundance_file_path(myAbundanceMetadata, 
+                          myBgeeMetadata, myUserMetadata)
     }
     if (!file.exists(abundance_file)) {
         stop(paste0("can not generate presence/absence calls. 
@@ -179,18 +174,22 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
     myBgeeMetadata, myUserMetadata) {
     file_without_intergenic_name <- "abundance_without_intergenic.tsv"
     
+    #
     # remove intergenic from tx2gene
     tx2gene_path <- create_tx2gene(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
+    intergenic_ids <- get_intergenic_ids(myBgeeMetadata, myUserMetadata)
     tx2gene <- read.table(tx2gene_path, header = TRUE, 
         sep = "\t")
-    tx2gene_without_intergenic <- tx2gene[as.character(tx2gene$TXNAME) != 
-        as.character(tx2gene$GENEID), ]
+    
+    tx2gene_without_intergenic <- subset(tx2gene, !(tx2gene$TXNAME %in% 
+        intergenic_ids$intergenic_ids))
     
     # remove intergenic from abundance file
     output_path <- get_tool_output_path(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
-    abundance_file <- file.path(output_path, "abundance.tsv")
+    abundance_file <- get_abundance_file_path(myAbundanceMetadata, 
+                      myBgeeMetadata, myUserMetadata)
     abundance <- read.table(abundance_file, header = TRUE, 
         sep = "\t")
     abundance_without_intergenic <- abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] %in% 
