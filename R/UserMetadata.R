@@ -222,6 +222,30 @@ setGeneric(name="setSimpleArborescence",
                standardGeneric("setSimpleArborescence")
            })
 
+#' @title `output_dir` Setter
+#' 
+#' @description Set value of the `output_dir` slot
+#' 
+#' @param userObject The UserMetadata object
+#' @param outputDir path to the directory wanted as `output_dir`
+#' 
+#' @return An object of the class UserMetadata with new `output_dir`
+#'  value
+#'  
+#' @export
+#' @docType methods
+#' @rdname setOutputDir
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' user <- setOutputDir(user, getwd())
+#' }
+#'
+setGeneric(name = "setOutputDir", 
+           def = function(userObject, outputDir) {
+               standardGeneric("setOutputDir")
+           })
+
 #' @title `simple_arborescence` Getter
 #' 
 #' @description Get value of the `simple_arborescence` slot
@@ -239,7 +263,7 @@ setGeneric(name="setSimpleArborescence",
 #' simple_arborescence <- getSimpleArborescence(user)
 #' }
 #'
-setGeneric(name="getSimpleArborescence", def=function(userObject) {
+setGeneric(name = "getSimpleArborescence", def = function(userObject) {
     standardGeneric("getSimpleArborescence")
 })
 
@@ -262,8 +286,8 @@ setGeneric(name="getSimpleArborescence", def=function(userObject) {
 #' user <- setRunIds(user, c("RUN_1", "RUN_2"))
 #' }
 #'
-setGeneric(name="setRunIds", 
-           def=function(userObject, runIds) {
+setGeneric(name = "setRunIds", 
+           def = function(userObject, runIds) {
                standardGeneric("setRunIds")
            })
 
@@ -284,7 +308,7 @@ setGeneric(name="setRunIds",
 #' run_ids <- getRunIds(user)
 #' }
 #'
-setGeneric(name="getRunIds", def=function(userObject) {
+setGeneric(name = "getRunIds", def=function(userObject) {
     standardGeneric("getRunIds")
 })
 
@@ -307,8 +331,8 @@ setGeneric(name="getRunIds", def=function(userObject) {
 #' user <- setWorkingPath(user, getwd())
 #' }
 #'
-setGeneric(name="setWorkingPath", 
-           def=function(userObject, workingPath) {
+setGeneric(name = "setWorkingPath", 
+           def = function(userObject, workingPath) {
     standardGeneric("setWorkingPath")
 })
 
@@ -330,7 +354,7 @@ setGeneric(name="setWorkingPath",
 #' working_path <- getWorkingPath(user)
 #' }
 #'
-setGeneric(name="getWorkingPath", def=function(userObject) {
+setGeneric(name = "getWorkingPath", def = function(userObject) {
     standardGeneric("getWorkingPath")
 })
 
@@ -527,4 +551,14 @@ setMethod(f="getSimpleArborescence",
           signature=c(userObject = "UserMetadata"), 
           definition=function(userObject) {
               return(userObject@simple_arborescence)
+          })
+
+#' @rdname setOutputDir
+#' @aliases setOutputDir,userMetadata,character
+setMethod(f="setOutputDir",
+          signature=c(userObject = "UserMetadata", 
+                      outputDir = "character"), 
+          definition=function(userObject, outputDir) {
+              userObject@output_dir <- outputDir
+              return(userObject)
           })
