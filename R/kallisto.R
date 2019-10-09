@@ -306,8 +306,6 @@ is_kallisto_installed <- function(myKallistoMetadata,
 #'
 #' @author Julien Wollbrett.
 #' 
-#' @return NULL
-#' 
 #' @examples {
 #'   kallisto <- new('KallistoMetadata')
 #'   user <- new('UserMetadata')
