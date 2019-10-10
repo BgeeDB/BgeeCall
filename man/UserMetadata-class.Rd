@@ -23,7 +23,7 @@ replicates and merged to run one transcript expression estimation analyse.}
 
 \item{\code{reads_size}}{The size of the reads. If smaller than 
 `KallistoMetadata@read_size_kmer_threshold`, 
-an index with a kmer size of 21 nt will be used.}
+an index with a kmer size of 15 bp will be used.}
 
 \item{\code{rnaseq_lib_path}}{Path to the directory of the RNA-Seq library that 
 contains fastq files.}
@@ -42,9 +42,15 @@ of output repositories.}
 defined with the `getwd()` function.}
 
 \item{\code{simple_arborescence}}{logical allowing to create a simple arborescence 
-of directory. All library ids are on the same directory. Default value is 
-`FALSE`. Do not use `TRUE` if you plan to generate expression calls for the 
-same library using different transcriptomes or gene annotations, otherwise 
-you will overwrite previous results}
+of directory. If `TRUE` (default), all results will be on the same directory 
+(working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you 
+plan to generate expression calls for the same library using different
+transcriptomes or gene annotations, otherwise you will overwrite previous results.
+When `FALSE` the path to result folder looks like : 
+working_path/intergenic_release/speciesId/kallisto/transcriptome_name/annotation_name/libraryId}
+
+\item{\code{output_dir}}{(optional) Allows to manually define your output directory.
+By default the path to output directory is created automatically from the
+working_path (working_path/intergenic_release/all_results/libraryId/).}
 }}
 

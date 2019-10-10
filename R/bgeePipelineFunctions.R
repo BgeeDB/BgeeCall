@@ -138,6 +138,10 @@ plot_distributions <- function(counts, selected_coding,
         xlab = "")
     axis(2, las = 1)
     
+    axis(1, at = seq(-30 , 30, by = 10), line = 0, mgp = c(3, 0.5, 0), cex.axis = 0.8)
+    mtext(expression(log[2]('TPM' + 10^-6)), 1,  adj = 1, padj = 0, line = 0.2, at = par("usr")[1], col = "black", cex = 0.8)
+    
+    
     ## Plot the TPM cutoff abline(v=cutoff, col='gray',
     ## lty=1, lwd=2)
     arrows(log2(cutoff + 1e-05), par("usr")[3], log2(cutoff + 

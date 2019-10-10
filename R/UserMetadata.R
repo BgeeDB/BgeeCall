@@ -12,7 +12,7 @@
 #' replicates and merged to run one transcript expression estimation analyse.
 #' @slot reads_size The size of the reads. If smaller than 
 #' `KallistoMetadata@read_size_kmer_threshold`, 
-#' an index with a kmer size of 21 nt will be used.
+#' an index with a kmer size of 15 bp will be used.
 #' @slot rnaseq_lib_path Path to the directory of the RNA-Seq library that 
 #' contains fastq files. 
 #' @slot transcriptome_name Name of the transcriptome used to generate 
@@ -24,10 +24,15 @@
 #' @slot working_path Working directory. By default the working directory is 
 #' defined with the `getwd()` function.
 #' @slot simple_arborescence logical allowing to create a simple arborescence 
-#' of directory. All library ids are on the same directory. Default value is 
-#' `FALSE`. Do not use `TRUE` if you plan to generate expression calls for the 
-#' same library using different transcriptomes or gene annotations, otherwise 
-#' you will overwrite previous results
+#' of directory. If `TRUE` (default), all results will be on the same directory 
+#' (working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you 
+#' plan to generate expression calls for the same library using different
+#' transcriptomes or gene annotations, otherwise you will overwrite previous results.
+#' When `FALSE` the path to result folder looks like : 
+#' working_path/intergenic_release/speciesId/kallisto/transcriptome_name/annotation_name/libraryId
+#' @slot output_dir (optional) Allows to manually define your output directory.
+#' By default the path to output directory is created automatically from the
+#' working_path (working_path/intergenic_release/all_results/libraryId/). 
 
 UserMetadata <- setClass(
     # Set the name for the class
@@ -44,14 +49,16 @@ UserMetadata <- setClass(
         annotation_name = "character",
         annotation_object = "GRanges",
         working_path = "character",
-        simple_arborescence = "logical"
+        simple_arborescence = "logical",
+        output_dir = "character"
     ),
     
     # Set the default values for the slots.
     prototype = prototype(
         working_path = getwd(),
         reads_size = 51,
-        simple_arborescence = FALSE
+        simple_arborescence = TRUE,
+        output_dir = ""
     )
 )
 
@@ -215,6 +222,30 @@ setGeneric(name="setSimpleArborescence",
                standardGeneric("setSimpleArborescence")
            })
 
+#' @title `output_dir` Setter
+#' 
+#' @description Set value of the `output_dir` slot
+#' 
+#' @param userObject The UserMetadata object
+#' @param outputDir path to the directory wanted as `output_dir`
+#' 
+#' @return An object of the class UserMetadata with new `output_dir`
+#'  value
+#'  
+#' @export
+#' @docType methods
+#' @rdname setOutputDir
+#' 
+#' @examples {
+#' user <- new("UserMetadata")
+#' user <- setOutputDir(user, getwd())
+#' }
+#'
+setGeneric(name = "setOutputDir", 
+           def = function(userObject, outputDir) {
+               standardGeneric("setOutputDir")
+           })
+
 #' @title `simple_arborescence` Getter
 #' 
 #' @description Get value of the `simple_arborescence` slot
@@ -232,7 +263,7 @@ setGeneric(name="setSimpleArborescence",
 #' simple_arborescence <- getSimpleArborescence(user)
 #' }
 #'
-setGeneric(name="getSimpleArborescence", def=function(userObject) {
+setGeneric(name = "getSimpleArborescence", def = function(userObject) {
     standardGeneric("getSimpleArborescence")
 })
 
@@ -255,8 +286,8 @@ setGeneric(name="getSimpleArborescence", def=function(userObject) {
 #' user <- setRunIds(user, c("RUN_1", "RUN_2"))
 #' }
 #'
-setGeneric(name="setRunIds", 
-           def=function(userObject, runIds) {
+setGeneric(name = "setRunIds", 
+           def = function(userObject, runIds) {
                standardGeneric("setRunIds")
            })
 
@@ -277,7 +308,7 @@ setGeneric(name="setRunIds",
 #' run_ids <- getRunIds(user)
 #' }
 #'
-setGeneric(name="getRunIds", def=function(userObject) {
+setGeneric(name = "getRunIds", def=function(userObject) {
     standardGeneric("getRunIds")
 })
 
@@ -300,8 +331,8 @@ setGeneric(name="getRunIds", def=function(userObject) {
 #' user <- setWorkingPath(user, getwd())
 #' }
 #'
-setGeneric(name="setWorkingPath", 
-           def=function(userObject, workingPath) {
+setGeneric(name = "setWorkingPath", 
+           def = function(userObject, workingPath) {
     standardGeneric("setWorkingPath")
 })
 
@@ -323,7 +354,7 @@ setGeneric(name="setWorkingPath",
 #' working_path <- getWorkingPath(user)
 #' }
 #'
-setGeneric(name="getWorkingPath", def=function(userObject) {
+setGeneric(name = "getWorkingPath", def = function(userObject) {
     standardGeneric("getWorkingPath")
 })
 
@@ -520,4 +551,14 @@ setMethod(f="getSimpleArborescence",
           signature=c(userObject = "UserMetadata"), 
           definition=function(userObject) {
               return(userObject@simple_arborescence)
+          })
+
+#' @rdname setOutputDir
+#' @aliases setOutputDir,userMetadata,character
+setMethod(f="setOutputDir",
+          signature=c(userObject = "UserMetadata", 
+                      outputDir = "character"), 
+          definition=function(userObject, outputDir) {
+              userObject@output_dir <- outputDir
+              return(userObject)
           })

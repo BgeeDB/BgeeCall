@@ -24,7 +24,7 @@
 #' outside of this package. This file is created by the pipeline. 
 #' You should edit this slot only if you already have such a file with a 
 #' different name. This file must be store at get_tool_path()
-#' @slot k21_index_file same as index_file. This index is generated with smallest 
+#' @slot k15_index_file same as index_file. This index is generated with smallest 
 #' kmers and will be used only for libraries containing reads smallest than 50nt.
 #' @slot single_end_parameters kallisto parameters used to run a single end mapping
 #' @slot pair_end_parameters kallisto parameters used to run a pair end mapping
@@ -47,7 +47,7 @@ KallistoMetadata <- setClass(
         unix_kallisto_name = "character",
         windows_kallisto_name = "character",
         index_file = "character",
-        k21_index_file = "character",
+        k15_index_file = "character",
         single_end_parameters = "character",
         pair_end_parameters = "character"
     ),
@@ -57,10 +57,11 @@ KallistoMetadata <- setClass(
         # slots defined in parent AbundanceMetadata Class
         tool_name = "kallisto",
         abundance_file = "abundance.tsv",
-        transcript_id_header ="target_id",
-        count_header ="est_counts",
-        abundance_header ="tpm",
-        eff_length_header ="eff_length",
+        abundance_file_without_tx_version = "abundance_without_tx_version.tsv",
+        transcript_id_header = "target_id",
+        count_header = "est_counts",
+        abundance_header = "tpm",
+        eff_length_header = "eff_length",
         read_size_kmer_threshold = 50,
         # slots specific to Class
         download_kallisto = FALSE,
@@ -76,12 +77,12 @@ KallistoMetadata <- setClass(
         unix_kallisto_name = "kallisto",
         windows_kallisto_name = "kallisto.exe",
         index_file = "transcriptome.idx",
-        #transcriptome index file for kmer size = 21
-        k21_index_file = "transcriptome_k21.idx", 
+        #transcriptome index file for kmer size = 15
+        k15_index_file = "transcriptome_k15.idx", 
         single_end_parameters = "-t 1 --single -l 180 -s 30 --bias",
         pair_end_parameters = "-t 1 --bias"
     ),
     
     # This class also have attributs/methods of AbundanceMetadata class (inheritence)
-    contains="AbundanceMetadata"
+    contains = "AbundanceMetadata"
 )

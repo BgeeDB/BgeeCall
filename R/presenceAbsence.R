@@ -16,13 +16,7 @@
 #'
 get_ref_intergenic_ids <- function(myBgeeMetadata, 
     myUserMetadata) {
-    bgee_intergenic_file <- file.path(get_species_path(myBgeeMetadata, 
-        myUserMetadata), myBgeeMetadata@fasta_intergenic_name)
-    if (!file.exists(bgee_intergenic_file)) {
-        # Download fasta file from Bgee FTP
-        download_fasta_intergenic(myBgeeMetadata, myUserMetadata, 
-            bgee_intergenic_file)
-    }
+    bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
     bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
     # keep only intergenic ids from fasta file
     return(as.data.frame(sub("^([^ ]+).*", "\\1", names(bgee_intergenic))))
@@ -72,9 +66,11 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         myUserMetadata)
     tool_path <- get_tool_path(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
-    output_path <- get_tool_output_path(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata)
     
+    # use the standard output dir or the one defined by the user
+    output_path <- get_tool_output_path(myAbundanceMetadata, 
+                                        myBgeeMetadata, myUserMetadata)
+
     # biotype mapping information will depend on
     # summarization at gene level or not
     biotype_mapping <- ""
@@ -169,8 +165,8 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                              myBgeeMetadata,
                                              myUserMetadata))
     s4_slots_path <- file.path(output_path, "S4_slots_summary.tsv")
-    write.table(s4_summary_df, file = s4_slots_path, quote = F, sep = "\t",
-                col.names = T, row.names = F)    
+    write.table(s4_summary_df, file = s4_slots_path, quote = FALSE, sep = "\t",
+                col.names = TRUE, row.names = FALSE)    
     calls_result <- list()
     calls_result$calls_tsv_path <- calls_file_path
     calls_result$cutoff_info_file_path <- cutoff_info_file_path
@@ -184,7 +180,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     ## vector vertically
 }
 
-#' @title Transform txinport object
+#' @title Transform tximport object
 #'
 #' @description transform tximport object in order to easily process information
 #'
