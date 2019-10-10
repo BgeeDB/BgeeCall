@@ -12,9 +12,9 @@
 #' KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
 #' 
 #'
-#' @param myAbundanceMetadata A Reference Class BgeeMetadata object (optional)
+#' @param abundanceMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze
-#' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
+#' @param bgeeMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to choose the version of reference intergenic sequences
 #' @param userMetadata A Reference Class UserMetadata object (optional).
 #' generate present/allows calls using objects of the UserMetadata class.
@@ -77,26 +77,26 @@
 #' }
 #' 
 generate_calls_workflow <- function(
-    myAbundanceMetadata = new("KallistoMetadata"), 
-    myBgeeMetadata = new("BgeeMetadata"), userMetadata = NULL, 
+    abundanceMetadata = new("KallistoMetadata"), 
+    bgeeMetadata = new("BgeeMetadata"), userMetadata = NULL, 
     userDataFrame = NULL, userFile = NULL) {
     if (is.null(userMetadata) && is.null(userDataFrame) && 
         is.null(userFile)) {
         stop("one of the parameters userMetadata, userDataFrame or userFile
              sould not be NULL")
         
-        # run workflow when userMetadata is not null
+    # run workflow when userMetadata is not null
     } else if (!is.null(userMetadata) && is.null(userDataFrame) && 
         is.null(userFile)) {
         if (isS4(userMetadata)) {
-            return(run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
-                myBgeeMetadata = myBgeeMetadata, myUserMetadata = userMetadata))
+            return(run_from_object(myAbundanceMetadata = abundanceMetadata, 
+                myBgeeMetadata = bgeeMetadata, myUserMetadata = userMetadata))
         } else if (typeof(userMetadata) == "list" && 
             isS4(userMetadata[[1]])) {
             for (i in seq_along(userMetadata)) {
                 results[i] <- 
-                    run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
-                                    myBgeeMetadata = myBgeeMetadata, 
+                    run_from_object(myAbundanceMetadata = abundanceMetadata, 
+                                    myBgeeMetadata = bgeeMetadata, 
                                     myUserMetadata = userMetadata[[i]])
             }
             return(results)
@@ -104,11 +104,11 @@ generate_calls_workflow <- function(
             stop("the parameter userMetadata should only be used to 
                  provide one or a list of UserMetadata objects")
         }
-        # run workflow when userDataFrame is not null
+    # run workflow when userDataFrame is not null
     } else if (is.null(userMetadata) && !is.null(userDataFrame) && 
         is.null(userFile)) {
-        return(run_from_dataframe(myAbundanceMetadata = myAbundanceMetadata, 
-            myBgeeMetadata = myBgeeMetadata, 
+        return(run_from_dataframe(myAbundanceMetadata = abundanceMetadata, 
+            myBgeeMetadata = bgeeMetadata, 
             userMetadataDataFrame = userDataFrame))
         # run workflow when userDataFrame is not null
     } else if (is.null(userMetadata) && is.null(userDataFrame) && 
@@ -118,8 +118,8 @@ generate_calls_workflow <- function(
             stop("Please provide a path to the file that contains all 
 information allowing to generate UserMetadata objects")
         }
-        return(run_from_file(myAbundanceMetadata = myAbundanceMetadata, 
-            myBgeeMetadata = myBgeeMetadata, userMetadataFile = userFile))
+        return(run_from_file(myAbundanceMetadata = abundanceMetadata, 
+            myBgeeMetadata = bgeeMetadata, userMetadataFile = userFile))
     } else {
         stop("Please use only 1 of the 3 follwowing attributs : 
              userMetadata, userDataFrame, userFile")
@@ -220,44 +220,13 @@ run_from_dataframe <-
     function(myAbundanceMetadata = new("KallistoMetadata"), 
              myBgeeMetadata = new("BgeeMetadata"), 
              userMetadataDataFrame) {
-    
     for (row_number in seq_len(nrow(userMetadataDataFrame))) {
         
-        # init myUserMetadata object
-        myUserMetadata <- new("UserMetadata")
-        myUserMetadata@species_id <- 
-            as.character(userMetadataDataFrame[["species_id"]][row_number])
-        
-        ids <- as.character(userMetadataDataFrame[["run_ids"]][row_number])
-        if (length(ids) == 0) {
-            myUserMetadata@run_ids <- character(0)
-        } else if (length(ids) == 1) {
-            if (grepl(", ", ids)) {
-                myUserMetadata@run_ids <- strsplit(ids, 
-                  ", ")
-            } else if (grepl(pattern = ",", x = ids)) {
-                myUserMetadata@run_ids <- strsplit(ids, 
-                  ",")
-            }
-        } else {
-            myUserMetadata@run_ids <- ids
-        }
-        myUserMetadata@reads_size <- 
-            as.numeric(userMetadataDataFrame[["reads_size"]][row_number])
-        myUserMetadata@rnaseq_lib_path <- 
-            as.character(userMetadataDataFrame[["rnaseq_lib_path"]][row_number])
-        myUserMetadata <- setTranscriptomeFromFile(userObject = myUserMetadata, 
-            transcriptomePath = as.character(
-                userMetadataDataFrame[["transcriptome_path"]][row_number]))
-        myUserMetadata <- setAnnotationFromFile(userObject = myUserMetadata, 
-            annotationPath = as.character(
-                userMetadataDataFrame[["annotation_path"]][row_number]))
-        myUserMetadata@working_path <- 
-            as.character(userMetadataDataFrame[["working_path"]][row_number])
+        ## init myUserMetadata object
+        user_metadata <- init_userMetadata_from_dataframe(userMetadataDataFrame, row_number)
         
         # run pipeline
-        run_from_object(myAbundanceMetadata, myBgeeMetadata, 
-            myUserMetadata)
+        run_from_object(myAbundanceMetadata, myBgeeMetadata, user_metadata)
     }
 }
 
@@ -303,3 +272,69 @@ run_from_file <- function(myAbundanceMetadata = new("KallistoMetadata"),
     return(output_files)
 }
 
+init_userMetadata_from_dataframe <- function(userMetadataDataFrame, 
+                                             row_number) {
+    myUserMetadata <- new("UserMetadata")
+    myUserMetadata@species_id <- 
+        as.character(userMetadataDataFrame[["species_id"]][row_number])
+    
+    # check if subset of run ids has to be used to generate present/absent
+    ids <- as.character(userMetadataDataFrame[["run_ids"]][row_number])
+    if (length(ids) == 0) {
+        myUserMetadata@run_ids <- character(0)
+    } else if (length(ids) == 1) {
+        if (grepl(", ", ids)) {
+            myUserMetadata@run_ids <- strsplit(ids, 
+                                               ", ")
+        } else if (grepl(pattern = ",", x = ids)) {
+            myUserMetadata@run_ids <- strsplit(ids, 
+                                               ",")
+        }
+    } else {
+        myUserMetadata@run_ids <- ids
+    }
+
+    # check if user provided an output_dir or if the default one will be used
+    if ("output_directory" %in% names(userMetadataDataFrame)) {
+        output_dir <- as.character(userMetadataDataFrame[["output_directory"]][row_number])
+        if (length(output_dir) != 0 ) {
+            if (!dir.exists(output_dir)) {
+                dir.create(path = output_dir, recursive = TRUE, 
+                           showWarnings = TRUE) 
+            }
+            myUserMetadata <- setOutputDir(myUserMetadata, output_dir)
+        }
+    }
+
+    # check if user provided an output_dir or if the default one will be used
+    if ("simple_arborescence" %in% names(userMetadataDataFrame)) {
+        simple_arborescence <- userMetadataDataFrame[["simple_arborescence"]][row_number]
+        if (length(simple_arborescence) != 0) {
+            if (simple_arborescence == "TRUE" || simple_arborescence == "true") {
+                myUserMetadata@simple_arborescence <- TRUE
+            } else if (simple_arborescence == "FALSE" || simple_arborescence == "false") {
+                myUserMetadata@simple_arborescence <- FALSE
+            } else {
+                stop("the column simple_arborescence should only contain TRUE or FALSE")
+            }
+        }
+    }
+    
+    
+    myUserMetadata@reads_size <- 
+        as.numeric(userMetadataDataFrame[["reads_size"]][row_number])
+    myUserMetadata@rnaseq_lib_path <- 
+        as.character(userMetadataDataFrame[["rnaseq_lib_path"]][row_number])
+    myUserMetadata <- setTranscriptomeFromFile(userObject = myUserMetadata, 
+                                               transcriptomePath = as.character(
+                                                   userMetadataDataFrame[["transcriptome_path"]][row_number]))
+    myUserMetadata <- setAnnotationFromFile(userObject = myUserMetadata, 
+                                            annotationPath = as.character(
+                                                userMetadataDataFrame[["annotation_path"]][row_number]))
+    if (is.na(myUserMetadata@working_path) || myUserMetadata@working_path == '')
+        myUserMetadata@working_path <- 
+        as.character(userMetadataDataFrame[["working_path"]][row_number])
+    
+    return(myUserMetadata)
+}
+    

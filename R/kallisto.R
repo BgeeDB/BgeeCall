@@ -4,7 +4,7 @@
 #' Two indexes can be created depending on the reads size (see 
 #' `AbundanceMetadata@read_size_kmer_threshold` and `UserMetadata@reads_size` 
 #' for more information). One with default kmer value (31 nt) and one with 
-#' kmer size of 21 nt. In order to generate.
+#' kmer size of 15 nt. In order to generate.
 #'
 #' @param myKallistoMetadata A Reference Class KallistoMetadata object.
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object.
@@ -59,8 +59,8 @@ create_kallisto_index <- function(myKallistoMetadata,
         myBgeeMetadata, myUserMetadata)
     transcriptome_index_path <- file.path(index_path, 
         myKallistoMetadata@index_file)
-    transcriptome_k21_index_path <- file.path(index_path, 
-        myKallistoMetadata@k21_index_file)
+    transcriptome_k15_index_path <- file.path(index_path, 
+        myKallistoMetadata@k15_index_file)
     kallisto_exec <- get_kallisto_program_path(myKallistoMetadata, 
         myUserMetadata)
     
@@ -86,7 +86,7 @@ potential already installed version of Kallisto.\n")
             system("kallisto", ignore.stdout = TRUE, 
                 ignore.stderr = TRUE)
         }, warning = function(w) {
-            stop("kallisto is not installed. You should either 
+stop("kallisto is not installed. You should either 
     - automatically install a version of kallisto used only by this package (see vignette for more details)
     - install kallisto on your system following official website instructions (https://pachterlab.github.io/kallisto/download)")
         })
@@ -99,7 +99,7 @@ potential already installed version of Kallisto.\n")
     if ((myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
         file.exists(transcriptome_index_path)) || (myUserMetadata@reads_size < 
         myKallistoMetadata@read_size_kmer_threshold && 
-        file.exists(transcriptome_k21_index_path))) {
+        file.exists(transcriptome_k15_index_path))) {
         message("Index file already exist. No need to create a new one.\n")
     } else {
         
@@ -114,13 +114,13 @@ potential already installed version of Kallisto.\n")
             system(kallisto_command)
         }
         
-        # create kallisto index with kmer size equal to 21
+        # create kallisto index with kmer size equal to 15
         if (myUserMetadata@reads_size < myKallistoMetadata@read_size_kmer_threshold && 
-            !file.exists(transcriptome_k21_index_path)) {
-            kallisto_k21_command <- paste0(kallisto_exec, 
-                " index -k 21 -i ", transcriptome_k21_index_path, 
+            !file.exists(transcriptome_k15_index_path)) {
+            kallisto_k15_command <- paste0(kallisto_exec, 
+                " index -k 15 -i ", transcriptome_k15_index_path, 
                 " ", transcriptome_path)
-            system(kallisto_k21_command)
+            system(kallisto_k15_command)
         }
         message("kallisto index files have been succesfully created 
                 for species ", myUserMetadata@species_id, ".\n")
@@ -190,19 +190,21 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
         myBgeeMetadata, myUserMetadata)
     kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
         myKallistoMetadata@index_file))
+    
+    # use the standard output dir or the one defined by the user
     kallisto_output_path <- get_tool_output_path(myKallistoMetadata, 
-        myBgeeMetadata, myUserMetadata)
+                                                myBgeeMetadata, myUserMetadata)
+
     output_abundance_file <- file.path(kallisto_output_path, 
         myKallistoMetadata@abundance_file)
     
-    # test if kallisto has to be run
+    # test if abundance file already exists
     if (file.exists(output_abundance_file)) {
         message("kallisto abundance file already exists for library ", 
             basename(myUserMetadata@rnaseq_lib_path), 
             ". Abundance file will be overwritten.\n")
     }
-    # create transcriptome containing bgee intergenic
-    # regions
+    # create transcriptome containing bgee intergenic regions
     if (transcriptome_path == "") {
         merge_transcriptome_and_intergenic(myKallistoMetadata, 
             myBgeeMetadata, myUserMetadata)
@@ -233,7 +235,7 @@ potential already installed version of Kallisto.\n")
     # small kmer size
     if (myUserMetadata@reads_size < 50) {
         kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
-            myKallistoMetadata@k21_index_file))
+            myKallistoMetadata@k15_index_file))
     }
     
     # check library folder and test if _1 and _2 files
@@ -253,14 +255,6 @@ potential already installed version of Kallisto.\n")
     message("Will run kallisto using this command line : ", 
         kallisto_command)
     system(kallisto_command)
-    
-    if (myKallistoMetadata@ignoreTxVersion) {
-        message("remove transcript version info in ", 
-            myKallistoMetadata@abundance_file, " ", 
-            myKallistoMetadata@tool_name, " abundance file.\n")
-        removeTxVersionFromAbundance(myKallistoMetadata, 
-            myBgeeMetadata, myUserMetadata)
-    }
 }
 
 
@@ -303,8 +297,6 @@ is_kallisto_installed <- function(myKallistoMetadata,
 #' @param myUserMetadata A Reference Class UserMetadata object.
 #'
 #' @author Julien Wollbrett.
-#' 
-#' @return NULL
 #' 
 #' @examples {
 #'   kallisto <- new('KallistoMetadata')
