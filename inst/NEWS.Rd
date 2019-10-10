@@ -15,7 +15,7 @@
     \item Can use custom reference intergenic sequences from a local fastq file
   }
 }
-\section{Version 1.1.1 (2019-08)}{
+\section{Version 1.1.1 (2019-10)}{
   \itemize{
     \item Better manage transcript version
     \item Manage output directory when calls are generated for several libraries
