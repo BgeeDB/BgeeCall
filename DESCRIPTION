@@ -23,7 +23,7 @@ License: GPL-3
 URL: https://github.com/BgeeDB/BgeeCall
 BugReports: https://github.com/BgeeDB/BgeeCall/issues
 VignetteBuilder: knitr
-biocViews: Workflow, GeneExpressionWorkflow
+biocViews: Software, GeneExpression, RNASeq
 Suggests: knitr, testthat, rmarkdown, AnnotationHub, httr
 RoxygenNote: 6.1.1
 Encoding: UTF-8
