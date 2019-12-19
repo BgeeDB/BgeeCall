@@ -30,7 +30,7 @@ list_intergenic_release <- function(release = NULL) {
                 release, ]
         } else {
             stop("ERROR: The specified release is invalid or is not available for 
-           this version of BgeeCall.")
+            this version of BgeeCall.")
         }
     }
     ## Only return the columns of interest to the user
@@ -60,7 +60,7 @@ list_intergenic_release <- function(release = NULL) {
     } else {
         file.remove(file.path(getwd(), "release.tsv.tmp"))
         stop("ERROR: File describing intergenic releases could not be downloaded 
-         from FTP.")
+        from FTP.")
     }
     ## Keep intergenic releases available with the
     ## current version of the package

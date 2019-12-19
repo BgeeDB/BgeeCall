@@ -162,8 +162,8 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     #save values of the Slots of the BgeeCall internal S4 objects
     s4_summary_df <- as.data.frame(
         generate_S4_object_properties_output(myAbundanceMetadata,
-                                             myBgeeMetadata,
-                                             myUserMetadata))
+            myBgeeMetadata,
+            myUserMetadata))
     s4_slots_path <- file.path(output_path, "S4_slots_summary.tsv")
     write.table(s4_summary_df, file = s4_slots_path, quote = FALSE, sep = "\t",
                 col.names = TRUE, row.names = FALSE)    

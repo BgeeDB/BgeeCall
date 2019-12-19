@@ -51,7 +51,7 @@ load_transcript_to_biotype <- function(myAbundanceMetadata,
         names(transcript_to_biotype) <- column_names
         if (myAbundanceMetadata@ignoreTxVersion) {
             transcript_to_biotype$id <- gsub(pattern = "\\..*", 
-                                   "", transcript_to_biotype$id)
+                "", transcript_to_biotype$id)
         }
         
         # retrieve gene2biotype information from intergenic
