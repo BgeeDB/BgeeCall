@@ -14,7 +14,7 @@ get_os <- function() {
     sysinf <- Sys.info()
     if (!is.null(sysinf)) {
         os <- sysinf["sysname"]
-        if (os == "Darwine") {
+        if (os == "Darwin") {
             os <- "osx"
         } else {
             os <- .Platform$OS.type
@@ -169,7 +169,7 @@ get_tool_output_path <- function(myAbundanceMetadata,
     myUserMetadata) {
     if (is.na(myUserMetadata@output_dir) ||
         myUserMetadata@output_dir == "") {
-        if (myUserMetadata@simple_arborescence == TRUE) {
+        if (myUserMetadata@simple_arborescence) {
             return(
                 file.path(
                     get_intergenic_release_path(myBgeeMetadata,

@@ -83,10 +83,10 @@ potential already installed version of Kallisto.\n")
         }
     } else {
         tryCatch({
-            system("kallisto", ignore.stdout = TRUE, 
+            system2("kallisto", ignore.stdout = TRUE, 
                 ignore.stderr = TRUE)
-        }, warning = function(w) {
-stop("kallisto is not installed. You should either 
+        }, error = function(w) {
+  stop("kallisto is not installed. You should either 
     - automatically install a version of kallisto used only by this package (see vignette for more details)
     - install kallisto on your system following official website instructions (https://pachterlab.github.io/kallisto/download)")
         })
@@ -111,7 +111,7 @@ stop("kallisto is not installed. You should either
             kallisto_command <- paste0(kallisto_exec, 
                 " index -i ", transcriptome_index_path, 
                 " ", transcriptome_path)
-            system(kallisto_command)
+            system2(kallisto_command)
         }
         
         # create kallisto index with kmer size equal to 15
@@ -120,7 +120,7 @@ stop("kallisto is not installed. You should either
             kallisto_k15_command <- paste0(kallisto_exec, 
                 " index -k 15 -i ", transcriptome_k15_index_path, 
                 " ", transcriptome_path)
-            system(kallisto_k15_command)
+            system2(kallisto_k15_command)
         }
         message("kallisto index files have been succesfully created 
                 for species ", myUserMetadata@species_id, ".\n")
@@ -254,7 +254,7 @@ potential already installed version of Kallisto.\n")
     
     message("Will run kallisto using this command line : ", 
         kallisto_command)
-    system(kallisto_command)
+    system2(kallisto_command)
 }
 
 

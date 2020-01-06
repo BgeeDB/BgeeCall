@@ -29,7 +29,7 @@ list_intergenic_release <- function(release = NULL) {
             allReleases <- allReleases[allReleases$release == 
                 release, ]
         } else {
-            stop("ERROR: The specified release is invalid or is not available for 
+            stop("The specified release is invalid or is not available for 
             this version of BgeeCall.")
         }
     }
@@ -54,12 +54,12 @@ list_intergenic_release <- function(release = NULL) {
             to = file.path(getwd(), "release.tsv"))
         allReleases <- read.table(file = "release.tsv", 
             header = TRUE, sep = "\t")
-        if (removeFile == TRUE) {
+        if (removeFile) {
             file.remove(file.path(getwd(), "release.tsv"))
         }
     } else {
         file.remove(file.path(getwd(), "release.tsv.tmp"))
-        stop("ERROR: File describing intergenic releases could not be downloaded 
+        stop("File describing intergenic releases could not be downloaded 
         from FTP.")
     }
     ## Keep intergenic releases available with the

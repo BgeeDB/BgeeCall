@@ -79,7 +79,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
     annotation_path <- get_annotation_path(myBgeeMetadata, 
         myUserMetadata)
     tx2gene_file <- myAbundanceMetadata@tx2gene_file
-    if (myAbundanceMetadata@ignoreTxVersion == TRUE) {
+    if (myAbundanceMetadata@ignoreTxVersion) {
         tx2gene_file <- myAbundanceMetadata@tx2gene_file_without_version
     }
     tx2gene_path <- file.path(annotation_path, tx2gene_file)

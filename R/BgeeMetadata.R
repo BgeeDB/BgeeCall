@@ -40,7 +40,7 @@ setMethod(
     definition = function(.Object, ...) {
         .Object <- callNextMethod()
         ## Get release information
-        cat("\nQuerying Bgee to get intergenic release information...\n")
+        message("Querying Bgee to get intergenic release information...")
         allReleases <-
             try(.getIntergenicRelease(removeFile = FALSE),
                 silent = TRUE)
@@ -51,23 +51,17 @@ setMethod(
             )
         } else if (is(allReleases, "try-error")) {
             if (file.exists(file.path(getwd(), "release.tsv"))) {
-                cat(
-                    paste0(
-                        "\nWARNING: BgeeCall could not access
-intergenic releases information from the internet, but a release
-information file was found in the download directory ",
-                        getwd(),
-                        ". This release file will be used, but be warned that it
-may not be up to date!\n"
-                    )
-                )
+                warning("BgeeCall could not access intergenic 
+                releases information from the internet, but a release
+                information file was found in the download directory ",
+                getwd(),". This release file will be used, but be warned
+                that it may not be up to date!")
                 allReleases <- read.table(file.path(getwd(),
                     "release.tsv"),
                     header = TRUE,
                     sep = "\t")
             } else {
-                stop(
-                    "ERROR: BgeeCall could not access Bgee
+                stop("BgeeCall could not access Bgee
 intergenic releases information. Is your internet connection working?"
                 )
             }
