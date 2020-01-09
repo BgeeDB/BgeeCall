@@ -46,7 +46,7 @@ list_bgee_ref_intergenic_species <- function(myBgeeMetadata = NULL, release = NU
         stop("The selected reference intergenic release does not exist.")
     }
     url <- paste0(all_releases$FTPURL[all_releases$release == intergenic_release],
-                  species_info_file)
+        species_info_file)
     species <- read.table(file = url, header = TRUE, sep = "\t")
     return(species)
 }

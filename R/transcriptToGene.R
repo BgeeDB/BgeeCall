@@ -79,7 +79,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
     annotation_path <- get_annotation_path(myBgeeMetadata, 
         myUserMetadata)
     tx2gene_file <- myAbundanceMetadata@tx2gene_file
-    if (myAbundanceMetadata@ignoreTxVersion == TRUE) {
+    if (myAbundanceMetadata@ignoreTxVersion) {
         tx2gene_file <- myAbundanceMetadata@tx2gene_file_without_version
     }
     tx2gene_path <- file.path(annotation_path, tx2gene_file)
@@ -101,7 +101,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
             message("remove transcript version info in ", 
                     tx2gene_file, " file.\n")
             tx2gene$TXNAME <- gsub(pattern = "\\..*", 
-                                   "", tx2gene$TXNAME)
+                "", tx2gene$TXNAME)
         }
         tx2gene <- rbind(tx2gene, intergenic_tx2gene)
         
@@ -147,8 +147,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #' @return a tximport object
 #'
 run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"), 
-                         myBgeeMetadata = new("BgeeMetadata"), 
-                         myUserMetadata, abundanceFile = "") {
+    myBgeeMetadata = new("BgeeMetadata"), 
+    myUserMetadata, abundanceFile = "") {
     tx2gene_path <- create_tx2gene(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
     tx2gene <- read.table(tx2gene_path, header = TRUE, 
@@ -157,11 +157,11 @@ run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"),
     abundance_file <- abundanceFile
     if (nchar(abundance_file) == 0) {
         abundance_file <- get_abundance_file_path(myAbundanceMetadata, 
-                          myBgeeMetadata, myUserMetadata)
+            myBgeeMetadata, myUserMetadata)
     }
     if (!file.exists(abundance_file)) {
         stop(paste0("can not generate presence/absence calls. 
-                Abundance file is missing : ", 
+Abundance file is missing : ", 
             abundance_file, "."))
     }
     txi <- tximport(abundance_file, type = myAbundanceMetadata@tool_name, 
@@ -179,8 +179,7 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
     tx2gene_path <- create_tx2gene(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
     intergenic_ids <- get_intergenic_ids(myBgeeMetadata, myUserMetadata)
-    tx2gene <- read.table(tx2gene_path, header = TRUE, 
-        sep = "\t")
+    tx2gene <- read.table(tx2gene_path, header = TRUE, sep = "\t")
     
     tx2gene_without_intergenic <- subset(tx2gene, !(tx2gene$TXNAME %in% 
         intergenic_ids$intergenic_ids))
@@ -189,7 +188,7 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
     output_path <- get_tool_output_path(myAbundanceMetadata, 
         myBgeeMetadata, myUserMetadata)
     abundance_file <- get_abundance_file_path(myAbundanceMetadata, 
-                      myBgeeMetadata, myUserMetadata)
+        myBgeeMetadata, myUserMetadata)
     abundance <- read.table(abundance_file, header = TRUE, 
         sep = "\t")
     abundance_without_intergenic <- abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] %in% 

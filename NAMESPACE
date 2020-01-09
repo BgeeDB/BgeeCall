@@ -35,9 +35,9 @@ import(rtracklayer)
 import(tximport)
 importFrom("grDevices", "dev.off", "pdf")
 importFrom("graphics", "arrows", "axis", "legend", "lines", "par",
-         "plot")
+    "plot","mtext")
 importFrom("methods", "callNextMethod", "is", "new", "validObject")
 importFrom("stats", "density", "na.omit")
 importFrom("utils", "compareVersion", "download.file",
-         "packageVersion", "read.table", "untar", "unzip",
-         "write.table")
+    "packageVersion", "read.table", "untar", "unzip",
+    "write.table")

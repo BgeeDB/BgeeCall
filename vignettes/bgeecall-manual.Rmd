@@ -1,10 +1,10 @@
 ---
-title: "BgeeCall, a R package for automatic RNA-Seq present/absent gene expression calls generation"
+title: "automatic RNA-Seq present/absent gene expression calls generation"
 author: "Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{automatic RNA-Seq present/absent gene expression calls generation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -155,7 +155,7 @@ You will potentialy be also interested to generate present/absent calls on diffe
 Columns of the dataframe or the tsv file are :
 
 - species_id : The NCBI ID of the species.
-- run_ids : The runs of the RNA-Seq library you want to use for the generation of the calls.	Allows to generate expression calls for a subset of the runs of one RNA-Seq library as described in [Generate calls for a subset of RNA-Seq runs](#run_ids). If not interested by this option, leave the column empty.
+- run_ids : The runs of the RNA-Seq library you want to use for the generation of the calls. Allows to generate expression calls for a subset of the runs of one RNA-Seq library as described in [Generate calls for a subset of RNA-Seq runs](#run_ids). If not interested by this option, leave the column empty.
 - reads_size : The size of the reads of your RNA-Seq library.
 - rnaseq_lib_path : Path to the directory containing all fastq files generated for this library. This directory can only contains single-end runs or paired-end runs.
 - transcriptome_path : path to the transcriptome file.

@@ -46,7 +46,7 @@ load_gene_to_biotype <- function(myAbundanceMetadata = new("AbundanceMetadata"),
         # retrieve gene2biotype information from intergenic
         # fasta file
         bgee_intergenic_file <- retrieve_intergenic_path(myBgeeMetadata, 
-                                                         myUserMetadata)
+            myUserMetadata)
         bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
         # intergenic ID correspond to part of the header
         # before the first space character

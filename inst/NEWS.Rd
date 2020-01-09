@@ -22,3 +22,8 @@
     \item Manage transcript version when calls are generated for several libraries
   }
 }
+\section{Version 1.2.0 (2019-12)}{
+  \itemize{
+    \item Moved from workflow to software section
+  }
+}
