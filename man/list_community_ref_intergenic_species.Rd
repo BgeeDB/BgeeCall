@@ -10,7 +10,7 @@ list_community_ref_intergenic_species()
 list all species having reference intergenic sequences created by the community
 }
 \description{
-Return information related to species having reference intergenic 
+Return information related to species having reference intergenic
 sequences created by the BgeeCall community
 - speciesId : the NCBI species ID of the species
 - url : url to the reference intergenic fasta file

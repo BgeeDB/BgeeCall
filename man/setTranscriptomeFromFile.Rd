@@ -11,32 +11,28 @@
 \usage{
 setTranscriptomeFromFile(userObject, transcriptomePath, transcriptomeName)
 
+\S4method{setTranscriptomeFromFile}{UserMetadata,character,missing}(userObject, transcriptomePath, transcriptomeName)
 
-  \S4method{setTranscriptomeFromFile}{UserMetadata,character,missing}(userObject,
-  transcriptomePath, transcriptomeName)
-
-
-  \S4method{setTranscriptomeFromFile}{UserMetadata,character,character}(userObject,
-  transcriptomePath, transcriptomeName)
+\S4method{setTranscriptomeFromFile}{UserMetadata,character,character}(userObject, transcriptomePath, transcriptomeName)
 }
 \arguments{
 \item{userObject}{The UserMetadata object}
 
 \item{transcriptomePath}{Absolute path to the transcriptome file}
 
-\item{transcriptomeName}{(optional) Name of the trancriptome. Will be used to 
+\item{transcriptomeName}{(optional) Name of the trancriptome. Will be used to
 create folders.}
 }
 \value{
 An object of the class UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set transcriptome_object of 
-one UserMetadata object 
+Method of the class UserMetadata. Set transcriptome_object of
+one UserMetadata object
 by providing the path to a fasta transcriptome file.
 }
 \details{
-If no transcriptomeName is provided the name of the transcriptome file 
+If no transcriptomeName is provided the name of the transcriptome file
 will be used to create folders.
 }
 \examples{

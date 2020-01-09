@@ -9,8 +9,7 @@
 \usage{
 setRNASeqLibPath(userObject, rnaSeqLibPath)
 
-\S4method{setRNASeqLibPath}{UserMetadata,character}(userObject,
-  rnaSeqLibPath)
+\S4method{setRNASeqLibPath}{UserMetadata,character}(userObject, rnaSeqLibPath)
 }
 \arguments{
 \item{userObject}{The UserMetadata object}

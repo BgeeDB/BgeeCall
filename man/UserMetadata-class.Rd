@@ -6,9 +6,9 @@
 \alias{UserMetadata}
 \title{UserMetadata S4 class}
 \description{
-An S4 class containing all metadata that have to be provided by 
-the user It is mandatory to edit `species_id`, `rnaseq_lib_path`, 
-`transcriptome_path`, `annotation_name`, `annotation_object` and potentialy 
+An S4 class containing all metadata that have to be provided by
+the user It is mandatory to edit `species_id`, `rnaseq_lib_path`,
+`transcriptome_path`, `annotation_name`, `annotation_object` and potentialy
 `run_ids` before using the package.
 }
 \section{Slots}{
@@ -17,36 +17,36 @@ the user It is mandatory to edit `species_id`, `rnaseq_lib_path`,
 \item{\code{species_id}}{The NCBI Taxon Id of the species}
 
 \item{\code{run_ids}}{A vector of charater. Has to be provided only if a subset of runs
-present in UserMetadata@rnaseq_lib_path has to be run. If empty, all fastq 
-files present in the rnaseq_lib_path will be considered as technical 
+present in UserMetadata@rnaseq_lib_path has to be run. If empty, all fastq
+files present in the rnaseq_lib_path will be considered as technical
 replicates and merged to run one transcript expression estimation analyse.}
 
-\item{\code{reads_size}}{The size of the reads. If smaller than 
-`KallistoMetadata@read_size_kmer_threshold`, 
+\item{\code{reads_size}}{The size of the reads. If smaller than
+`KallistoMetadata@read_size_kmer_threshold`,
 an index with a kmer size of 15 bp will be used.}
 
-\item{\code{rnaseq_lib_path}}{Path to the directory of the RNA-Seq library that 
+\item{\code{rnaseq_lib_path}}{Path to the directory of the RNA-Seq library that
 contains fastq files.}
 
-\item{\code{transcriptome_name}}{Name of the transcriptome used to generate 
+\item{\code{transcriptome_name}}{Name of the transcriptome used to generate
 arborescence of output repositories.}
 
 \item{\code{transcriptome_object}}{Object containing transcriptome}
 
-\item{\code{annotation_name}}{Name of the annotation used to generate arborescence 
+\item{\code{annotation_name}}{Name of the annotation used to generate arborescence
 of output repositories.}
 
 \item{\code{annotation_object}}{Object containing annotations from GTF or GFF file}
 
-\item{\code{working_path}}{Working directory. By default the working directory is 
+\item{\code{working_path}}{Working directory. By default the working directory is
 defined with the `getwd()` function.}
 
-\item{\code{simple_arborescence}}{logical allowing to create a simple arborescence 
-of directory. If `TRUE` (default), all results will be on the same directory 
-(working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you 
+\item{\code{simple_arborescence}}{logical allowing to create a simple arborescence
+of directory. If `TRUE` (default), all results will be on the same directory
+(working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you
 plan to generate expression calls for the same library using different
 transcriptomes or gene annotations, otherwise you will overwrite previous results.
-When `FALSE` the path to result folder looks like : 
+When `FALSE` the path to result folder looks like :
 working_path/intergenic_release/speciesId/kallisto/transcriptome_name/annotation_name/libraryId}
 
 \item{\code{output_dir}}{(optional) Allows to manually define your output directory.

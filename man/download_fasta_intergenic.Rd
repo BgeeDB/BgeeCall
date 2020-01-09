@@ -4,8 +4,11 @@
 \alias{download_fasta_intergenic}
 \title{Download fasta intergenic}
 \usage{
-download_fasta_intergenic(myBgeeMetadata = new("BgeeMetadata"),
-  myUserMetadata, intergenic_file)
+download_fasta_intergenic(
+  myBgeeMetadata = new("BgeeMetadata"),
+  myUserMetadata,
+  intergenic_file
+)
 }
 \arguments{
 \item{myBgeeMetadata}{A Reference Class BgeeMetadata object (optional)}
@@ -19,7 +22,7 @@ download fasta intergenic from Bgee FTP or from the Zenodo community and save it
 locally
 }
 \description{
-Check if reference intergenic fasta file has already 
+Check if reference intergenic fasta file has already
 been downloaded. If not the file is downloaded from Bgee FTP or from
 the community repository depending on myBgeeMetadata@intergenic_release.
 if myBgeeMetadata@intergenic_release == "community" then reference intergenic

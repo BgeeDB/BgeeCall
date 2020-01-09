@@ -4,8 +4,12 @@
 \alias{run_kallisto}
 \title{Run one kallisto abundance analyse}
 \usage{
-run_kallisto(myKallistoMetadata, myBgeeMetadata, myUserMetadata,
-  transcriptome_path = "")
+run_kallisto(
+  myKallistoMetadata,
+  myBgeeMetadata,
+  myUserMetadata,
+  transcriptome_path = ""
+)
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}
