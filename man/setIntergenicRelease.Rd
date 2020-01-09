@@ -9,8 +9,7 @@
 \usage{
 setIntergenicRelease(bgeeObject, intergenicRelease)
 
-\S4method{setIntergenicRelease}{BgeeMetadata,character}(bgeeObject,
-  intergenicRelease)
+\S4method{setIntergenicRelease}{BgeeMetadata,character}(bgeeObject, intergenicRelease)
 }
 \arguments{
 \item{bgeeObject}{The BgeeMetadata object}

@@ -20,7 +20,7 @@ setRunIds(userObject, runIds)
 An object of the class UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set run_ids of 
+Method of the class UserMetadata. Set run_ids of
 one UserMetadata object by providing the id of all wanted runs
 }
 \examples{

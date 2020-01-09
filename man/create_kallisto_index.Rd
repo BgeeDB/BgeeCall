@@ -4,8 +4,12 @@
 \alias{create_kallisto_index}
 \title{Create kallisto indexes.}
 \usage{
-create_kallisto_index(myKallistoMetadata, myBgeeMetadata, myUserMetadata,
-  transcriptome_path = "")
+create_kallisto_index(
+  myKallistoMetadata,
+  myBgeeMetadata,
+  myUserMetadata,
+  transcriptome_path = ""
+)
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}

@@ -4,9 +4,12 @@
 \alias{run_tximport}
 \title{Run tximport}
 \usage{
-run_tximport(myAbundanceMetadata = new("KallistoMetadata"),
-  myBgeeMetadata = new("BgeeMetadata"), myUserMetadata,
-  abundanceFile = "")
+run_tximport(
+  myAbundanceMetadata = new("KallistoMetadata"),
+  myBgeeMetadata = new("BgeeMetadata"),
+  myUserMetadata,
+  abundanceFile = ""
+)
 }
 \arguments{
 \item{myAbundanceMetadata}{A descendant object of the Class 

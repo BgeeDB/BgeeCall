@@ -4,9 +4,13 @@
 \alias{generate_calls_workflow}
 \title{generate present/absent calls}
 \usage{
-generate_calls_workflow(abundanceMetadata = new("KallistoMetadata"),
-  bgeeMetadata = new("BgeeMetadata"), userMetadata = NULL,
-  userDataFrame = NULL, userFile = NULL)
+generate_calls_workflow(
+  abundanceMetadata = new("KallistoMetadata"),
+  bgeeMetadata = new("BgeeMetadata"),
+  userMetadata = NULL,
+  userDataFrame = NULL,
+  userFile = NULL
+)
 }
 \arguments{
 \item{abundanceMetadata}{A Reference Class BgeeMetadata object (optional)
@@ -23,7 +27,7 @@ Can be one object or a list of objects.}
 present/absent calls. Each line of this data.frame will generate calls for
 one RNA-Seq library. This data.frame must contains 7 columns :
 - species_id : The ensembl species ID
-- run_ids : (optional) allows to generate calls for a subpart of all runs 
+- run_ids : (optional) allows to generate calls for a subpart of all runs
   of the library. must be a character or a list of characters.
 - reads_size (optional) the size of the reads of the library (Default = 50)
 if the reads size is lower than 51 abundance quantification wil be run with
@@ -34,7 +38,7 @@ a smaller kmer size
 - working_path : root of the directory where results will be written}
 
 \item{userFile}{path to a tsv file containing 7 columns. these columns are
-the same than for userDataFrame (see above). a template of this file is 
+the same than for userDataFrame (see above). a template of this file is
 available at the root of the package and accessible with the command
 system.file('userMetadataTemplate.tsv', package = 'BgeeCall')}
 }
@@ -42,12 +46,12 @@ system.file('userMetadataTemplate.tsv', package = 'BgeeCall')}
 paths to the 4 results files (see vignette for more details)
 }
 \description{
-Main function running the workflow allowing to generate 
-present/absent calls from a file, a data.frame, or objects of the 
+Main function running the workflow allowing to generate
+present/absent calls from a file, a data.frame, or objects of the
 classe UserMetadata (please choose only 1 out of the 3)
 This workflow is highly tunable by editing default values of the slots of
-S4 objects. For more information on how to tune the workflow please have 
-a look at the vignette and the documentation of the classes 
+S4 objects. For more information on how to tune the workflow please have
+a look at the vignette and the documentation of the classes
 KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
 }
 \examples{
@@ -61,18 +65,18 @@ transcriptome_object <- rtracklayer::import.2bit(ah_resources[['AH50453']])
 
 # instanciate BgeeCall object
 # add annotation and transcriptome in the user_BgeeCall object
-# it is possible to import them using an S4 object (GRanges, DNAStringSet) 
+# it is possible to import them using an S4 object (GRanges, DNAStringSet)
 # or a file (gtf, fasta) with methods setAnnotationFromFile() and
 # setTranscriptomeFromFile()
-user_BgeeCall <- setAnnotationFromObject(user_BgeeCall, 
-                                         annotation_object, 
+user_BgeeCall <- setAnnotationFromObject(user_BgeeCall,
+                                         annotation_object,
                                          'WBcel235_84')
-user_BgeeCall <- setTranscriptomeFromObject(user_BgeeCall, 
-                                          transcriptome_object, 
+user_BgeeCall <- setTranscriptomeFromObject(user_BgeeCall,
+                                          transcriptome_object,
                                           'WBcel235')
 # provide path to the directory of your RNA-Seq library
-user_BgeeCall <- setRNASeqLibPath(user_BgeeCall, 
-                 system.file('extdata', 'SRX099901_subset', 
+user_BgeeCall <- setRNASeqLibPath(user_BgeeCall,
+                 system.file('extdata', 'SRX099901_subset',
                  package = 'BgeeCall'))
 
 # run the full BgeeCall workflow
