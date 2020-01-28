@@ -5,8 +5,11 @@
 \title{Merge transcriptome file provided by the user with the Bgee intergenic 
 fasta file.}
 \usage{
-merge_transcriptome_and_intergenic(myKallistoMetadata, myBgeeMetadata,
-  myUserMetadata)
+merge_transcriptome_and_intergenic(
+  myKallistoMetadata,
+  myBgeeMetadata,
+  myUserMetadata
+)
 }
 \arguments{
 \item{myKallistoMetadata}{A Reference Class KallistoMetadata object.}

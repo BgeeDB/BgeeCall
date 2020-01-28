@@ -327,7 +327,6 @@ init_userMetadata_from_dataframe <- function(userMetadataDataFrame,
     } else {
         myUserMetadata@run_ids <- ids
     }
-    
     # check if user provided an output_dir or if the default one will be used
     if ("output_directory" %in% names(userMetadataDataFrame)) {
         output_dir <-

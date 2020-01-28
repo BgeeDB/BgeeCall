@@ -9,33 +9,31 @@
 \usage{
 setAnnotationFromObject(userObject, annotationObject, annotationName)
 
-
-  \S4method{setAnnotationFromObject}{UserMetadata,GRanges,character}(userObject,
-  annotationObject, annotationName = "")
+\S4method{setAnnotationFromObject}{UserMetadata,GRanges,character}(userObject, annotationObject, annotationName = "")
 }
 \arguments{
 \item{userObject}{The UserMetadata object}
 
 \item{annotationObject}{object of thr GRanges S4 class}
 
-\item{annotationName}{(optional) Name of the annotation. Will be used to 
+\item{annotationName}{(optional) Name of the annotation. Will be used to
 create folders.}
 }
 \value{
 An object of the class UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set annotation_object of one 
+Method of the class UserMetadata. Set annotation_object of one
 UserMetadata object by using one GRanges object as input.
 }
 \details{
-If no annotationName is provided the name of the file is used to 
+If no annotationName is provided the name of the file is used to
 create folders.
 }
 \examples{
 {
 user <- new("UserMetadata")
-annotation_object <- rtracklayer::import(system.file("extdata", 
+annotation_object <- rtracklayer::import(system.file("extdata",
 "annotation.gtf", package = "BgeeCall"))
 user <- setAnnotationFromObject(user, annotation_object,
                                  "annotation_name")

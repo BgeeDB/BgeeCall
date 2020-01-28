@@ -4,8 +4,11 @@
 \alias{generate_presence_absence}
 \title{Generate presence absence}
 \usage{
-generate_presence_absence(myAbundanceMetadata = new("KallistoMetadata"),
-  myBgeeMetadata = new("BgeeMetadata"), myUserMetadata)
+generate_presence_absence(
+  myAbundanceMetadata = new("KallistoMetadata"),
+  myBgeeMetadata = new("BgeeMetadata"),
+  myUserMetadata
+)
 }
 \arguments{
 \item{myAbundanceMetadata}{A descendant object of the Class myAbundanceMetadata

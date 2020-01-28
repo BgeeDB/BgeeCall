@@ -7,31 +7,28 @@
 \alias{setTranscriptomeFromObject,userMetadata,DNAStringSet,character}
 \title{Set transcriptome_object of one UserMetadata object}
 \usage{
-setTranscriptomeFromObject(userObject, transcriptomeObject,
-  transcriptomeName)
+setTranscriptomeFromObject(userObject, transcriptomeObject, transcriptomeName)
 
-
-  \S4method{setTranscriptomeFromObject}{UserMetadata,DNAStringSet,character}(userObject,
-  transcriptomeObject, transcriptomeName)
+\S4method{setTranscriptomeFromObject}{UserMetadata,DNAStringSet,character}(userObject, transcriptomeObject, transcriptomeName)
 }
 \arguments{
 \item{userObject}{UserMetadata object}
 
 \item{transcriptomeObject}{Object of the DNAStringSet S4 class}
 
-\item{transcriptomeName}{Name of the transcriptome. Will be used to create 
+\item{transcriptomeName}{Name of the transcriptome. Will be used to create
 transcriptome folders.}
 }
 \value{
 an object of UserMetadata
 }
 \description{
-Method of the class UserMetadata. Set transcriptome_object of 
-one UserMetadata object 
+Method of the class UserMetadata. Set transcriptome_object of
+one UserMetadata object
 by using one DNAStringSet object as input.
 }
 \details{
-Please use a DNAStringSet object as input. This class is defined 
+Please use a DNAStringSet object as input. This class is defined
 in the Biostrings package
 }
 \examples{
@@ -39,7 +36,7 @@ in the Biostrings package
 user <- new("UserMetadata")
 transcriptome_object <- Biostrings::readDNAStringSet(
     system.file("extdata", "transcriptome.fa", package = "BgeeCall"))
-user <- setTranscriptomeFromObject(user, 
+user <- setTranscriptomeFromObject(user,
                  transcriptome_object,
                  "transcriptome_name")
 }

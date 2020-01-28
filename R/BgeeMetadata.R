@@ -34,6 +34,7 @@ BgeeMetadata <- setClass(
     )
 )
 
+
 setMethod(
     f = "initialize",
     signature = "BgeeMetadata" ,

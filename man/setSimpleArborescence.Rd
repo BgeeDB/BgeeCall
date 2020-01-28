@@ -9,8 +9,7 @@
 \usage{
 setSimpleArborescence(userObject, simpleArborescence)
 
-\S4method{setSimpleArborescence}{UserMetadata,logical}(userObject,
-  simpleArborescence)
+\S4method{setSimpleArborescence}{UserMetadata,logical}(userObject, simpleArborescence)
 }
 \arguments{
 \item{userObject}{The UserMetadata object}

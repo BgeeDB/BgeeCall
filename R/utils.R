@@ -4,6 +4,7 @@
 
 #' @title get Operating System
 #'
+
 #' @description Function used to detect the OS in which the package is run.
 #' Return 'linux', 'osx', or 'windows', depending on the OS
 #'
