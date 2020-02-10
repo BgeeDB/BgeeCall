@@ -31,8 +31,10 @@ load_gene_to_biotype <- function(myAbundanceMetadata = new("AbundanceMetadata"),
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
-        message("Generate file ", myAbundanceMetadata@gene2biotype_file, 
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("Generate file ", myAbundanceMetadata@gene2biotype_file, 
             ".\n")
+        }
         # retrieve gene2biotype data frame from annotation
         # file
         gtf <- as.data.frame(myUserMetadata@annotation_object)

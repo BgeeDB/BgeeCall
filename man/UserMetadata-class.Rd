@@ -52,5 +52,7 @@ working_path/intergenic_release/speciesId/kallisto/transcriptome_name/annotation
 \item{\code{output_dir}}{(optional) Allows to manually define your output directory.
 By default the path to output directory is created automatically from the
 working_path (working_path/intergenic_release/all_results/libraryId/).}
+
+\item{\code{verbose}}{logical allowing to use the verbose mode. TRUE by default.}
 }}
 

@@ -719,3 +719,9 @@ get_abundance_file_path <- function(myAbundanceMetadata,
     }
     return(abundance_file)
 }
+
+quiet <- function(x) { 
+    sink(tempfile()) 
+    on.exit(sink()) 
+    invisible(force(x)) 
+} 

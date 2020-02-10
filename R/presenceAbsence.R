@@ -60,6 +60,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #'
 generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"), 
     myBgeeMetadata = new("BgeeMetadata"), myUserMetadata) {
+    
     system.file()
     # load data
     ref_intergenic <- get_ref_intergenic_ids(myBgeeMetadata, 
@@ -70,11 +71,14 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     # use the standard output dir or the one defined by the user
     output_path <- get_tool_output_path(myAbundanceMetadata, 
                                         myBgeeMetadata, myUserMetadata)
-
-    # biotype mapping information will depend on
-    # summarization at gene level or not
-    biotype_mapping <- ""
-    if (myAbundanceMetadata@txOut) {
+    
+    # check if calls have to be created
+    if(!(myAbundanceMetadata@overwrite_calls & file.exists(file.path(output_path,
+        myAbundanceMetadata@gene_calls_file_name)))) {
+        # biotype mapping information will depend on
+        # summarization at gene level or not
+        biotype_mapping <- ""
+        if (myAbundanceMetadata@txOut) {
         biotype_mapping <- load_transcript_to_biotype(myAbundanceMetadata, 
             myBgeeMetadata, myUserMetadata)
     } else {
@@ -113,9 +117,14 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         abundance$id %in% biotype_mapping$id)
     
     # calculate TPM cutoff
-    message("Generate present/absent expression calls.\n")
-    results <- calculate_abundance_cutoff(abundance, 
-        selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
+    if(isTRUE(myUserMetadata@verbose)) {
+        message("Generate present/absent expression calls.\n")
+        results <- calculate_abundance_cutoff(abundance, 
+            selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
+    } else {
+        results <- suppressMessages(calculate_abundance_cutoff(abundance, 
+            selected_coding, selected_intergenic, myAbundanceMetadata@cutoff))
+    }
     abundance_cutoff <- results[1]
     r_cutoff <- results[2]
     
@@ -178,6 +187,11 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     return(calls_result)
     ## t(t(cutoff_info_file)) is a solution to export a
     ## vector vertically
+    } else {
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("no need to regenerate calls")
+        }
+    }
 }
 
 #' @title Transform tximport object

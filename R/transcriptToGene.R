@@ -84,7 +84,9 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
     }
     tx2gene_path <- file.path(annotation_path, tx2gene_file)
     if (!file.exists(tx2gene_path)) {
-        message("Generate file ", tx2gene_file, ".\n")
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("Generate file ", tx2gene_file, ".\n")
+        }
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
@@ -98,8 +100,10 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         # Remove the transcript version that can be present
         # in transcript id of gtf files
         if (myAbundanceMetadata@ignoreTxVersion) {
-            message("remove transcript version info in ", 
+            if(isTRUE(myUserMetadata@verbose)) {
+                message("remove transcript version info in ", 
                     tx2gene_file, " file.\n")
+            }
             tx2gene$TXNAME <- gsub(pattern = "\\..*", 
                 "", tx2gene$TXNAME)
         }
@@ -164,9 +168,15 @@ run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"),
 Abundance file is missing : ", 
             abundance_file, "."))
     }
-    txi <- tximport(abundance_file, type = myAbundanceMetadata@tool_name, 
-        tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, 
-        ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion)
+    if(isTRUE(myUserMetadata@verbose)) {
+        txi <- tximport(abundance_file, type = myAbundanceMetadata@tool_name, 
+            tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, 
+            ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion)
+    } else {
+        txi <- suppressMessages(tximport(abundance_file, type = myAbundanceMetadata@tool_name, 
+            tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, 
+            ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion))
+    }
     return(txi)
 }
 
@@ -191,7 +201,8 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
         myBgeeMetadata, myUserMetadata)
     abundance <- read.table(abundance_file, header = TRUE, 
         sep = "\t")
-    abundance_without_intergenic <- abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] %in% 
+    abundance_without_intergenic <- 
+        abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] %in% 
         tx2gene_without_intergenic$TXNAME), ]
     temp_abundance_file_without_intergenic <- file.path(output_path, 
         file_without_intergenic_name)
@@ -199,11 +210,18 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
         sep = "\t", row.names = FALSE)
     
     # calculate corrected TPM value
-    abundance_without_intergenic[myAbundanceMetadata@abundance_header] <- countToTpm(abundance_without_intergenic[[myAbundanceMetadata@count_header]], 
+    abundance_without_intergenic[myAbundanceMetadata@abundance_header] <- 
+        countToTpm(abundance_without_intergenic[[myAbundanceMetadata@count_header]], 
         abundance_without_intergenic[[myAbundanceMetadata@eff_length_header]])
-    txi_without_intergenic <- tximport(temp_abundance_file_without_intergenic, 
-        type = myAbundanceMetadata@tool_name, tx2gene = tx2gene_without_intergenic, 
-        txOut = myAbundanceMetadata@txOut, ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion)
+    if(isTRUE(myUserMetadata@verbose)) {
+        txi_without_intergenic <- tximport(temp_abundance_file_without_intergenic, 
+            type = myAbundanceMetadata@tool_name, tx2gene = tx2gene_without_intergenic, 
+            txOut = myAbundanceMetadata@txOut, ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion)
+    } else {
+        txi_without_intergenic <- suppressMessages(tximport(temp_abundance_file_without_intergenic, 
+            type = myAbundanceMetadata@tool_name, tx2gene = tx2gene_without_intergenic, 
+            txOut = myAbundanceMetadata@txOut, ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion))
+    }
     file.remove(temp_abundance_file_without_intergenic)
     return(txi_without_intergenic)
 }

@@ -41,11 +41,15 @@ merge_transcriptome_and_intergenic <- function(myKallistoMetadata,
     # test if file containing both transcriptomic and
     # intergenic regions alredy exists
     if (file.exists(transcriptome_with_intergenic_path)) {
-        message("File containing both transcriptomic and intergenic 
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("File containing both transcriptomic and intergenic 
                 regions already exists.\n")
+        }
     } else {
-        message("Start generation of the file containing both transcriptomic
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("Start generation of the file containing both transcriptomic
                 and intergenic regions.\n")
+        }
         if (!dir.exists(transcriptome_dir)) {
             dir.create(transcriptome_dir, recursive = TRUE)
         }
@@ -59,7 +63,9 @@ merge_transcriptome_and_intergenic <- function(myKallistoMetadata,
             bgee_intergenic)
         writeXStringSet(x = transcriptome_with_intergenic_data, 
             filepath = transcriptome_with_intergenic_path)
-        message("File containing both transcriptomic and intergenic regions has
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("File containing both transcriptomic and intergenic regions has
                 been created successfully.\n")
+        }
     }
 }

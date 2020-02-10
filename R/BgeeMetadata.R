@@ -42,31 +42,7 @@ setMethod(
         .Object <- callNextMethod()
         ## Get release information
         message("Querying Bgee to get intergenic release information...")
-        allReleases <-
-            try(.getIntergenicRelease(removeFile = FALSE),
-                silent = TRUE)
-        if (is(allReleases, "data.frame")) {
-            file.rename(
-                from = file.path(getwd(), 'release.tsv'),
-                to = file.path(getwd(), "release.tsv")
-            )
-        } else if (is(allReleases, "try-error")) {
-            if (file.exists(file.path(getwd(), "release.tsv"))) {
-                warning("BgeeCall could not access intergenic 
-                releases information from the internet, but a release
-                information file was found in the download directory ",
-                getwd(),". This release file will be used, but be warned
-                that it may not be up to date!")
-                allReleases <- read.table(file.path(getwd(),
-                    "release.tsv"),
-                    header = TRUE,
-                    sep = "\t")
-            } else {
-                stop("BgeeCall could not access Bgee
-intergenic releases information. Is your internet connection working?"
-                )
-            }
-        }
+        allReleases <- listIntergenicReleases(removeFile = FALSE)
         # keep information of all available releases
         .Object@all_releases <- allReleases
         # if no release has been specified during instanciation

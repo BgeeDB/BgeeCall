@@ -39,8 +39,10 @@ load_transcript_to_biotype <- function(myAbundanceMetadata,
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
-        message("Generate file ", basename(transcript_to_biotype_file), 
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("Generate file ", basename(transcript_to_biotype_file), 
             ".\n")
+        }
         # retrieve tx2biotype data frame from annotation file
         gtf = as.data.frame(myUserMetadata@annotation_object)
         gtf_transcript <- gtf[gtf$type == "transcript", 
