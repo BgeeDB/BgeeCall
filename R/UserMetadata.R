@@ -14,7 +14,8 @@
 #' `KallistoMetadata@read_size_kmer_threshold`,
 #' an index with a kmer size of 15 bp will be used.
 #' @slot rnaseq_lib_path Path to the directory of the RNA-Seq library that
-#' contains fastq files.
+#' contains fastq files. The extension of the fastq files name must be
+#' .fq, .fastq, .fq.gz, or .fastq.gz
 #' @slot transcriptome_name Name of the transcriptome used to generate
 #' arborescence of output repositories.
 #' @slot transcriptome_object Object containing transcriptome

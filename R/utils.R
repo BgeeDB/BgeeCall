@@ -367,7 +367,7 @@ get_fastq_files <- function(myUserMetadata) {
     for (library_file in library_files) {
         if (grepl(".fq$", library_file) || grepl(".fq.gz$",
             library_file) || grepl(".fastq.gz$", library_file) ||
-            grepl(".fastq.gz$", library_file)) {
+            grepl(".fastq$", library_file)) {
             fastq_files[i] <- library_file
             i <- i + 1
         }
