@@ -28,6 +28,14 @@
 #' kmers and will be used only for libraries containing reads smallest than 50nt.
 #' @slot single_end_parameters kallisto parameters used to run a single end mapping
 #' @slot pair_end_parameters kallisto parameters used to run a pair end mapping
+#' @slot overwrite_index logical allowing to overwrite already existing index. FALSE by
+#' default. Then by default already existing index files will not be generated again.
+#' @slot overwrite_quant logical allowing to overwrite already existing abundance.txt 
+#' files. FALSE by default. Then by default already existing quantitfdication files will 
+#' not be generated again.
+#' @slot overwrite_calls logical allowing to overwrite already existing present/absent 
+#' calls. FALSE by default. Then by default already generated calls will not be 
+#' generated again.
 #' 
 #' @exportClass KallistoMetadata
 
@@ -49,7 +57,10 @@ KallistoMetadata <- setClass(
         index_file = "character",
         k15_index_file = "character",
         single_end_parameters = "character",
-        pair_end_parameters = "character"
+        pair_end_parameters = "character",
+        overwrite_index = "logical",
+        overwrite_quant = "logical",
+        overwrite_calls = "logical"
     ),
     
     # Set the default values for the slots.
@@ -80,7 +91,10 @@ KallistoMetadata <- setClass(
         #transcriptome index file for kmer size = 15
         k15_index_file = "transcriptome_k15.idx", 
         single_end_parameters = "-t 1 --single -l 180 -s 30 --bias",
-        pair_end_parameters = "-t 1 --bias"
+        pair_end_parameters = "-t 1 --bias",
+        overwrite_index = FALSE,
+        overwrite_quant = FALSE,
+        overwrite_calls = TRUE
     ),
     
     # This class also have attributs/methods of AbundanceMetadata class (inheritence)

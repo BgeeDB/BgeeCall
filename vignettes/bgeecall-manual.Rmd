@@ -236,7 +236,7 @@ If kallisto is not installed on your computer you can either :
 - let BgeeCall automatically download the version 0.45 of kallisto. BgeeCall will use it to quantify abundance of transcripts. It will only be used by this package and will have no impact on your potential already existing version of kallisto.
 
 ``` {r, eval=FALSE}
-kallisto <- new("KallistoMetadata", install_kallisto = TRUE)
+kallisto <- new("KallistoMetadata", download_kallisto = TRUE)
 calls_output <- generate_calls_workflow(myAbundanceMetadata = kallisto, userMetadata = user_BgeeCall)
 ```
 
@@ -286,6 +286,23 @@ This 0.05 corresponds to the ratio used in the Bgee pipeline. However it is poss
 ```{r}
 kallisto <- new("KallistoMetadata", cutoff = 0.1)
 ```
+
+### Run BgeeCall in quiet mode
+
+By default BgeeCall write output messages for all parts of the workflow.
+It is possible not to write any messages by changing the value of the slot verbose in the UserMetadata object.
+By default this value is set to true but it is possible to change it to false with this line :
+
+```{r}
+user_BgeeCall@verbose <- FALSE
+```
+
+### Do not rerun parts of the pipeline
+
+Generation of present/absent expression calls is done in several steps. It is possible to force overwritting already existing intermediary files :
+ - overwrite_index : slot of the object KallistoMetadata. The value has to be a logical. If FALSE (default), the index generation step is skiped if one index already exists. If TRUE, the kallisto index will be generated even if one index already exists. 
+ - overwrite_quant : slot of the object KallistoMetadata. The value has to be a logical. If FALSE (default), the kallisto quantification step is skiped if a quantification file already exists. If TRUE, the kallisto quantification step will be run even if a quantification file already exists. 
+ - overwrite_calls : slot of the object KallistoMetadata. The value has to be a logical. If FALSE, the generation of present/absent calls is skiped if an index already exists. If TRUE (default), the generation of present/absent calls will be run even if calls were already generated.
 
 ### Generate calls with a simple arborescence of directories
 By default the arborescence of directories created by `BgeeCall` is as simple as possible. the results will be created using the path `working_path/intergenic_release/all_results/libraryId`. Generating present/absent gene expression calls for the same RNA-Seq library using different transcriptome or annotation versions using this arborescence will overwrite previous results. 

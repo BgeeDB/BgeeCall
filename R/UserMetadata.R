@@ -14,7 +14,8 @@
 #' `KallistoMetadata@read_size_kmer_threshold`,
 #' an index with a kmer size of 15 bp will be used.
 #' @slot rnaseq_lib_path Path to the directory of the RNA-Seq library that
-#' contains fastq files.
+#' contains fastq files. The extension of the fastq files name must be
+#' .fq, .fastq, .fq.gz, or .fastq.gz
 #' @slot transcriptome_name Name of the transcriptome used to generate
 #' arborescence of output repositories.
 #' @slot transcriptome_object Object containing transcriptome
@@ -33,6 +34,7 @@
 #' @slot output_dir (optional) Allows to manually define your output directory.
 #' By default the path to output directory is created automatically from the
 #' working_path (working_path/intergenic_release/all_results/libraryId/).
+#' @slot verbose logical allowing to use the verbose mode. TRUE by default.
 
 UserMetadata <- setClass(
     # Set the name for the class
@@ -50,7 +52,8 @@ UserMetadata <- setClass(
         annotation_object = "GRanges",
         working_path = "character",
         simple_arborescence = "logical",
-        output_dir = "character"
+        output_dir = "character",
+        verbose = "logical"
     ),
     
     # Set the default values for the slots.
@@ -58,7 +61,8 @@ UserMetadata <- setClass(
         working_path = getwd(),
         reads_size = 51,
         simple_arborescence = TRUE,
-        output_dir = ""
+        output_dir = "",
+        verbose = TRUE
     )
 )
 

@@ -21,7 +21,7 @@
 # the BgeeCall package
 list_intergenic_release <- function(release = NULL) {
     message("Downloading release information of reference intergenic sequences...\n")
-    allReleases <- .getIntergenicRelease(removeFile = TRUE)
+    allReleases <- .listIntergenicReleases(removeFile = TRUE)
     if (length(release) == 1) {
         if (sum(allReleases$release == 1)) {
             message("Only displaying information from targeted release ", 
@@ -42,30 +42,32 @@ list_intergenic_release <- function(release = NULL) {
 # Function returning a data frame describing all
 # intergenic releases available for the BgeeCall
 # package
-.getIntergenicRelease <- function(removeFile = TRUE) {
+listIntergenicReleases <- function(removeFile = TRUE) {
     ## query FTP to get file describing all releases
     releaseUrl <- "ftp://ftp.bgee.org/intergenic/intergenic_release.tsv"
     success <- try(download.file(url = releaseUrl, 
         quiet = TRUE, destfile = file.path(getwd(), 
-            "release.tsv.tmp")))
-    if (success == 0 & file.exists(file.path(getwd(), 
-        "release.tsv.tmp"))) {
-        file.rename(from = file.path(getwd(), "release.tsv.tmp"), 
-            to = file.path(getwd(), "release.tsv"))
-        allReleases <- read.table(file = "release.tsv", 
-            header = TRUE, sep = "\t")
-        if (removeFile) {
-            file.remove(file.path(getwd(), "release.tsv"))
+            "release.tsv.tmp")), silent = TRUE)
+    if (success != 0) {
+        if (file.exists(file.path(getwd(), "release.tsv"))) {
+            warning("BgeeCall could not download intergenic releases 
+information but a release information file was found locally. This release 
+file will be used, but be warned that it may not be up to date!")
+        } else {
+            stop("File describing intergenic releases could not be downloaded 
+from FTP.")
         }
     } else {
-        file.remove(file.path(getwd(), "release.tsv.tmp"))
-        stop("File describing intergenic releases could not be downloaded 
-        from FTP.")
+        file.rename(from = file.path(getwd(), "release.tsv.tmp"), 
+            to = file.path(getwd(), "release.tsv"))
     }
-    ## Keep intergenic releases available with the
-    ## current version of the package
+    allReleases <- read.table(file = "release.tsv", 
+        header = TRUE, sep = "\t")
+    if (removeFile) {
+        file.remove(file.path(getwd(), "release.tsv"))
+    }
     allAvailableReleases <- allReleases[vapply(as.character(allReleases$minimumVersionBgeeCall), 
-        compareVersion, numeric(1), as.character(packageVersion("BgeeCall"))) <= 
-        0, ]
+        compareVersion, numeric(1), as.character(packageVersion("BgeeCall"))) <= 0, ]
     return(allAvailableReleases)
 }
+
