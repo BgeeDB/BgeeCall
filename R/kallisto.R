@@ -123,9 +123,9 @@ potential already installed version of Kallisto.\n")
         # create kallisto index with kmer size equal to 15
         if (myUserMetadata@reads_size < myKallistoMetadata@read_size_kmer_threshold && 
             !file.exists(transcriptome_k15_index_path)) {
-            kallisto_k15_args <- paste0(kallisto_exec," index -k 15 -i ", 
+            kallisto_k15_args <- paste0(" index -k 15 -i ", 
                 transcriptome_k15_index_path, " ", transcriptome_path)
-            system2(command = kallisto_exec, args = kallisto_args)
+            system2(command = kallisto_exec, args = kallisto_k15_args)
         }
         if(isTRUE(myUserMetadata@verbose)) {
             message("kallisto index files have been succesfully created for species ", 

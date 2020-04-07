@@ -26,7 +26,8 @@ replicates and merged to run one transcript expression estimation analyse.}
 an index with a kmer size of 15 bp will be used.}
 
 \item{\code{rnaseq_lib_path}}{Path to the directory of the RNA-Seq library that
-contains fastq files.}
+contains fastq files. The extension of the fastq files name must be
+.fq, .fastq, .fq.gz, or .fastq.gz}
 
 \item{\code{transcriptome_name}}{Name of the transcriptome used to generate
 arborescence of output repositories.}
