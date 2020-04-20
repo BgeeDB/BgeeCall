@@ -629,6 +629,10 @@ retrieve_intergenic_path <-
         if (!file.exists(bgee_intergenic_file)) {
             # Check if custom reference intergenic path has to be used
             if (!(myBgeeMetadata@custom_intergenic_path == "")) {
+                if(!file.exists(myBgeeMetadata@custom_intergenic_path)) {
+                    stop("File ", myBgeeMetadata@custom_intergenic_path, 
+                         " selected as custom intergenic does not exist")
+                }
                 if (myBgeeMetadata@intergenic_release != "custom") {
                     stop(
                         "You selected a custom intergenic path (BgeeMetadata@custom_intergenic_path)
@@ -640,6 +644,7 @@ retrieve_intergenic_path <-
                 }
                 bgee_intergenic_file <-
                     myBgeeMetadata@custom_intergenic_path
+                return(bgee_intergenic_file)
             } else {
                 if (myBgeeMetadata@intergenic_release == "custom") {
                     stop(
