@@ -21,7 +21,7 @@
 # the BgeeCall package
 list_intergenic_release <- function(release = NULL) {
     message("Downloading release information of reference intergenic sequences...\n")
-    allReleases <- .listIntergenicReleases(removeFile = TRUE)
+    allReleases <- listIntergenicReleases(removeFile = TRUE)
     if (length(release) == 1) {
         if (sum(allReleases$release == 1)) {
             message("Only displaying information from targeted release ", 
