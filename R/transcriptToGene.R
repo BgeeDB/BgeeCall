@@ -168,6 +168,39 @@ run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"),
 Abundance file is missing : ", 
             abundance_file, "."))
     }
+    # fix bug when ignoreTxVersion is used AND contig/chromosome name contains a dot 
+    # ignoreTxVersion option of tximport allows to remove version of transcripts. Name of intergenic regions was created using the approach
+    # CONTIGNAME_START_STOP. However, if the contig name contains a "." then the ignoreTxVersion option remove everything after the "."
+    # e.g. KB708127.1_324_4365 => KB708127
+    # In order to solve this bug the name of intergenic regions is modified before tximport step. This modification is done only if ignoreTxVersion option is set to TRUE.
+    if(myAbundanceMetadata@ignoreTxVersion) {
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("As ignoreTxVersion==TRUE first need to verify that intergenic names does not contain any dot")
+        }
+        #create mapping data.frame in order to be able to change back TXNAME after tximport
+        mapping_modify_intergenic <- tx2gene[as.character(tx2gene$TXNAME)==as.character(tx2gene$GENEID),]
+        colnames(mapping_modify_intergenic) <- c(myAbundanceMetadata@transcript_id_header, "GENEID")
+        mapping_modify_intergenic$modified <- as.character(gsub('\\.', '_', mapping_modify_intergenic[,1]))
+        # update tx2gene
+        tx2gene$TXNAME <- gsub('\\.', '_', tx2gene$TXNAME)
+        # create temporary abundance file with modified name for intergenic regions
+        temp_abundance <- read.table(file = abundance_file, header = TRUE, sep = "\t")
+        #transform first column as character column
+        temp_abundance[,1] <- as.character(temp_abundance[,1])
+        is_intergenic <- with(temp_abundance, match(target_id, mapping_modify_intergenic[,1]))
+        for (i in seq(is_intergenic)) {
+            if(!is.na(is_intergenic[i])) {
+                #message(mapping_modify_intergenic$modified[is_intergenic[i]])
+                temp_abundance[i,1] <- as.character(mapping_modify_intergenic$modified[is_intergenic[i]])
+            }
+        }
+        temp_abundance_file <- file.path(get_tool_output_path(myAbundanceMetadata, myBgeeMetadata,
+                                                              myUserMetadata), "temp_abundance.tsv")
+        write.table(x = temp_abundance, file = temp_abundance_file, quote = FALSE, sep = "\t", 
+                    row.names = FALSE, col.names = TRUE)
+        abundance_file <- temp_abundance_file
+    }
+    
     if(isTRUE(myUserMetadata@verbose)) {
         txi <- tximport(abundance_file, type = myAbundanceMetadata@tool_name, 
             tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, 
@@ -176,6 +209,10 @@ Abundance file is missing : ",
         txi <- suppressMessages(tximport(abundance_file, type = myAbundanceMetadata@tool_name, 
             tx2gene = tx2gene, txOut = myAbundanceMetadata@txOut, 
             ignoreTxVersion = myAbundanceMetadata@ignoreTxVersion))
+    }
+    # If ignoreTxVersion==TRUE temp abundance file was created. Now need to delete it
+    if(myAbundanceMetadata@ignoreTxVersion) {
+        file.remove(temp_abundance_file)
     }
     return(txi)
 }
