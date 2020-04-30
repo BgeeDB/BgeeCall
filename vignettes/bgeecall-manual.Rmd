@@ -206,7 +206,7 @@ list_community_ref_intergenic_species()
 If reference intergenic sequences of the species you are interested in are available only from the community release it is then possible to use this release to generate your present/absent calls
 ```{r, eval=FALSE}
 # create a BgeeMetadata object using the community release
-bgee <- new("BgeeMetadata", release = "community")
+bgee <- new("BgeeMetadata", intergenic_release = "community")
 calls_output <- generate_calls_workflow(bgeeMetadata = bgee, userMetadata = user_BgeeCall)
 ```
 
@@ -214,7 +214,7 @@ calls_output <- generate_calls_workflow(bgeeMetadata = bgee, userMetadata = user
 
 If you generated your own reference intergenic sequences follwowing [this tuorial](https://github.com/BgeeDB/reference_intergenic_standalone#protocol-to-generate-reference-intergenic-sequences) but did not share them for the moment (do not forget to do it...), it is also possible to use BgeeCall with a file containing the sequences. In this case you need to select the custom release and provide the path to the file containing reference intergenic sequences :
 ```{r, eval=FALSE}
-bgee <- new("BgeeMetadata", release = "community", custom_intergenic_path = "path/to/custom/ref_intergenic.fa.gz")
+bgee <- new("BgeeMetadata", intergenic_release = "custom", custom_intergenic_path = "path/to/custom/ref_intergenic.fa.gz")
 calls_output <- generate_calls_workflow(bgeeMetadata = bgee, userMetadata = user_BgeeCall)
 ```
 ### <a name="transcript_level"></a>Generate present/absent calls at transcript level (beta version)

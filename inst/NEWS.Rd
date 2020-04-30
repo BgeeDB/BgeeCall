@@ -27,3 +27,11 @@
     \item Moved from workflow to software section
   }
 }
+\section{Version 1.4.0 (2020-04)}{
+  \itemize{
+    \item add verbose slot in UserMetadata
+    \iten add slots allowing not to rerun steps of the workflow. Do not rerun by default
+    \item update documentation
+    \item new functionalties when running BgeeCall from list of libraries
+  }
+}
