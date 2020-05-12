@@ -99,7 +99,7 @@ Each analyze generates 5 files and return path to each one of them.
 
 * calls_tsv_path : path to main tsv file with TPM, count, length, biotype, type, and presence/absence of expression summarized at gene level (or at the [transcript level](#transcript_level) if it was requested)
 ``` {r, message = FALSE, warning = FALSE}
-head.DataTable(x = read.table(calls_output$calls_tsv_path, header = TRUE), n = 5)
+head(read.table(calls_output$calls_tsv_path, header = TRUE), n = 5)
 ```
 * cutoff_info_file_path : path to tsv summary of the analyze containing the proportion of gene, protein coding and intergenic defined as expressed. It also contains the library ID and the present/absent TPM threshold
 ``` {r, message = FALSE, warning = FALSE}
@@ -107,7 +107,7 @@ read.table(calls_output$cutoff_info_file_path)
 ```
 * abundance_tsv : path to tsv kallisto quant output file
 ``` {r, message = FALSE, warning = FALSE}
-head.DataTable(x = read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
+head(read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
 ```
 * TPM_distribution_path : path to plot in pdf reprensting density distribution of TPM values for all sequences, protein coding sequences, and intergenic sequences. The grey line corresponds to TPM threshold used to generate present/absent calls.
 ``` {r, eval = FALSE}
