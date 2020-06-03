@@ -24,7 +24,7 @@ BugReports: https://github.com/BgeeDB/BgeeCall/issues
 VignetteBuilder: knitr
 biocViews: Software, GeneExpression, RNASeq
 Suggests: knitr, testthat, rmarkdown, AnnotationHub, httr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Encoding: UTF-8
 NeedsCompilation: no
 SystemRequirements: kallisto
