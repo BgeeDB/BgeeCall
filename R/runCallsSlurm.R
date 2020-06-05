@@ -65,27 +65,31 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   #use both rscript_path and modules variables to tune the bash template script
   rscript_path <- generateRScriptPath(rscript_path, modules)
   
+  #define function used to generate kallisto index. This function has to be defined inside of the function
+  # calling slurm_apply (enclosing environment (http://adv-r.had.co.nz/Environments.html#function-envs))
+  index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
+                            annotation_path, working_path, output_directory, simple_arborescence) {
+    userMetadata <- new("UserMetadata", speciesId = species_id, run_ids = run_ids, 
+                        reads_size = reads_size, rnaseq_lib_path = rnaseq_lib_path, 
+                        working_path = working_path, output_directory = output_directory,
+                        simple_arborescence = simple_arborescence)
+    userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = transcriptome_path)
+    merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
+                                       myUserMetadata = userMetadata)
+    create_kallisto_index(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
+                          myUserMetadata = userMetadata)
+    message("run index generation for species ",userMetadata@species_id)
+  }
+  
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
-                              nodes = 1, cpus_per_node = 1, submit = TRUE, 
+                              nodes = 1, cpus_per_node = 1, submit = FALSE, 
                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
                               sh_template = submit_sh_template, rscript_path = rscript_path)
   return(sjobs)
 }
 
 
-index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
-                          annotation_path, working_path, output_directory, simple_arborescence) {
-  userMetadata <- new("UserMetadata", speciesId = species_id, run_ids = run_ids, 
-                      reads_size = reads_size, rnaseq_lib_path = rnaseq_lib_path, 
-                      working_path = working_path, output_directory = output_directory,
-                      simple_arborescence = simple_arborescence)
-  userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = transcriptome_path)
-  merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
-                                     myUserMetadata = userMetadata)
-  create_kallisto_index(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
-                        myUserMetadata = userMetadata)
-  message("run index generation for species ",userMetadata@species_id)
-}
+
 
 abundance_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
                           annotation_path, working_path, output_directory, simple_arborescence) {
