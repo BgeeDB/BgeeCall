@@ -66,7 +66,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   rscript_path <- generateRScriptPath(rscript_path, modules)
   
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
-                              nodes = 1, cpus_per_node = 1, submit = FALSE, 
+                              nodes = 1, cpus_per_node = 1, submit = TRUE, 
                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
                               sh_template = submit_sh_template, rscript_path = rscript_path)
   return(sjobs)
