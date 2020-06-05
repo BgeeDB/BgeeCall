@@ -39,7 +39,7 @@ the documentation of the rslurm::slurm_apply function}
 to the location of Rscript within the R installation being run.}
 
 \item{modules}{A list of modules you want to load in the invironment. Should stay
-empty except if you need to load R and/or kallisto}
+empty except if you need to load R and/or kallisto (e.g module add R)}
 
 \item{abundanceMetadata}{A Reference Class BgeeMetadata object (optional)
 allowing to tune your gene quantification abundance analyze. If no object is
