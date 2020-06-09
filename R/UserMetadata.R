@@ -66,7 +66,7 @@ UserMetadata <- setClass(
         simple_arborescence = TRUE,
         output_dir = "",
         verbose = TRUE,
-        custom_intergenic_path = NULL
+        custom_intergenic_path = ""
     )
 )
 
