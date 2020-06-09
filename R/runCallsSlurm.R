@@ -70,8 +70,13 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
                             annotation_path, working_path, output_directory, simple_arborescence) {
     userMetadata <- new("UserMetadata", speciesId = species_id, run_ids = run_ids, 
                         reads_size = reads_size, rnaseq_lib_path = rnaseq_lib_path, 
-                        working_path = working_path, output_directory = output_directory,
-                        simple_arborescence = simple_arborescence)
+                        output_directory = output_directory)
+    if(!is.null(working_path)) {
+      userMetadata@working_path <- working_path
+    }
+    if(!is.null(simple_arborescence)) {
+      userMetadata@simple_arborescence <- simple_arborescence
+    }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = transcriptome_path)
     merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                                        myUserMetadata = userMetadata)
@@ -81,7 +86,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   }
   
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
-                              nodes = 1, cpus_per_node = 1, submit = TRUE, 
+                              nodes = 1, cpus_per_node = 1, submit = TRUER/runCallsSlurm.R, 
                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
                               sh_template = submit_sh_template, rscript_path = rscript_path, slurm_options = slurm_options)
   return(sjobs)
