@@ -74,6 +74,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
+    }
     if(!is.null(working_path)) {
       userMetadata@working_path <- working_path
     }
