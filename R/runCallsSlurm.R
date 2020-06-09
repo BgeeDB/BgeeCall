@@ -55,7 +55,6 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   read_length_threshold <- kallistoMetadata@read_size_kmer_threshold
   user_df[user_df$reads_size < read_length_threshold, "index_type"] <- "short"
   user_df[user_df$reads_size >= read_length_threshold, "index_type"] <- "normal"
-  message(kallistoMetadata@download_kallisto)
   # detect unique conbination of index to generate (transcriptome, index type 
   # and species)
   unique_df <- user_df[!duplicated(user_df[c("species_id", "index_type", 
@@ -84,7 +83,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
                               nodes = 1, cpus_per_node = 1, submit = TRUE, 
                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
-                              sh_template = submit_sh_template, rscript_path = rscript_path)
+                              sh_template = submit_sh_template, rscript_path = rscript_path, slurm_options = slurm_options)
   return(sjobs)
 }
 
