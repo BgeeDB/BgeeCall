@@ -33,6 +33,14 @@
 #' the documentation of the rslurm::slurm_apply function
 #' @param rscript_path The location of the Rscript command. If not specified, defaults 
 #' to the location of Rscript within the R installation being run.
+#' @param submit Whether or not to submit the job to the cluster with sbatch. Default 
+#' value is TRUE
+#' @param nodes The (maximum) number of cluster nodes to spread the calculation over. 
+#' slurm_apply automatically divides params in chunks of approximately equal size to 
+#' send to each node. Less nodes are allocated if the parameter set is too small to 
+#' use all CPUs on the requested nodes. By default this number is 10.
+
+
 #' 
 #' @return generate index files
 #' 
@@ -50,7 +58,8 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
                                  bgeeMetadata = new("BgeeMetadata"), 
                                  userMetadata = new("UserMetadata"), userFile, 
                                  submit_sh_template = NULL, slurm_options = NULL,
-                                 rscript_path = NULL, modules = NULL) {
+                                 rscript_path = NULL, modules = NULL, submit = TRUE, 
+                                 nodes = 10) {
   user_df <- read.table(file = userFile, header = TRUE, sep = "\t")
   read_length_threshold <- kallistoMetadata@read_size_kmer_threshold
   user_df[user_df$reads_size < read_length_threshold, "index_type"] <- "short"
@@ -85,25 +94,10 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   }
   
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
-                              nodes = 1, cpus_per_node = 1, submit = TRUE, 
+                              nodes = nodes, cpus_per_node = 1, submit = submit, 
                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
                               sh_template = submit_sh_template, rscript_path = rscript_path, slurm_options = slurm_options)
   return(sjobs)
-}
-
-
-
-
-abundance_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
-                          annotation_path, working_path, output_directory, simple_arborescence) {
-  userMetadata <- new("UserMetadata", speciesId = species_id, run_ids = run_ids, 
-                      reads_size = reads_size, rnaseq_lib_path = rnaseq_lib_path, 
-                      working_path = working_path, output_directory = output_directory,
-                      simple_arborescence = simple_arborescence)
-  userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = transcriptome_path)
-  run_from_object(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
-                        myUserMetadata = userMetadata)
-  message("generate present/absent calls")
 }
 
 # internal function hacking the rscript_path variable of rslurm to automatically add
