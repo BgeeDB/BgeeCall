@@ -67,7 +67,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   #define function used to generate kallisto index. This function has to be defined inside of the function
   # calling slurm_apply (enclosing environment (http://adv-r.had.co.nz/Environments.html#function-envs))
   index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
-                            annotation_path, working_path, output_directory, simple_arborescence) {
+                            annotation_path, working_path = NULL, output_directory, simple_arborescence = NULL) {
     userMetadata <- new("UserMetadata", species_id = as.character(species_id), 
                         run_ids = as.character(run_ids), reads_size = reads_size, 
                         rnaseq_lib_path = as.character(rnaseq_lib_path))
