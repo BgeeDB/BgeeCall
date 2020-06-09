@@ -68,9 +68,9 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   # calling slurm_apply (enclosing environment (http://adv-r.had.co.nz/Environments.html#function-envs))
   index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
                             annotation_path, working_path, output_directory, simple_arborescence) {
-    userMetadata <- new("UserMetadata", speciesId = species_id, run_ids = run_ids, 
+    userMetadata <- new("UserMetadata", species_id = species_id, run_ids = run_ids, 
                         reads_size = reads_size, rnaseq_lib_path = rnaseq_lib_path, 
-                        output_directory = output_directory)
+                        output_dir = output_directory)
     if(!is.null(working_path)) {
       userMetadata@working_path <- working_path
     }
