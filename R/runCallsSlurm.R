@@ -76,12 +76,12 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
       userMetadata <- setOutputDir(userMetadata, outputDir)
     }
     if(!is.null(working_path)) {
-      userMetadata@working_path <- working_path
+      userMetadata@working_path <- as.character(working_path)
     }
     if(!is.null(simple_arborescence)) {
-      userMetadata@simple_arborescence <- simple_arborescence
+      userMetadata@simple_arborescence <- as.logical(simple_arborescence)
     }
-    userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = transcriptome_path)
+    userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
     merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                                        myUserMetadata = userMetadata)
     create_kallisto_index(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
