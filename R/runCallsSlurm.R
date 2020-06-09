@@ -67,7 +67,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   #define function used to generate kallisto index. This function has to be defined inside of the function
   # calling slurm_apply (enclosing environment (http://adv-r.had.co.nz/Environments.html#function-envs))
   index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
-                            annotation_path, working_path = NULL, output_directory, simple_arborescence = NULL) {
+                            annotation_path, output_directory) {
     userMetadata@species_id <- as.character(species_id) 
     userMetadata@run_ids = as.character(run_ids)
     userMetadata@reads_size = as.integer(reads_size)
@@ -75,12 +75,6 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
-    }
-    if(!is.null(working_path)) {
-      userMetadata@working_path <- as.character(working_path)
-    }
-    if(!is.null(simple_arborescence)) {
-      userMetadata@simple_arborescence <- as.logical(simple_arborescence)
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
     merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
