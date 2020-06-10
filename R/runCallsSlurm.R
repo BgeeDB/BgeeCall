@@ -180,7 +180,8 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
       userMetadata <- setOutputDir(userMetadata, outputDir)
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
-    generate_presence_absence(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
+    userMetadata <- setAnnotationFromFile(userMetadata, annotationPath =  as.character(annotation_path))
+    generate_presence_absence(myAbundanceMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                           myUserMetadata = userMetadata)
   }
   
