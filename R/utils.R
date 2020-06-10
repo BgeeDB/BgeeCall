@@ -266,7 +266,6 @@ download_fasta_intergenic <-
 #' @noRd
 #'
 get_merged_fastq_file_names <- function(myUserMetadata) {
-    message("debug problem with fastq files... rnaseq lib path: ", myUserMetadata@rnaseq_lib_path)
     fastq_files <- get_fastq_files(myUserMetadata)
     message("debug problem with fastq files... all fastq_files: ", fastq_files)
     
@@ -283,6 +282,7 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
     }
     fastq_files_names <- ""
     if (is_pair_end(fastq_files)) {
+        message("is pair end")
         first_files <- sort(grep("_1", fastq_files,
             value = TRUE))
         second_files <- sort(grep("_2", fastq_files,
@@ -329,6 +329,7 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
             }
         }
     } else {
+        message("is not pair end")
         if (length(grep("_1", fastq_files, value = TRUE)) !=
             0 || length(grep("_2", fastq_files, value = TRUE)) !=
             0) {
@@ -341,7 +342,9 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 )
             )
         }
+        message("debug seq_along(fastq_files) : ", seq_along(fastq_files))
         for (i in seq_along(fastq_files)) {
+            message("loop creating fastq files list, i = ",i ,", fastq_file = ", fastq_files[i])
             fastq_files_names = paste(
                 fastq_files_names,
                 file.path(myUserMetadata@rnaseq_lib_path,

@@ -175,7 +175,6 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
     userMetadata@run_ids <- as.character(run_ids)
     userMetadata@reads_size <- as.integer(reads_size)
     userMetadata@rnaseq_lib_path <- as.character(rnaseq_lib_path)
-    message(userMetadata@rnaseq_lib_path)
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
