@@ -269,7 +269,6 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
     fastq_files <- get_fastq_files(myUserMetadata)
     
     # filter list of fastq files if run_ids are provided
-    message("debug... check length of run_ids. Should be 0 : ", length(myUserMetadata@run_ids))
     if (length(myUserMetadata@run_ids) != 0) {
         fastq_files <- unique(grep(
             paste(myUserMetadata@run_ids,
@@ -338,8 +337,6 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 )
             )
         }
-        message("debug problem with fastq files... all fastq_files after run_ids verification : ", fastq_files)
-        message("debug seq_along(fastq_files) : ", seq_along(fastq_files))
         for (i in seq_along(fastq_files)) {
             fastq_files_names = paste(
                 fastq_files_names,
@@ -729,7 +726,6 @@ get_abundance_file_path <- function(myAbundanceMetadata,
 
 # check if subset of run ids has to be used to generate present/absent
 check_run_ids <- function(ids) {
-    ids <- as.character(userMetadataDataFrame[["run_ids"]][row_number])
     if (length(ids) == 0) {
         return(character(0))
     } 
