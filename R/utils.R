@@ -726,7 +726,7 @@ get_abundance_file_path <- function(myAbundanceMetadata,
 
 # check if subset of run ids has to be used to generate present/absent
 check_run_ids <- function(ids) {
-    if (length(ids) == 0) {
+    if (is.null(ids) || length(ids) == 0 || nchar(ids) == 0) {
         return(character(0))
     } 
     if (length(ids) == 1) {
