@@ -266,7 +266,10 @@ download_fasta_intergenic <-
 #' @noRd
 #'
 get_merged_fastq_file_names <- function(myUserMetadata) {
+    message("debug problem with fastq files... rnaseq lib path: ", myUserMetadata@rnaseq_lib_path)
     fastq_files <- get_fastq_files(myUserMetadata)
+    message("debug problem with fastq files... all fastq_files: ", fastq_files)
+    
     
     # filter list of fastq files if run_ids are
     # provided\024

@@ -257,8 +257,6 @@ potential already installed version of Kallisto.")
         # check library folder and test if _1 and _2 files
         # are present
         fastq_files <- get_merged_fastq_file_names(myUserMetadata)
-        message("debug problem with fastq files... rnaseq lib path: ", myUserMetadata@rnaseq_lib_path)
-        message("debug problem with fastq files... fastq_files: ", fastq_files)
         kallisto_parameters <- myKallistoMetadata@single_end_parameters
         # if paired-end analyses
         if (grepl("_1.", lapply(strsplit(fastq_files, " "), 
