@@ -78,9 +78,9 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
                             annotation_path, output_directory) {
     userMetadata@species_id <- as.character(species_id) 
-    userMetadata@run_ids = as.character(run_ids)
-    userMetadata@reads_size = as.integer(reads_size)
-    userMetadata@rnaseq_lib_path = as.character(rnaseq_lib_path)
+    userMetadata@run_ids <- as.character(run_ids)
+    userMetadata@reads_size <- as.integer(reads_size)
+    userMetadata@rnaseq_lib_path <- as.character(rnaseq_lib_path)
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
@@ -172,9 +172,10 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
   calls_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
                             annotation_path, output_directory) {
     userMetadata@species_id <- as.character(species_id) 
-    userMetadata@run_ids = as.character(run_ids)
-    userMetadata@reads_size = as.integer(reads_size)
-    userMetadata@rnaseq_lib_path = as.character(rnaseq_lib_path)
+    userMetadata@run_ids <- as.character(run_ids)
+    userMetadata@reads_size <- as.integer(reads_size)
+    userMetadata@rnaseq_lib_path <- as.character(rnaseq_lib_path)
+    message(userMetadata@rnaseq_lib_path)
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
