@@ -321,18 +321,7 @@ init_userMetadata_from_dataframe <- function(userMetadataDataFrame, myUserMetada
     myUserMetadata@species_id <-as.character(userMetadataDataFrame[["species_id"]][row_number])
     
     # check if subset of run ids has to be used to generate present/absent
-    ids <- as.character(userMetadataDataFrame[["run_ids"]][row_number])
-    if (length(ids) == 0) {
-        myUserMetadata@run_ids <- character(0)
-    } else if (length(ids) == 1) {
-        if (grepl(", ", ids)) {
-            myUserMetadata@run_ids <- strsplit(ids, ", ")
-        } else if (grepl(pattern = ",", x = ids)) {
-            myUserMetadata@run_ids <- strsplit(ids, ",")
-        }
-    } else {
-        myUserMetadata@run_ids <- ids
-    }
+    myUserMetadata@run_ids <- check_run_ids(as.character(userMetadataDataFrame[["run_ids"]][row_number]))
     # check if user provided an output_dir or if the default one will be used
     if ("output_directory" %in% names(userMetadataDataFrame)) {
         output_dir <- as.character(userMetadataDataFrame[["output_directory"]][row_number])

@@ -727,6 +727,23 @@ get_abundance_file_path <- function(myAbundanceMetadata,
     return(abundance_file)
 }
 
+# check if subset of run ids has to be used to generate present/absent
+check_run_ids <- function(ids) {
+    ids <- as.character(userMetadataDataFrame[["run_ids"]][row_number])
+    if (length(ids) == 0) {
+        return(character(0))
+    } 
+    if (length(ids) == 1) {
+        if (grepl(", ", ids)) {
+            return(strsplit(ids, ", "))
+        }
+        if (grepl(pattern = ",", x = ids)) {
+            return(strsplit(ids, ","))
+        }
+    }
+    return(ids)
+}
+
 quiet <- function(x) { 
     sink(tempfile()) 
     on.exit(sink()) 
