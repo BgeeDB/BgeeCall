@@ -13,10 +13,10 @@ of each species integrated in Bgee (https://bgee.org).
 \details{
 Thes most important functions are :
 \itemize{
-  \item `generate_calls_workflow` : generate present/absent calls on a computer
-  \item `generate_slurm_indexes` : generate kallisto indexes for a list of libraries 
+  \item generate_calls_workflow : generate present/absent calls on a computer
+  \item generate_slurm_indexes : generate kallisto indexes for a list of libraries 
   on a cluster with slurm queuing system.
-  \item `generate_slurm_calls` : generate present/absent calls for a list of libraries 
+  \item generate_slurm_calls : generate present/absent calls for a list of libraries 
   on a cluster with slurm queuing system. Indexes have to be generated first with the function
   `generate_slurm_indexes`
 }
