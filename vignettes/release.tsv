@@ -1,3 +1,0 @@
-release	releaseDate	FTPURL	referenceIntergenicFastaURL	minimumVersionBgeeCall	messageToUsers	description
-0.1	2018-12-21	ftp://ftp.bgee.org/intergenic/0.1/	ftp://ftp.bgee.org/intergenic/0.1/SPECIES_ID_intergenic.fa.gz	0.9.9		intergenic regions used to generate Bgee 14
-0.2	2019-02-07	ftp://ftp.bgee.org/intergenic/0.2/	ftp://ftp.bgee.org/intergenic/0.2/SPECIES_ID_intergenic.fa.gz	0.9.9	be careful, this intergenic release has not been tested by Bgee	 cleaned intergenic sequences based on release 0.1 (remove blocks of Ns longer than 100 and sequences containing more than 5% of Ns)
