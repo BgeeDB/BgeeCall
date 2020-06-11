@@ -369,7 +369,6 @@ slurm_options_index <- list(account = "account", time = "2:00:00", partition = "
 generate_slurm_indexes(userFile = "path/to/file.tsv", slurm_options = slurm_options_index)
 ```
 
-
 #### Add modules to your environment
 
 In some cluster programs are not loaded by default. The modules parameter allows to load them by adding one line in the sbatch script.
