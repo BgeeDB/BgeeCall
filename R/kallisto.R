@@ -212,7 +212,7 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
             if(isTRUE(myUserMetadata@verbose)) {
                 message("kallisto abundance file already exists for library ", 
                     basename(myUserMetadata@rnaseq_lib_path), 
-                    ". No need to to generate a new one.\n")
+                    ". No need to to generate a new one.")
             }
             need_to_generate_abundance = FALSE
         }
@@ -232,7 +232,7 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
                     message("It is the first time you try to use Kallisto downloaded 
 from this package. Kallisto has to be downloaded. This version of Kallisto 
 will only be used inside of this package. It will have no impact on your 
-potential already installed version of Kallisto.\n")
+potential already installed version of Kallisto.")
                 }
                 download_kallisto(myKallistoMetadata, myUserMetadata)
             }
@@ -257,7 +257,6 @@ potential already installed version of Kallisto.\n")
         # check library folder and test if _1 and _2 files
         # are present
         fastq_files <- get_merged_fastq_file_names(myUserMetadata)
-    
         kallisto_parameters <- myKallistoMetadata@single_end_parameters
         # if paired-end analyses
         if (grepl("_1.", lapply(strsplit(fastq_files, " "), 
@@ -266,7 +265,7 @@ potential already installed version of Kallisto.\n")
         }
         kallisto_args <- paste("quant -i",  kallisto_index_path, 
             "-o", kallisto_output_path, kallisto_parameters, fastq_files, sep = " ")
-    
+      
         message("Will run kallisto using this command line : ", 
             paste(kallisto_exec_path, kallisto_args))
         system2(command = kallisto_exec_path, args = kallisto_args)

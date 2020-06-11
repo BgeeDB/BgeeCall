@@ -55,5 +55,8 @@ By default the path to output directory is created automatically from the
 working_path (working_path/intergenic_release/all_results/libraryId/).}
 
 \item{\code{verbose}}{logical allowing to use the verbose mode. TRUE by default.}
+
+\item{\code{custom_intergenic_path}}{allows to use a custom reference intergenic fasta file by providing
+the path to this file.}
 }}
 

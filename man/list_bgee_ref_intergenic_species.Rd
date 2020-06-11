@@ -17,11 +17,14 @@ release
 }
 \description{
 Return information related to species having Bgee reference intergenic 
-sequences available for the selected Bgee intergenic release:
-- speciesId : the NCBI species ID of the species
-- specieName : scientific species name
-- numberOfLibraries : number of libraries used to generate these reference intergenic
-sequences
+sequences available for the selected Bgee intergenic release: 
+\itemize{
+ \item{speciesId}{ the NCBI species ID of the species}
+ \item{specieName}{ scientific species name}
+ \item{numberOfLibraries}{ number of libraries used to generate these reference intergenic
+sequences}
+ \item{genomeVersion}{ version of the genome used to generate the reference intergenic sequences}
+}
 If a BgeeMetadata object is provided this function retrieve the list of species using 
 BgeeMetadata@intergenic_release.
 If only a `release` is provided it will use it to retrieve the list of species.
