@@ -4,4 +4,7 @@
 .Ruserdata
 .DS_Store
 .project
-.Rproj
+BgeeCall.Rproj
+_rslurm_generate_index/
+release.tsv
+.Rbuildignore

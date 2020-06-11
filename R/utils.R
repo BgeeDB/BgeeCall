@@ -268,8 +268,7 @@ download_fasta_intergenic <-
 get_merged_fastq_file_names <- function(myUserMetadata) {
     fastq_files <- get_fastq_files(myUserMetadata)
     
-    # filter list of fastq files if run_ids are
-    # provided\024
+    # filter list of fastq files if run_ids are provided
     if (length(myUserMetadata@run_ids) != 0) {
         fastq_files <- unique(grep(
             paste(myUserMetadata@run_ids,
@@ -629,6 +628,10 @@ retrieve_intergenic_path <-
         if (!file.exists(bgee_intergenic_file)) {
             # Check if custom reference intergenic path has to be used
             if (!(myBgeeMetadata@custom_intergenic_path == "")) {
+                if(!file.exists(myBgeeMetadata@custom_intergenic_path)) {
+                    stop("File ", myBgeeMetadata@custom_intergenic_path, 
+                         " selected as custom intergenic does not exist")
+                }
                 if (myBgeeMetadata@intergenic_release != "custom") {
                     stop(
                         "You selected a custom intergenic path (BgeeMetadata@custom_intergenic_path)
@@ -640,6 +643,7 @@ retrieve_intergenic_path <-
                 }
                 bgee_intergenic_file <-
                     myBgeeMetadata@custom_intergenic_path
+                return(bgee_intergenic_file)
             } else {
                 if (myBgeeMetadata@intergenic_release == "custom") {
                     stop(
@@ -718,6 +722,22 @@ get_abundance_file_path <- function(myAbundanceMetadata,
             file.path(output_path, myAbundanceMetadata@abundance_file)
     }
     return(abundance_file)
+}
+
+# check if subset of run ids has to be used to generate present/absent
+check_run_ids <- function(ids) {
+    if (is.null(ids) || is.na(ids) || length(ids) == 0 || nchar(ids) == 0) {
+        return(character(0))
+    } 
+    if (length(ids) == 1) {
+        if (grepl(", ", ids)) {
+            return(strsplit(ids, ", "))
+        }
+        if (grepl(pattern = ",", x = ids)) {
+            return(strsplit(ids, ","))
+        }
+    }
+    return(ids)
 }
 
 quiet <- function(x) { 
