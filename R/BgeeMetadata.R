@@ -8,11 +8,6 @@
 #' used to generate your present/absent expression calls.
 #' @slot intergenic_prefix String used to generate an intergenic release
 #' specific output directory
-#' @slot custom_intergenic_path path to a local version of reference intergenic
-#' fasta file. If NULL (by default) the reference intergenic fasta file will be
-#' downloaded. If not NULL BgeeCall will merge this local reference intergenic
-#' file with the transcriptome. Except if you generated your own intergenic
-#' regions always keep it NULL.
 #'
 BgeeMetadata <- setClass(
     # Set the name for the class
@@ -23,14 +18,12 @@ BgeeMetadata <- setClass(
         intergenic_release = "character",
         all_releases = "list",
         intergenic_prefix = "character",
-        fasta_intergenic_name = "character",
-        custom_intergenic_path = "character"
+        fasta_intergenic_name = "character"
     ),
     
     prototype = prototype(
         intergenic_prefix = "intergenic_",
-        fasta_intergenic_name = "bgee_intergenic.fa.gz",
-        custom_intergenic_path = ""
+        fasta_intergenic_name = "bgee_intergenic.fa.gz"
     )
 )
 
@@ -40,37 +33,42 @@ setMethod(
     signature = "BgeeMetadata" ,
     definition = function(.Object, ...) {
         .Object <- callNextMethod()
-        ## Get release information
-        message("Querying Bgee to get intergenic release information...")
-        allReleases <- listIntergenicReleases(removeFile = FALSE)
-        # keep information of all available releases
-        .Object@all_releases <- allReleases
-        # if no release has been specified during instanciation
-        # take more recent release
-        if (length(.Object@intergenic_release) == 0) {
-            .Object@intergenic_release <-
-                as.character(allReleases$release[1])
-            message_to_users <-
-                as.character(allReleases$messageToUsers[1])
-        } else if (length(.Object@intergenic_release) == 1) {
-            if (.Object@intergenic_release %in% allReleases$release) {
-                .Object@intergenic_release <-
-                    as.character(allReleases$release[allReleases$release ==
-                        .Object@intergenic_release])
-                message_to_users <-
-                    as.character(allReleases$messageToUsers[allReleases$release ==
-                                                                .Object@intergenic_release])
-            } else {
-                stop(
-                    "ERROR: The specified release number is invalid,
-or is not available for BgeeCall."
-                )
-            }
+        # do not download intergenic releases information when instantiation of BgeeMetadata with custom release.
+        # Allows to run BgeeCall without internet connection when using intergenic sequences available localy.
+        if(.Object@intergenic_release == "custom") {
+            message("IMPORTANT : You decided to use your own reference intergenic sequences")
         } else {
-            stop("ERROR: The specified release number is invalid.")
-        }
-        if (message_to_users != "") {
-            message("IMPORTANT : ", message_to_users)
+            ## Get release information
+            message("Querying Bgee to get intergenic release information...")
+            allReleases <- listIntergenicReleases(removeFile = FALSE)
+            # keep information of all available releases
+            .Object@all_releases <- allReleases
+            # if no release has been specified during instanciation
+            # take more recent release
+            if (length(.Object@intergenic_release) == 0) {
+                .Object@intergenic_release <-
+                    as.character(allReleases$release[1])
+                message_to_users <-
+                    as.character(allReleases$messageToUsers[1])
+            } else if (length(.Object@intergenic_release) == 1) {
+                if (.Object@intergenic_release %in% allReleases$release) {
+                    .Object@intergenic_release <-
+                        as.character(allReleases$release[allReleases$release ==
+                            .Object@intergenic_release])
+                    message_to_users <-
+                        as.character(allReleases$messageToUsers[allReleases$release ==
+                                                                    .Object@intergenic_release])
+                } else {
+                    stop(
+                        "ERROR: The specified release number is invalid, or is not available for this version of BgeeCall."
+                    )
+                }
+            } else {
+                stop("ERROR: The specified release number is invalid.")
+            }
+            if (message_to_users != "") {
+                message("IMPORTANT : ", message_to_users)
+            }
         }
         validObject(.Object)
         .Object
