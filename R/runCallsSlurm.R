@@ -76,7 +76,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   #define function used to generate kallisto index. This function has to be defined inside of the function
   # calling slurm_apply (enclosing environment (http://adv-r.had.co.nz/Environments.html#function-envs))
   index_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
-                            annotation_path, output_directory) {
+                            annotation_path, output_directory=NULL, custom_intergenic_path=NULL) {
     userMetadata@species_id <- as.character(species_id) 
     userMetadata@run_ids <- as.character(run_ids)
     userMetadata@reads_size <- as.integer(reads_size)
@@ -84,6 +84,10 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
+    }
+    customIntergenicPath <- as.character(custom_intergenic_path)
+    if (length(customIntergenicPath) != 0) {
+      userMetadata@custom_intergenic_path <- customIntergenicPath
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
     merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
@@ -170,7 +174,7 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
   #define function used to generate present/absent calls. This function has to be defined inside of the function
   # calling slurm_apply (enclosing environment (http://adv-r.had.co.nz/Environments.html#function-envs))
   calls_wrapper <- function(species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path, 
-                            annotation_path, output_directory) {
+                            annotation_path, output_directory=NULL, custom_intergenic_path=NULL) {
     userMetadata@species_id <- as.character(species_id) 
     userMetadata@run_ids <- check_run_ids(as.character(run_ids))
     userMetadata@reads_size <- as.integer(reads_size)
@@ -178,6 +182,10 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
     outputDir <- as.character(output_directory)
     if (length(outputDir) != 0) {
       userMetadata <- setOutputDir(userMetadata, outputDir)
+    }
+    customIntergenicPath <- as.character(custom_intergenic_path)
+    if (length(customIntergenicPath) != 0) {
+      userMetadata@custom_intergenic_path <- customIntergenicPath
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
     userMetadata <- setAnnotationFromFile(userMetadata, annotationPath =  as.character(annotation_path))
