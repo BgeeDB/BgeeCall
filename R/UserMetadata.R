@@ -35,9 +35,11 @@
 #' By default the path to output directory is created automatically from the
 #' working_path (working_path/intergenic_release/all_results/libraryId/).
 #' @slot verbose logical allowing to use the verbose mode. TRUE by default.
-#' @slot custom_intergenic_path allows to use a custom reference intergenic fasta file by providing
-#' the path to this file.
-
+#' @slot custom_intergenic_path path to a local version of reference intergenic
+#' fasta file. If NULL (by default) the reference intergenic fasta file will be
+#' downloaded. If not NULL BgeeCall will merge this local reference intergenic
+#' file with the transcriptome. Except if you generated your own intergenic
+#' regions always keep it NULL.
 UserMetadata <- setClass(
     # Set the name for the class
     Class = "UserMetadata",
