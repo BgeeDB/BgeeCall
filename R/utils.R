@@ -627,14 +627,14 @@ retrieve_intergenic_path <-
         )
         if (!file.exists(bgee_intergenic_file)) {
             # Check if custom reference intergenic path has to be used
-            if (!(myBgeeMetadata@custom_intergenic_path == "")) {
-                if(!file.exists(myBgeeMetadata@custom_intergenic_path)) {
-                    stop("File ", myBgeeMetadata@custom_intergenic_path, 
+            if (!(myUserMetadata@custom_intergenic_path == "")) {
+                if(!file.exists(myUserMetadata@custom_intergenic_path)) {
+                    stop("File ", myUserMetadata@custom_intergenic_path, 
                          " selected as custom intergenic does not exist")
                 }
                 if (myBgeeMetadata@intergenic_release != "custom") {
                     stop(
-                        "You selected a custom intergenic path (BgeeMetadata@custom_intergenic_path)
+                        "You selected a custom intergenic path (UserMetadata@custom_intergenic_path)
                     but the intergenic release (BgeeMetadata@intergenic_release) was not defined
                     as `custom`. In order to use custom reference intergenic sequences please
                     provide the path to your custom_intergenic_path AND update the
@@ -642,13 +642,13 @@ retrieve_intergenic_path <-
                     )
                 }
                 bgee_intergenic_file <-
-                    myBgeeMetadata@custom_intergenic_path
+                    myUserMetadata@custom_intergenic_path
                 return(bgee_intergenic_file)
             } else {
                 if (myBgeeMetadata@intergenic_release == "custom") {
                     stop(
                         "You selected a `custom`` intergenic release (BgeeMetadata@intergenic_release)
-                    but the intergenic path (BgeeMetadata@custom_intergenic_path) was not defined. In
+                    but the intergenic path (UserMetadata@custom_intergenic_path) was not defined. In
                     order to use custom reference intergenic sequences please both provide the path
                     to your custom_intergenic_path AND update the intergenic_release to `custom`."
                     )

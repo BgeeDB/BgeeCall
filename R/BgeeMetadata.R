@@ -35,7 +35,7 @@ setMethod(
         .Object <- callNextMethod()
         # do not download intergenic releases information when instantiation of BgeeMetadata with custom release.
         # Allows to run BgeeCall without internet connection when using intergenic sequences available localy.
-        if(.Object@intergenic_release == "custom") {
+        if(length(.Object@intergenic_release) != 0 && .Object@intergenic_release == "custom") {
             message("IMPORTANT : You decided to use your own reference intergenic sequences")
         } else {
             ## Get release information

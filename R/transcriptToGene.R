@@ -50,8 +50,10 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 create_TxDb <- function(myAbundanceMetadata, myUserMetadata) {
     # create txdb from GRanges Object
-    txdb <- makeTxDbFromGRanges(myUserMetadata@annotation_object, 
-        taxonomyId = as.numeric(myUserMetadata@species_id))
+    # use the suppressWarnings function in order not to print useless warnings like :
+    # The "phase" metadata column contains non-NA values for features of type stop_codon. This information was ignored.
+    txdb <- suppressWarnings(makeTxDbFromGRanges(myUserMetadata@annotation_object, 
+        taxonomyId = as.numeric(myUserMetadata@species_id)))
     return(txdb)
 }
 
@@ -92,8 +94,10 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         }
         txdb <- create_TxDb(myAbundanceMetadata, myUserMetadata)
         k <- biomaRt::keys(txdb, keytype = "TXNAME")
-        tx2gene <- as.data.frame(biomaRt::select(txdb, 
-            k, "GENEID", "TXNAME"))
+        # Used suppressMessages in order not to print meesages like :
+        # 'select()' returned 1:1 mapping between keys and columns
+        tx2gene <- suppressMessages(as.data.frame(biomaRt::select(txdb, 
+            k, "GENEID", "TXNAME")))
         intergenic_tx2gene <- intergenic_tx2gene(myBgeeMetadata, 
             myUserMetadata)
         
