@@ -66,6 +66,7 @@ system is installed. This step has to be run before the quantification
 otherwise indexes will be created for each abundance quantification. This
 will slow down the abundance quantification and can generate errors when 
 writting the same file at the same time from different nodes.
+This function also generate tx2gene and gene2biotype mapping files.
 }
 \examples{
 \dontrun{
