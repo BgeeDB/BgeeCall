@@ -1,7 +1,7 @@
 # regroup all function used to easily run the
 # RNA-Seq calls presence/absence pipeline in slurm cluster
 #' 
-#' @title Generate all indexes for the abundance quantification step 
+#' @title Generate all indexes for the abundance quantification step
 #' 
 #' @description Check all unique lines of the input file to check which
 #' indexes have to be generated beore running all abundance quantification.
@@ -10,6 +10,7 @@
 #' otherwise indexes will be created for each abundance quantification. This
 #' will slow down the abundance quantification and can generate errors when 
 #' writting the same file at the same time from different nodes.
+#' This function also generate tx2gene and gene2biotype mapping files.
 #' 
 #' @param abundanceMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze. If no object is
@@ -94,6 +95,12 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
                                        myUserMetadata = userMetadata)
     create_kallisto_index(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                           myUserMetadata = userMetadata)
+    #create tx2gene file
+    tx2gene <- create_tx2gene(myAbundanceMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
+                              myUserMetadata = userMetadata)
+    #create gene2biotype file
+    create_gene_to_biotype(myAbundanceMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
+                           myUserMetadata = userMetadata)
   }
   
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
