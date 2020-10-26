@@ -12,12 +12,14 @@
 #' writting the same file at the same time from different nodes.
 #' This function also generate tx2gene and gene2biotype mapping files.
 #' 
-#' @param abundanceMetadata A Reference Class BgeeMetadata object (optional)
+#' @param kallistoMetadata A Reference Class KallistoMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze. If no object is
 #' provided a new one will be created with default values.
 #' @param bgeeMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to choose the version of reference intergenic sequences. If no object
 #' is provided a new one will be created with default values.
+#' @param userMetadata A Class UserMetadata object (optional).
+#' If no object is provided a new one will be created with default values.
 #' @param userFile Path to the file where each line corresponds to one abundance
 #' quantification to be run. The structure of the file is the same than the 
 #' `userFile` used as input of  the `generate_calls_workflow` function.
@@ -124,12 +126,15 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
 #'   \item generate present/absent expression calls
 #' } 
 #' 
-#' @param abundanceMetadata A Reference Class BgeeMetadata object (optional)
+#' 
+#' @param kallistoMetadata A Reference Class KallistoMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze. If no object is
 #' provided a new one will be created with default values.
 #' @param bgeeMetadata A Reference Class BgeeMetadata object (optional)
 #' allowing to choose the version of reference intergenic sequences. If no object
 #' is provided a new one will be created with default values.
+#' @param userMetadata A Class UserMetadata object (optional).
+#' If no object is provided a new one will be created with default values.
 #' @param userFile Path to the file where each line corresponds to one abundance
 #' quantification to be run. The structure of the file is the same than the 
 #' `userFile` used as input of  the `generate_calls_workflow` function.
