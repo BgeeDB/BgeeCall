@@ -12,13 +12,12 @@
 #' KallistoMetadata, AbundanceMetadata, UserMetadata and BgeeMetadata
 #'
 #'
-#' @param abundanceMetadata A Class BgeeMetadata object (optional)
+#' @param abundanceMetadata A Class AbundanceMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze
 #' @param bgeeMetadata A Class BgeeMetadata object (optional)
 #' allowing to choose the version of reference intergenic sequences
 #' @param userMetadata A Class UserMetadata object (optional).
-#' generate present/allows calls using objects of the UserMetadata class.
-#' Can be one object or a list of objects.
+#' generate present/absent calls using slots of the UserMetadata class.
 #' @param userDataFrame a data.frame comtaining all information to generate
 #' present/absent calls. Each line of this data.frame will generate calls for
 #' one RNA-Seq library. This data.frame must contains between 4 and 8 columns :

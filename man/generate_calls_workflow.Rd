@@ -13,15 +13,14 @@ generate_calls_workflow(
 )
 }
 \arguments{
-\item{abundanceMetadata}{A Class BgeeMetadata object (optional)
+\item{abundanceMetadata}{A Class AbundanceMetadata object (optional)
 allowing to tune your gene quantification abundance analyze}
 
 \item{bgeeMetadata}{A Class BgeeMetadata object (optional)
 allowing to choose the version of reference intergenic sequences}
 
 \item{userMetadata}{A Class UserMetadata object (optional).
-generate present/allows calls using objects of the UserMetadata class.
-Can be one object or a list of objects.}
+generate present/absent calls using slots of the UserMetadata class.}
 
 \item{userDataFrame}{a data.frame comtaining all information to generate
 present/absent calls. Each line of this data.frame will generate calls for

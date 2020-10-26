@@ -18,9 +18,16 @@ generate_slurm_calls(
 )
 }
 \arguments{
+\item{kallistoMetadata}{A Reference Class KallistoMetadata object (optional)
+allowing to tune your gene quantification abundance analyze. If no object is
+provided a new one will be created with default values.}
+
 \item{bgeeMetadata}{A Reference Class BgeeMetadata object (optional)
 allowing to choose the version of reference intergenic sequences. If no object
 is provided a new one will be created with default values.}
+
+\item{userMetadata}{A Class UserMetadata object (optional).
+If no object is provided a new one will be created with default values.}
 
 \item{userFile}{Path to the file where each line corresponds to one abundance
 quantification to be run. The structure of the file is the same than the 
@@ -50,10 +57,6 @@ value is TRUE}
 slurm_apply automatically divides params in chunks of approximately equal size to 
 send to each node. Less nodes are allocated if the parameter set is too small to 
 use all CPUs on the requested nodes. By default this number is 10.}
-
-\item{abundanceMetadata}{A Reference Class BgeeMetadata object (optional)
-allowing to tune your gene quantification abundance analyze. If no object is
-provided a new one will be created with default values.}
 }
 \value{
 generate calls
