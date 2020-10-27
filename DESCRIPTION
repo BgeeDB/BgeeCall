@@ -1,7 +1,7 @@
 Package: BgeeCall
 Type: Package
 Title: Automatic RNA-Seq present/absent gene expression calls generation
-Version: 1.6.0
+Version: 1.7.0
 Date: 2020-06
 Authors@R: 
 	c(person("Julien", "Wollbrett", 
