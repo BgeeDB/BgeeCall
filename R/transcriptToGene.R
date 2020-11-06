@@ -35,8 +35,6 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 #' @description Create TxDb annotation from gtf or gff3 annotations
 #'
-#' @param myAbundanceMetadata A descendant object of the Class 
-#' myAbundanceMetadata.
 #' @param myUserMetadata A Reference Class UserMetadata object.
 #'
 #' @author Julien Wollbrett
@@ -48,7 +46,7 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #' @noMd
 #' @noRd
 #'
-create_TxDb <- function(myAbundanceMetadata, myUserMetadata) {
+create_TxDb <- function(myUserMetadata) {
     # create txdb from GRanges Object
     # use the suppressWarnings function in order not to print useless warnings like :
     # The "phase" metadata column contains non-NA values for features of type stop_codon. This information was ignored.
@@ -92,7 +90,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         if (!dir.exists(annotation_path)) {
             dir.create(annotation_path, recursive = TRUE)
         }
-        txdb <- create_TxDb(myAbundanceMetadata, myUserMetadata)
+        txdb <- create_TxDb(myUserMetadata = myUserMetadata)
         k <- biomaRt::keys(txdb, keytype = "TXNAME")
         # Used suppressMessages in order not to print meesages like :
         # 'select()' returned 1:1 mapping between keys and columns
@@ -157,8 +155,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 run_tximport <- function(myAbundanceMetadata = new("KallistoMetadata"), 
     myBgeeMetadata = new("BgeeMetadata"), 
     myUserMetadata, abundanceFile = "") {
-    tx2gene_path <- create_tx2gene(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata)
+    tx2gene_path <- create_tx2gene(myAbundanceMetadata = myAbundanceMetadata, 
+        myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
     tx2gene <- read.table(tx2gene_path, header = TRUE, 
         sep = "\t")
     
@@ -227,8 +225,8 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
     
     #
     # remove intergenic from tx2gene
-    tx2gene_path <- create_tx2gene(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata)
+    tx2gene_path <- create_tx2gene(myAbundanceMetadata = myAbundanceMetadata, 
+        myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
     intergenic_ids <- get_intergenic_ids(myBgeeMetadata, myUserMetadata)
     tx2gene <- read.table(tx2gene_path, header = TRUE, sep = "\t")
     
