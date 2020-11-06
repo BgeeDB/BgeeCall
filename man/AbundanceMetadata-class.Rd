@@ -21,11 +21,18 @@ transcript level if TRUE (default = FALSE)}
 \item{\code{ignoreTxVersion}}{logical used to remove transcript version in 
 transcript ID if TRUE (default = FALSE)}
 
-\item{\code{cutoff}}{numeric corresponding to the proportion of intergenic present 
-divided by proportion of protein coding present (default = 0.05). In the 
-Bgee pipeline this cutoff is fixed and its value is 0.05. Be careful when 
-changing this parameter as it could have a huge impact on your 
-present/absent calls.}
+\item{\code{cutoff_type}}{Defines the approach used to generate present/absent calls.
+default value is 'pValue', allowing calls to be generated using a pValue.
+Other possible value is 'intergenic' allowing to use a ratio of intergenic
+sequences considered as present as a threshold.}
+
+\item{\code{cutoff}}{numeric value of the cutoff used to generate the present/absent
+calls. If value of the slot cutoff_type is 'pValue' this cutoff will correspond
+to the highest pValue allowing to define a gene as present. If value of the slot 
+cutoff_type is 'intergenic' this cutoff will correspond to the proportion of 
+intergenic present divided by proportion of protein coding present. The default
+value is 0.05. Be careful when modifying this value as it could have a huge impact 
+on present/absent calls.}
 
 \item{\code{full_transcriptome_file}}{Name of the fasta file containing both 
 transcriptomic and intergenic regions. This file is created by the pipeline.
