@@ -249,7 +249,7 @@ plot_distributions <- function(counts,
 #'
 cutoff_info <- function(counts,
     column, abundance_cutoff, r_cutoff,
-    myUserMetadata) {
+    myUserMetadata, myAbundanceMetadata) {
     ## Calculate summary statistics to export in cutoff
     ## info file
     genic_present <- sum(counts[[column]][counts$type ==
@@ -282,8 +282,7 @@ cutoff_info <- function(counts,
         sum(counts$biotype %in% "protein_coding"),
         intergenic_present,
         number_intergenic_present,
-        sum(counts$type == "intergenic"),
-        r_cutoff
+        sum(counts$type == "intergenic")
     )
     names(to_export) <- c(
         "libraryId",
@@ -296,10 +295,39 @@ cutoff_info <- function(counts,
         "numberCoding",
         "proportionIntergenicPresent",
         "numberIntergenicPresent",
-        "numberIntergenic",
-        "ratioIntergenicCodingPresent"
+        "numberIntergenic"
     )
+    if(myAbundanceMetadata@cutoff_type == "intergenic") {
+        to_export <- c(to_export, r_cutoff)
+        names(to_export)[length(to_export)] <- "ratioIntergenicCodingPresent"
+    } else if(myAbundanceMetadata@cutoff_type == "pValue") {
+        to_export <- c(to_export, myAbundanceMetadata@cutoff)
+        names(to_export)[length(to_export)] <- "pValueCutoff"
+    } else {
+        stop("unknown cutoff type : ", myAbundanceMetadata@cutoff_type, ". Should be 
+        \"pValue\" or \"intergenic\"")
+    }
     return(to_export)
+}
+
+
+generate_theoretical_pValue <- function(counts, pValueCutoff) {
+    ## select values with TPM > 0 (because we will use log2 scale)
+    selected_intergenic <- dplyr::filter(counts, abundance > 0 & type == "intergenic")
+
+    ## select genic region from the library
+    selected_count <- dplyr::filter(counts, abundance > 0)  
+    ## calculate z-score for each gene_id using the reference intergenic 
+    selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
+    ## calculate p-values for each gene_id
+    
+    selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
+    counts_with_pValue <- merge(counts, selected_count[, c("id", "zScore", "pValue")], 
+                                by = "id", all.x=TRUE)
+
+    counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
+                                          is.na(counts_with_pValue$pValue)), "absent", "present")
+    return(counts_with_pValue)
 }
 
 #' @title Recalculate TPMs

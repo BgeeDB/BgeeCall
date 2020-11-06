@@ -212,7 +212,7 @@ run_kallisto <- function(myKallistoMetadata, myBgeeMetadata,
             if(isTRUE(myUserMetadata@verbose)) {
                 message("kallisto abundance file already exists for library ", 
                     basename(myUserMetadata@rnaseq_lib_path), 
-                    ". No need to to generate a new one.")
+                    ". No need to generate a new one.")
             }
             need_to_generate_abundance = FALSE
         }
