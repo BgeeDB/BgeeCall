@@ -99,7 +99,7 @@ Each analyze generates 5 files and return path to each one of them.
 
 * calls_tsv_path : path to main tsv file with TPM, count, length, biotype, type, and presence/absence of expression summarized at gene level (or at the [transcript level](#transcript_level) if it was requested)
 ``` {r, message = FALSE, warning = FALSE}
-head.DataTable(x = read.table(calls_output$calls_tsv_path, header = TRUE), n = 5)
+head(read.table(calls_output$calls_tsv_path, header = TRUE), n = 5)
 ```
 * cutoff_info_file_path : path to tsv summary of the analyze containing the proportion of gene, protein coding and intergenic defined as expressed. It also contains the library ID and the present/absent TPM threshold
 ``` {r, message = FALSE, warning = FALSE}
@@ -107,7 +107,7 @@ read.table(calls_output$cutoff_info_file_path)
 ```
 * abundance_tsv : path to tsv kallisto quant output file
 ``` {r, message = FALSE, warning = FALSE}
-head.DataTable(x = read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
+head(read.table(calls_output$abundance_tsv, header = TRUE), n = 5)
 ```
 * TPM_distribution_path : path to plot in pdf reprensting density distribution of TPM values for all sequences, protein coding sequences, and intergenic sequences. The grey line corresponds to TPM threshold used to generate present/absent calls.
 ``` {r, eval = FALSE}
@@ -139,6 +139,22 @@ Columns of the dataframe or the tsv file are :
 Once the file has been fill in expression calls can be generated with :
 ``` {r, eval=FALSE}
 calls_output <- generate_calls_workflow(userFile = "path_to_your_file.tsv")
+```
+
+### Parallized generation of present/absent calls on a cluster
+
+BgeeCall already implement everything you need to generate calls on a cluster if it uses slurm as queuing system.
+The same TSV file as described in the previous section will be used as input. In addition to tuning options available when running
+BgeeCall on your computer, It is possible to modify how slurm jobs are submitted. More information available in section [Modify slurm options](#slurm_options)
+In order to optimize parallelization calls will be generated in 2 steps.  
+\itemize {
+  \item Generate data at species level (e.g trancriptome with intergenic sequences, kallisto indexes)
+  \item Generate expression calls for each RNA-Seq libraries
+``` {r, eval = FALSE}
+# generate kallisto indexes
+generate_slurm_indexes(userFile = "path_to_your_file.tsv")
+# generate expression calls
+generate_slurm_calls(userFile = "path_to_your_file.tsv")
 ```
 
 ### Reference intergenic sequences
@@ -272,3 +288,63 @@ By default directories used to save present/absent calls are subdirectories of `
 user_BgeeCall@output_dir <- "path/to/calls/for/this/library/"
 ```
 This output directory will only contains results generated at the RNA-Seq library level. All data generated at species level are still stored using the `UserMetadata@working_path`. They can then still be reused to generate calls from other libraries of the same species. 
+
+### <a name="slurm_options"></a>Modify slurm options
+
+Two functions are available to run BgeeCall on a slurm queuing system. Parameters described below are available for both of them.
+
+#### Number of jobs
+
+The full idea of using a cluster is to parallelize your jobs. By default 10 jobs are run at the same time. It is possible to modify this number with the parameter `nodes`.
+
+```{r, eval=FALSE}
+# run 50 jobs in parallel
+generate_slurm_indexes(userFile = "path/to/file.tsv", nodes = 50)
+```
+
+#### Do not submit the jobs
+
+In order to be able to check files automatically generated to run the jobs it is possible to generate these files without submiting your jobs.
+More information on created files are available on the vignette of the (https://cran.r-project.org/web/packages/rslurm/vignettes/rslurm.html)[rslurm package]. 
+
+```{r, eval=FALSE}
+# create temporary files but do not submit the jobs
+generate_slurm_indexes(userFile = "path/to/file.tsv", submit = FALSE)
+```
+
+#### Modify slurm options
+
+A bash scirpt is automatically created to run the jobs. This script contains default slurm options (array, cpus-per-task, job-name, output).
+All other slurm options recognized by the sbatch command can be updated b creating a named list where name correspond to long name of options (e.g do not use 'p' but 'partition'). 
+
+```{r, eval=FALSE}
+# add slurm options to the sbatch script
+slurm_options_index <- list(account = "account", time = "2:00:00", partition = "partition", mem = "30G")
+generate_slurm_indexes(userFile = "path/to/file.tsv", slurm_options = slurm_options_index)
+```
+
+#### Add modules to your environment
+
+In some cluster programs are not loaded by default. The modules parameter allows to load them by adding one line in the sbatch script.
+This option has been implemented to add modules but could potentially be used to add any custom line of code in the sbatch script.
+
+```{r, eval=FALSE}
+# load R 3.6.1 and kallisto in a cluster environment where software has to loaded manually
+modules <- c("module add R/3.6.1;", "module add kallisto;")
+generate_slurm_indexes(userFile = "path/to/file.tsv", modules = modules)
+```
+
+#### Modify BgeeCall objects
+
+By default except for columns present in the tsv file all other slots of the 3 BgeeCall classes will use default values.
+In order to tune these parameters it is possible to create the objects and pass them to the slurm functions.
+\strong{ Important :} When generating these objects it is mandatory to keep the same name as in the example below.
+
+```{r, eval=FALSE}
+# create BgeeCall objects and use them to generate indexes
+kallistoMetadata <- new("KallistoMetadata", download_kallisto=TRUE)
+userMetadata <- new("UserMetadata", working_path = "/path/to/working/dir")
+bgeeMetadata <- new("BgeeMetadata", intergenic_release = "0.1")
+generate_slurm_indexes(userFile = "path/to/file.tsv", kallistoMetadata = kallistoMetadata, bgeeMetadata = bgeeMetadata, userMetadata = userMetadata)
+```
+

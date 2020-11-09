@@ -13,46 +13,49 @@ generate_calls_workflow(
 )
 }
 \arguments{
-\item{abundanceMetadata}{A Reference Class BgeeMetadata object (optional)
+\item{abundanceMetadata}{A Class AbundanceMetadata object (optional)
 allowing to tune your gene quantification abundance analyze}
 
-\item{bgeeMetadata}{A Reference Class BgeeMetadata object (optional)
+\item{bgeeMetadata}{A Class BgeeMetadata object (optional)
 allowing to choose the version of reference intergenic sequences}
 
-\item{userMetadata}{A Reference Class UserMetadata object (optional).
-generate present/allows calls using objects of the UserMetadata class.
-Can be one object or a list of objects.}
+\item{userMetadata}{A Class UserMetadata object (optional).
+generate present/absent calls using slots of the UserMetadata class.}
 
 \item{userDataFrame}{a data.frame comtaining all information to generate
 present/absent calls. Each line of this data.frame will generate calls for
-one RNA-Seq library. This data.frame must contains 7 columns :
-- species_id : The ensembl species ID
-- run_ids : (optional) allows to generate calls for a subpart of all runs
-  of the library. must be a character or a list of characters.
-- reads_size (optional) the size of the reads of the library (Default = 50)
-if the reads size is lower than 51 abundance quantification wil be run with
-a smaller kmer size
-- rnaseq_lib_path : path to RNA-Seq library directory
-- transcriptome_path : path to transcriptome file
-- annotation_path : path to annotation file
-- working_path : root of the directory where results will be written}
+one RNA-Seq library. This data.frame must contains between 4 and 8 columns :
+\itemize{
+ \item{species_id : The ensembl species ID}
+ \item{run_ids : (optional) allows to generate calls for a subpart of all runs
+  of the library. must be a character or a list of characters}
+ \item{reads_size (optional) the size of the reads of the library (Default = 51)
+if the reads size is lower than 51 abundance quantification will be run from an index
+ generated with a smaller kmer size}
+ \item{rnaseq_lib_path : path to RNA-Seq library directory}
+ \item{transcriptome_path : path to transcriptome file}
+ \item{annotation_path : path to annotation file}
+ \item{output_dir : (optional)root of the directory where results will be written}
+ \item{custom_intergenic_path : (optional) To use if the "custom" reference intergenic
+ release has been selected. Provide the path to the reference intergenic file}
+}}
 
-\item{userFile}{path to a tsv file containing 7 columns. these columns are
+\item{userFile}{path to a tsv file containing between 4 and 8 columns. these columns are
 the same than for userDataFrame (see above). a template of this file is
 available at the root of the package and accessible with the command
 system.file('userMetadataTemplate.tsv', package = 'BgeeCall')}
 }
 \value{
-paths to the 4 results files (see vignette for more details)
+paths to the 5 results files (see vignette for more details)
 }
 \description{
-Main function running the workflow allowing to generate
+Main function running the workflow that generates
 present/absent calls from a file, a data.frame, or objects of the
-classe UserMetadata (please choose only 1 out of the 3)
+classe UserMetadata (please choose only 1 out of the 3). 
 This workflow is highly tunable by editing default values of the slots of
 S4 objects. For more information on how to tune the workflow please have
 a look at the vignette and the documentation of the classes
-KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
+KallistoMetadata, AbundanceMetadata, UserMetadata and BgeeMetadata
 }
 \examples{
 \dontrun{

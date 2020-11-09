@@ -3,36 +3,40 @@
 
 #' @title generate present/absent calls
 #'
-#' @description Main function running the workflow allowing to generate
+#' @description Main function running the workflow that generates
 #' present/absent calls from a file, a data.frame, or objects of the
-#' classe UserMetadata (please choose only 1 out of the 3)
+#' classe UserMetadata (please choose only 1 out of the 3). 
 #' This workflow is highly tunable by editing default values of the slots of
 #' S4 objects. For more information on how to tune the workflow please have
 #' a look at the vignette and the documentation of the classes
-#' KallistoMetadata, AbundanceMetadata, UserMetadata, and BgeeMetadata
+#' KallistoMetadata, AbundanceMetadata, UserMetadata and BgeeMetadata
 #'
 #'
-#' @param abundanceMetadata A Reference Class BgeeMetadata object (optional)
+#' @param abundanceMetadata A Class AbundanceMetadata object (optional)
 #' allowing to tune your gene quantification abundance analyze
-#' @param bgeeMetadata A Reference Class BgeeMetadata object (optional)
+#' @param bgeeMetadata A Class BgeeMetadata object (optional)
 #' allowing to choose the version of reference intergenic sequences
-#' @param userMetadata A Reference Class UserMetadata object (optional).
-#' generate present/allows calls using objects of the UserMetadata class.
-#' Can be one object or a list of objects.
+#' @param userMetadata A Class UserMetadata object (optional).
+#' generate present/absent calls using slots of the UserMetadata class.
 #' @param userDataFrame a data.frame comtaining all information to generate
 #' present/absent calls. Each line of this data.frame will generate calls for
-#' one RNA-Seq library. This data.frame must contains 7 columns :
-#' - species_id : The ensembl species ID
-#' - run_ids : (optional) allows to generate calls for a subpart of all runs
-#'   of the library. must be a character or a list of characters.
-#' - reads_size (optional) the size of the reads of the library (Default = 50)
-#' if the reads size is lower than 51 abundance quantification wil be run with
-#' a smaller kmer size
-#' - rnaseq_lib_path : path to RNA-Seq library directory
-#' - transcriptome_path : path to transcriptome file
-#' - annotation_path : path to annotation file
-#' - working_path : root of the directory where results will be written
-#' @param userFile path to a tsv file containing 7 columns. these columns are
+#' one RNA-Seq library. This data.frame must contains between 4 and 8 columns :
+#' \itemize{
+#'  \item{species_id : The ensembl species ID}
+#'  \item{run_ids : (optional) allows to generate calls for a subpart of all runs
+#'   of the library. must be a character or a list of characters}
+#'  \item{reads_size (optional) the size of the reads of the library (Default = 51)
+#' if the reads size is lower than 51 abundance quantification will be run from an index
+#'  generated with a smaller kmer size}
+#'  \item{rnaseq_lib_path : path to RNA-Seq library directory}
+#'  \item{transcriptome_path : path to transcriptome file}
+#'  \item{annotation_path : path to annotation file}
+#'  \item{output_dir : (optional)root of the directory where results will be written}
+#'  \item{custom_intergenic_path : (optional) To use if the "custom" reference intergenic
+#'  release has been selected. Provide the path to the reference intergenic file}
+#' }
+#'  
+#' @param userFile path to a tsv file containing between 4 and 8 columns. these columns are
 #' the same than for userDataFrame (see above). a template of this file is
 #' available at the root of the package and accessible with the command
 #' system.file('userMetadataTemplate.tsv', package = 'BgeeCall')
@@ -40,7 +44,7 @@
 #'
 #' @author Julien Wollbrett
 #'
-#' @return paths to the 4 results files (see vignette for more details)
+#' @return paths to the 5 results files (see vignette for more details)
 #'
 #' @export
 #'
@@ -121,12 +125,12 @@ generate_calls_workflow <- function(abundanceMetadata = new("KallistoMetadata"),
             run_from_dataframe(
                 myAbundanceMetadata = abundanceMetadata,
                 myBgeeMetadata = bgeeMetadata,
+                myUserMetadata = myUserMetadata,
                 userMetadataDataFrame = userDataFrame
             )
         )
         # run workflow when userDataFrame is not null
-    } else if (is.null(userMetadata) && is.null(userDataFrame) &&
-        !is.null(userFile)) {
+    } else if (is.null(userDataFrame) && !is.null(userFile)) {
         if ((!(typeof(userFile) == "character") &&
             file.exists(userFile))) {
             stop(
@@ -138,6 +142,7 @@ information allowing to generate UserMetadata objects"
             run_from_file(
                 myAbundanceMetadata = abundanceMetadata,
                 myBgeeMetadata = bgeeMetadata,
+                myUserMetadata = userMetadata,
                 userMetadataFile = userFile
             )
         )
@@ -225,6 +230,8 @@ run_from_object <-
 #'
 #' @param myAbundanceMetadata A Reference Class BgeeMetadata object (optional)
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
+#' @param myUserMetadata A class BgeeMetadata object (optional). Used to modify
+#' values slots that are not part of the userMetadataFile
 #' @param userMetadataDataFrame A data frame containing all information needed
 #' to generate UserMetadata objects. This data frame must contains 7 columns
 #' (species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path,
@@ -245,19 +252,21 @@ run_from_object <-
 #' @noMd
 #' @noRd
 #'
-run_from_dataframe <-
-    function(myAbundanceMetadata = new("KallistoMetadata"),
-        myBgeeMetadata = new("BgeeMetadata"),
+run_from_dataframe <-function(myAbundanceMetadata = new("KallistoMetadata"),
+        myBgeeMetadata = new("BgeeMetadata"), myUserMetadata = NULL, 
         userMetadataDataFrame) {
-        for (row_number in seq_len(nrow(userMetadataDataFrame))) {
-            ## init myUserMetadata object
-            user_metadata <-
-                init_userMetadata_from_dataframe(userMetadataDataFrame, row_number)
-            
-            # run pipeline
-            run_from_object(myAbundanceMetadata, myBgeeMetadata, user_metadata)
-        }
+    all_results <- list()
+    for (row_number in seq_len(nrow(userMetadataDataFrame))) {
+        ## init myUserMetadata object
+        user_metadata <-
+            init_userMetadata_from_dataframe(userMetadataDataFrame, myUserMetadata, row_number)
+        
+        # run pipeline
+        result <- run_from_object(myAbundanceMetadata, myBgeeMetadata, user_metadata)
+        all_results <- c(all_results, list(result))
     }
+    return(all_results)
+}
 
 #' @title generate present/absent calls from a file
 #'
@@ -267,6 +276,8 @@ run_from_dataframe <-
 #'
 #' @param myAbundanceMetadata A Reference Class BgeeMetadata object (optional)
 #' @param myBgeeMetadata A Reference Class BgeeMetadata object (optional)
+#' @param myUserMetadata A class BgeeMetadata object (optional). Used to modify
+#' values slots that are not part of the userMetadataFile
 #' @param userMetadataFile A tsv file describing all user libraries for which
 #' present/absent calls have to be generated. A template of this file named
 #' `userMetadataTemplate.tsv` is available at the root of the `BgeeCall`
@@ -293,91 +304,55 @@ run_from_dataframe <-
 #' @noRd
 #'
 run_from_file <-
-    function(myAbundanceMetadata = new("KallistoMetadata"),
-        myBgeeMetadata = new("BgeeMetadata"),
-        userMetadataFile) {
-        user_metadata_df <- read.table(
-            userMetadataFile,
-            header = TRUE,
-            sep = "\t",
-            comment.char = "#"
-        )
-        output_files <- run_from_dataframe(myAbundanceMetadata,
-            myBgeeMetadata, user_metadata_df)
-        return(output_files)
-    }
+    function(myAbundanceMetadata = new("KallistoMetadata"), myBgeeMetadata = new("BgeeMetadata"), 
+             myUserMetadata = NULL, userMetadataFile) {
+    user_metadata_df <- read.table(userMetadataFile, header = TRUE, sep = "\t", comment.char = "#")
+    output_files <- run_from_dataframe(myAbundanceMetadata, myBgeeMetadata, myUserMetadata, 
+                                       user_metadata_df)
+    return(output_files)
+}
 
-init_userMetadata_from_dataframe <- function(userMetadataDataFrame,
-    row_number) {
-    myUserMetadata <- new("UserMetadata")
-    myUserMetadata@species_id <-
-        as.character(userMetadataDataFrame[["species_id"]][row_number])
+init_userMetadata_from_dataframe <- function(userMetadataDataFrame, myUserMetadata = NULL, 
+                                             row_number) {
+    if (is.null(myUserMetadata)) {
+        myUserMetadata <- new("UserMetadata")
+    }
+    myUserMetadata@species_id <-as.character(userMetadataDataFrame[["species_id"]][row_number])
     
     # check if subset of run ids has to be used to generate present/absent
-    ids <-
-        as.character(userMetadataDataFrame[["run_ids"]][row_number])
-    if (length(ids) == 0) {
-        myUserMetadata@run_ids <- character(0)
-    } else if (length(ids) == 1) {
-        if (grepl(", ", ids)) {
-            myUserMetadata@run_ids <- strsplit(ids, ", ")
-        } else if (grepl(pattern = ",", x = ids)) {
-            myUserMetadata@run_ids <- strsplit(ids, ",")
-        }
-    } else {
-        myUserMetadata@run_ids <- ids
-    }
+    myUserMetadata@run_ids <- check_run_ids(as.character(userMetadataDataFrame[["run_ids"]][row_number]))
     # check if user provided an output_dir or if the default one will be used
     if ("output_directory" %in% names(userMetadataDataFrame)) {
-        output_dir <-
-            as.character(userMetadataDataFrame[["output_directory"]][row_number])
+        output_dir <- as.character(userMetadataDataFrame[["output_directory"]][row_number])
         if (length(output_dir) != 0) {
             if (!dir.exists(output_dir)) {
-                dir.create(
-                    path = output_dir,
-                    recursive = TRUE,
-                    showWarnings = TRUE
-                )
+                dir.create(path = output_dir, recursive = TRUE, showWarnings = TRUE)
             }
-            myUserMetadata <-
-                setOutputDir(myUserMetadata, output_dir)
+            myUserMetadata <- setOutputDir(myUserMetadata, output_dir)
         }
     }
     
     # check if user provided an output_dir or if the default one will be used
-    if ("simple_arborescence" %in% names(userMetadataDataFrame)) {
-        simple_arborescence <-
-            userMetadataDataFrame[["simple_arborescence"]][row_number]
-        if (length(simple_arborescence) != 0) {
-            if (simple_arborescence == "TRUE" ||
-                simple_arborescence == "true") {
-                myUserMetadata@simple_arborescence <- TRUE
-            } else if (simple_arborescence == "FALSE" ||
-                simple_arborescence == "false") {
-                myUserMetadata@simple_arborescence <- FALSE
-            } else {
-                stop("the column simple_arborescence should only contain TRUE or FALSE")
-            }
+    if ("custom_intergenic_path" %in% names(userMetadataDataFrame)) {
+        custom_intergenic_path <- as.character(
+            userMetadataDataFrame[["custom_intergenic_path"]][row_number])
+        if (length(custom_intergenic_path) != 0) {
+            myUserMetadata@custom_intergenic_path <-custom_intergenic_path
         }
     }
     
-    
-    myUserMetadata@reads_size <-
-        as.numeric(userMetadataDataFrame[["reads_size"]][row_number])
-    myUserMetadata@rnaseq_lib_path <-
-        as.character(userMetadataDataFrame[["rnaseq_lib_path"]][row_number])
-    myUserMetadata <-
-        setTranscriptomeFromFile(
-            userObject = myUserMetadata,
-            transcriptomePath = as.character(userMetadataDataFrame[["transcriptome_path"]][row_number])
-        )
-    myUserMetadata <-
-        setAnnotationFromFile(userObject = myUserMetadata,
-            annotationPath = as.character(userMetadataDataFrame[["annotation_path"]][row_number]))
-    if (is.na(myUserMetadata@working_path) ||
-        myUserMetadata@working_path == '')
-        myUserMetadata@working_path <-
-        as.character(userMetadataDataFrame[["working_path"]][row_number])
-
+    myUserMetadata@reads_size <-  as.numeric(userMetadataDataFrame[["reads_size"]][row_number])
+    myUserMetadata@rnaseq_lib_path <- as.character(
+        userMetadataDataFrame[["rnaseq_lib_path"]][row_number])
+    myUserMetadata <- setTranscriptomeFromFile(userObject = myUserMetadata, 
+                    transcriptomePath = as.character(
+                        userMetadataDataFrame[["transcriptome_path"]][row_number]))
+    myUserMetadata <- setAnnotationFromFile(userObject = myUserMetadata, 
+                    annotationPath = as.character(
+                        userMetadataDataFrame[["annotation_path"]][row_number]))
+    if (is.na(myUserMetadata@working_path) || myUserMetadata@working_path == '') {
+        myUserMetadata@working_path <- as.character(
+            userMetadataDataFrame[["working_path"]][row_number])
+    }
     return(myUserMetadata)
 }

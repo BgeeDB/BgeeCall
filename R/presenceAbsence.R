@@ -11,6 +11,8 @@
 #'
 #' @return A dataframe containing reference intergenic ids
 #' 
+#' @import Biostrings
+#' 
 #' @noMd
 #' @noRd
 #'
@@ -73,124 +75,150 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                         myBgeeMetadata, myUserMetadata)
     
     # check if calls have to be created
-    if(!(myAbundanceMetadata@overwrite_calls & file.exists(file.path(output_path,
-        myAbundanceMetadata@gene_calls_file_name)))) {
+    if (file.exists(file.path(output_path, 
+            myAbundanceMetadata@gene_calls_file_name)) & !myAbundanceMetadata@overwrite_calls ){
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("no need to regenerate calls")
+        }
+    }
+    else {
         # biotype mapping information will depend on
         # summarization at gene level or not
         biotype_mapping <- ""
         if (myAbundanceMetadata@txOut) {
-        biotype_mapping <- load_transcript_to_biotype(myAbundanceMetadata, 
-            myBgeeMetadata, myUserMetadata)
-    } else {
-        biotype_mapping <- load_gene_to_biotype(myAbundanceMetadata, 
-            myBgeeMetadata, myUserMetadata)
-    }
-    
-    # run tximport for file with intergenic regions (if
-    # myAbundanceMetadata@txOut = FALSE, then tximport
-    # will summurarize transcript level estimates at
-    # gene level)
-    tximportObject <- run_tximport(myAbundanceMetadata = myAbundanceMetadata, 
-        myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
-    
-    # recalculate TPM without intergenic regions and
-    # run tximport (if myAbundanceMetadata@txOut =
-    # FALSE, then tximport will summurarize at
-    # transcript level estimates at gene level)
-    
-    # remove intergenic
-    tximportObject_without_intergenic <- abundance_without_intergenic(myAbundanceMetadata, 
-        myBgeeMetadata, myUserMetadata)
-    
-    # transform tximportObect in order to easily
-    # process information
-    abundance <- transform_tximport(tximportObject, 
-        biotype_mapping)
-    # transform tximportObject without intergenic in
-    # order to easily process information
-    abundance_without_intergenic <- transform_tximport(tximportObject_without_intergenic, 
-        biotype_mapping)
-    
-    # define coding and intergenic abundance subset
-    selected_coding <- abundance$biotype %in% "protein_coding"
-    selected_intergenic <- (abundance$type == "intergenic" & 
-        abundance$id %in% biotype_mapping$id)
-    
-    # calculate TPM cutoff
-    if(isTRUE(myUserMetadata@verbose)) {
-        message("Generate present/absent expression calls.\n")
-        results <- calculate_abundance_cutoff(abundance, 
-            selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
-    } else {
-        results <- suppressMessages(calculate_abundance_cutoff(abundance, 
-            selected_coding, selected_intergenic, myAbundanceMetadata@cutoff))
-    }
-    abundance_cutoff <- results[1]
-    r_cutoff <- results[2]
-    
-    # generate name of output file
-    calls_file_name <- myAbundanceMetadata@gene_calls_file_name
-    cutoff_info_file_name <- myAbundanceMetadata@gene_cutoff_file_name
-    distribution_file_name <- myAbundanceMetadata@gene_distribution_file_name
-    if (myAbundanceMetadata@txOut) {
-        calls_file_name <- myAbundanceMetadata@transcript_calls_file_name
-        cutoff_info_file_name <- myAbundanceMetadata@transcript_cutoff_file_name
-        distribution_file_name <- myAbundanceMetadata@transcript_distribution_file_name
-    }
-    
-    # generate pdf plot
-    pdf(file = file.path(output_path, distribution_file_name), 
-        width = 6, height = 5)
-    plot_distributions(abundance, selected_coding, 
-        selected_intergenic, abundance_cutoff, myUserMetadata)
-    
-    # add presence/absence information
-    abundance$call <- ifelse(abundance$abundance >= 
-        abundance_cutoff, "present", "absent")
-    
-    # generate cutoff info file
-    cutoff_info_file <- cutoff_info(abundance, "call", 
-        abundance_cutoff, r_cutoff, myUserMetadata)
-    dev.off()
-    
-    # transfert presence/absence annotations to the
-    # abundances without intergenic
-    abundance_without_intergenic <- merge(abundance_without_intergenic, 
-        abundance[, c("id", "call")], by = "id")
-    
-    # Save calls and stats to output folder
-    calls_file_path <- file.path(output_path, calls_file_name)
-    cutoff_info_file_path <- file.path(output_path, 
-        cutoff_info_file_name)
-    write.table(abundance_without_intergenic, file = calls_file_path, 
-        quote = FALSE, sep = "\t", col.names = TRUE, 
-        row.names = FALSE)
-    write.table(t(t(cutoff_info_file)), file = cutoff_info_file_path, 
-        quote = FALSE, sep = "\t", col.names = FALSE, 
-        row.names = TRUE)
-    #save values of the Slots of the BgeeCall internal S4 objects
-    s4_summary_df <- as.data.frame(
-        generate_S4_object_properties_output(myAbundanceMetadata,
-            myBgeeMetadata,
-            myUserMetadata))
-    s4_slots_path <- file.path(output_path, "S4_slots_summary.tsv")
-    write.table(s4_summary_df, file = s4_slots_path, quote = FALSE, sep = "\t",
-                col.names = TRUE, row.names = FALSE)    
-    calls_result <- list()
-    calls_result$calls_tsv_path <- calls_file_path
-    calls_result$cutoff_info_file_path <- cutoff_info_file_path
-    calls_result$abundance_tsv <- file.path(output_path, 
-        myAbundanceMetadata@abundance_file)
-    calls_result$TPM_distribution_path <- file.path(output_path, 
-        distribution_file_name)
-    calls_result$S4_slots_summary <- s4_slots_path
-    return(calls_result)
-    ## t(t(cutoff_info_file)) is a solution to export a
-    ## vector vertically
-    } else {
-        if(isTRUE(myUserMetadata@verbose)) {
-            message("no need to regenerate calls")
+            biotype_mapping <- load_transcript_to_biotype(myAbundanceMetadata, 
+                myBgeeMetadata, myUserMetadata)
+        } else {
+            biotype_mapping <- load_gene_to_biotype(myAbundanceMetadata, 
+                myBgeeMetadata, myUserMetadata)
         }
+    
+        # run tximport for file with intergenic regions (if
+        # myAbundanceMetadata@txOut = FALSE, then tximport
+        # will summurarize transcript level estimates at
+        # gene level)
+        tximportObject <- run_tximport(myAbundanceMetadata = myAbundanceMetadata, 
+            myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
+    
+        # recalculate TPM without intergenic regions and
+        # run tximport (if myAbundanceMetadata@txOut =
+        # FALSE, then tximport will summurarize at
+        # transcript level estimates at gene level)
+    
+        # remove intergenic
+        tximportObject_without_intergenic <- abundance_without_intergenic(myAbundanceMetadata, 
+            myBgeeMetadata, myUserMetadata)
+    
+        # transform tximportObect in order to easily
+        # process information
+        abundance <- transform_tximport(tximportObject, 
+        biotype_mapping)
+        # transform tximportObject without intergenic in
+        # order to easily process information
+        abundance_without_intergenic <- transform_tximport(tximportObject_without_intergenic, 
+            biotype_mapping)
+    
+        # define coding and intergenic abundance subset
+        selected_coding <- abundance$biotype %in% "protein_coding"
+        selected_intergenic <- (abundance$type == "intergenic" & 
+            abundance$id %in% biotype_mapping$id)
+        
+        # actual call generation depending on cutoff_type
+        if(isTRUE(myUserMetadata@verbose)) {
+            message("Generate present/absent expression calls using ",
+                myAbundanceMetadata@cutoff_type, "cutoff")
+        }
+    
+        if(myAbundanceMetadata@cutoff_type == 'intergenic') {
+            if(isTRUE(myUserMetadata@verbose)) {
+                results <- calculate_abundance_cutoff(abundance, 
+                    selected_coding, selected_intergenic, myAbundanceMetadata@cutoff)
+            } else {
+                results <- suppressMessages(calculate_abundance_cutoff(abundance, 
+                    selected_coding, selected_intergenic, myAbundanceMetadata@cutoff))
+            }
+            abundance_cutoff <- results[1]
+            r_cutoff <- results[2]
+            # add presence/absence information
+            abundance$call <- ifelse(abundance$abundance >= 
+                                         abundance_cutoff, "present", "absent")
+            # transfert presence/absence annotations to the
+            # abundances without intergenic
+            abundance_without_intergenic <- merge(abundance_without_intergenic, 
+                                                  abundance[, c("id", "call")], 
+                                                  by = "id")
+        # generate calls and calculate abundance_cutoff
+        }else if (myAbundanceMetadata@cutoff_type == 'pValue') {
+            abundance <- generate_theoretical_pValue(counts =abundance,
+                                                     myAbundanceMetadata@cutoff)
+
+            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$pValue <= 0.05]))
+            # such cutoff does not exist for the pValue approach
+            r_cutoff <- NULL
+            # abundances without intergenic
+            abundance_without_intergenic <- merge(abundance_without_intergenic, 
+                                                  abundance[, c("id", "zScore", "pValue", "call")], 
+                                                  by = "id")
+        } else {
+            stop("unknown cutoff type : ", myAbundanceMetadata@cutoffType, ". Should be 
+            \"pValue\" or \"intergenic\"")
+        }
+            
+        
+    
+        # generate name of output file
+        calls_file_name <- myAbundanceMetadata@gene_calls_file_name
+        cutoff_info_file_name <- myAbundanceMetadata@gene_cutoff_file_name
+        distribution_file_name <- myAbundanceMetadata@gene_distribution_file_name
+        if (myAbundanceMetadata@txOut) {
+            calls_file_name <- myAbundanceMetadata@transcript_calls_file_name
+            cutoff_info_file_name <- myAbundanceMetadata@transcript_cutoff_file_name
+            distribution_file_name <- myAbundanceMetadata@transcript_distribution_file_name
+        }
+    
+        # generate pdf plot
+        pdf(file = file.path(output_path, distribution_file_name), 
+            width = 6, height = 5)
+        plot_distributions(abundance, selected_coding, 
+            selected_intergenic, abundance_cutoff, myUserMetadata)
+    
+        # generate cutoff info file
+        cutoff_info_file <- cutoff_info(counts = abundance, column = "call", abundance_cutoff = abundance_cutoff, 
+                                        r_cutoff = r_cutoff, myUserMetadata = myUserMetadata, 
+                                        myAbundanceMetadata = myAbundanceMetadata)
+        dev.off()
+        
+
+    
+        # Save calls and stats to output folder
+        calls_file_path <- file.path(output_path, calls_file_name)
+        cutoff_info_file_path <- file.path(output_path, 
+            cutoff_info_file_name)
+        write.table(abundance_without_intergenic, file = calls_file_path, 
+            quote = FALSE, sep = "\t", col.names = TRUE, 
+            row.names = FALSE)
+        write.table(t(t(cutoff_info_file)), file = cutoff_info_file_path, 
+            quote = FALSE, sep = "\t", col.names = FALSE, 
+            row.names = TRUE)
+        #save values of the Slots of the BgeeCall internal S4 objects
+        s4_summary_df <- as.data.frame(
+            generate_S4_object_properties_output(myAbundanceMetadata,
+                myBgeeMetadata,
+                myUserMetadata))
+        s4_slots_path <- file.path(output_path, "S4_slots_summary.tsv")
+        write.table(s4_summary_df, file = s4_slots_path, quote = FALSE, sep = "\t",
+                    col.names = TRUE, row.names = FALSE)    
+        calls_result <- list()
+        calls_result$calls_tsv_path <- calls_file_path
+        calls_result$cutoff_info_file_path <- cutoff_info_file_path
+        calls_result$abundance_tsv <- file.path(output_path, 
+            myAbundanceMetadata@abundance_file)
+        calls_result$TPM_distribution_path <- file.path(output_path, 
+            distribution_file_name)
+        calls_result$S4_slots_summary <- s4_slots_path
+        return(calls_result)
+        ## t(t(cutoff_info_file)) is a solution to export a
+        ## vector vertically
     }
 }
 

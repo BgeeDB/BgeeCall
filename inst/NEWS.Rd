@@ -29,9 +29,17 @@
 }
 \section{Version 1.4.0 (2020-04)}{
   \itemize{
-    \item add verbose slot in UserMetadata
-    \item add slots allowing not to rerun steps of the workflow. Do not rerun by default
-    \item update documentation
-    \item new functionalties when running BgeeCall from list of libraries
+    \item Add verbose slot in UserMetadata
+    \item Add slots allowing not to rerun steps of the workflow. Do not rerun by default
+    \item Update documentation
+    \item New functionalties when running BgeeCall from list of libraries
+  }
+}
+\section{Version 1.5.3 (2020-06)}{
+  \itemize{
+    \item Add function ```generate_slurm_indexes``` generating kallisto indexes on a cluster with slurm queing system
+    \item Add function ```generate_slurm_calls``` generating expression calls on a cluster with slurm queing system
+    \item Update documentation
+    \item Add ?BgeeCall documentation with link to main functions
   }
 }
