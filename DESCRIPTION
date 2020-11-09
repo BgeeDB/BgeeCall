@@ -1,7 +1,7 @@
 Package: BgeeCall
 Type: Package
 Title: Automatic RNA-Seq present/absent gene expression calls generation
-Version: 1.7.1
+Version: 1.7.2
 Date: 2020-06
 Authors@R: 
 	c(person("Julien", "Wollbrett", 
@@ -15,7 +15,7 @@ Description: BgeeCall allows to generate present/absent gene expression calls wi
     Calls are generated based on reference intergenic sequences. These sequences are generated based on expression of all RNA-Seq 
     libraries of each species integrated in Bgee (https://bgee.org).
 Depends: R (>= 3.6)
-Imports: GenomicFeatures, rhdf5, tximport, Biostrings, rtracklayer, biomaRt, jsonlite, methods, grDevices, graphics, stats, utils, rslurm
+Imports: GenomicFeatures, rhdf5, tximport, Biostrings, rtracklayer, biomaRt, jsonlite, methods, dplyr, grDevices, graphics, stats, utils, rslurm
 License: GPL-3
 URL: https://github.com/BgeeDB/BgeeCall
 BugReports: https://github.com/BgeeDB/BgeeCall/issues

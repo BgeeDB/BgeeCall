@@ -310,7 +310,21 @@ cutoff_info <- function(counts,
     return(to_export)
 }
 
-
+#' @title Generate theoretical pValue
+#'
+#' @description Uses reference intergenic to calculate a present/absent pValue.
+#' Then uses the pValue cutoff provided by user to generate present/absent calls
+#'
+#' @param counts A list of extimated counts
+#' @param pValueCutoff the pValue cutoff
+#'
+#' @return counts with zscore, pvalue and calls
+#'
+#' @noMd
+#' @noRd
+#' 
+#' @import dplyr
+#'
 generate_theoretical_pValue <- function(counts, pValueCutoff) {
     ## select values with TPM > 0 (because we will use log2 scale)
     selected_intergenic <- dplyr::filter(counts, abundance > 0 & type == "intergenic")
