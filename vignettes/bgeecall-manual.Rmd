@@ -297,11 +297,13 @@ When run IDs are selected, the name output directory combine the library ID and 
 
 #### Default pValue approach
 
-By default BgeeCall generate calls using a pValue approach. Genes are consider present if the pValue is lower or equal to 0.05. The pValue is calculated in two steps using these formula :
+By default BgeeCall generate calls using a pValue approach. In order to generate the pValue per gene id we compute the numerical measure, Z-score, that describes the value relationship to the mean. The Z-score measure is done in terms of standards deviations from the referent mean, in this case using a set of reference intergenic regions, as specified in the formula below:
 
 $$ zScore = \frac {log2(tpmValue) - mean(log2(IntergenicTpmValues))}{sd(log2(IntergenicTpmValues))} $$
+From the Z-score value, for each gene id, we compute a distribution of pValues using the following formula:
 
 $$ pValue = pnorm(zscore, lower.tail = FALSE) $$
+Genes are consider present if the pValue is lower or equal to 0.05.
 
 By default all genes with an abundance higher than 0 (i.e having at least one read mapped to a transcript) and with a pValue lower or equal to 0.05 are considered as present. Other genes are called absent.
 It is possible to modify the pValue cutoff. Be careful when editing this value as it has a big impact on your present absent.
@@ -315,7 +317,6 @@ kallisto <- new("KallistoMetadata", cutoff = 0.1)
 Expression calls can also be generated using a threshold of intergenic sequences called present. This approach was used to generate Bgee expression calls until release 14 with the formula :
 
 $$ \frac {proportion\ of\ reference\ intergenic\ present}{proportion\ of\ protein\ coding\ present} = 0.05 $$
-
 It is possible to change the cutoff value of this ratio.
 
 ```{r}
@@ -324,6 +325,14 @@ kallisto <- new("KallistoMetadata", cutoff_type = "intergenic")
 # use intergenic approach with cutoff ratio 0.01
 kallisto <- new("KallistoMetadata", cutoff_type = "intergenic", cutoff = 0.01)
 ```
+
+#### qValue threshold approach
+
+The expression calls can also be generated using the qValue approach. In this approach we perform a linear interpolation for each density region, genic and reference intergenic, followed by the numerical integration. Then for each unique abundance value (TPM) we integrate and scale across the region.
+After that, the correspondent qValue for each gene id is computed following the formula:
+
+
+$$ qValue = \frac {intergenic}{intergenic + genic} $$
 
 ### Run BgeeCall in quiet mode
 
