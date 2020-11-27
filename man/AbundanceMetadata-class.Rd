@@ -23,15 +23,19 @@ transcript ID if TRUE (default = FALSE)}
 
 \item{\code{cutoff_type}}{Defines the approach used to generate present/absent calls.
 default value is 'pValue', allowing calls to be generated using a pValue.
-Other possible value is 'intergenic' allowing to use a ratio of intergenic
-sequences considered as present as a threshold.}
+Other possible values are 'intergenic' allowing to use a ratio of intergenic
+sequences considered as present as a threshold, or use qValue allowing calls
+to be generated from a qValue.}
 
 \item{\code{cutoff}}{numeric value of the cutoff used to generate the present/absent
 calls. If value of the slot cutoff_type is 'pValue' this cutoff will correspond
 to the highest pValue allowing to define a gene as present. If value of the slot 
 cutoff_type is 'intergenic' this cutoff will correspond to the proportion of 
-intergenic present divided by proportion of protein coding present. The default
-value is 0.05. Be careful when modifying this value as it could have a huge impact 
+intergenic present divided by proportion of protein coding present. 
+If value of the slot cutoff_type is 'qValue' this cutoff will correspond to the
+highest qValue allowing to define a gene as present. The qValue is calculated
+based on the proportion of intergenic/(intergenic + genic) at each unique abundance value (TPM).
+The default value is 0.05. Be careful when modifying this value as it could have a huge impact 
 on present/absent calls.}
 
 \item{\code{full_transcriptome_file}}{Name of the fasta file containing both 

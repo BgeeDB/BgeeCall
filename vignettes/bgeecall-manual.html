@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian" />
+
+<meta name="date" content="2020-11-27" />
+
+<title>automatic RNA-Seq present/absent gene expression calls generation</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">automatic RNA-Seq present/absent gene expression calls generation</h1>
+<h4 class="author">Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian</h4>
+<h4 class="date">2020-11-27</h4>
+
+
+
+<p><code>BgeeCall</code> is a collection of functions that uses <a href="https://bgee.org/">Bgee</a> expertise to create RNA-Seq gene expression present/absent calls.</p>
+<p>The <code>BgeeCall</code> package allows to:</p>
+<ul>
+<li>Generate calls of presence/absence of expression at the gene level. You can generate these calls for any RNA-Seq samples as long as reference intergenic sequences have been generated by the Bgee team or by the Bgee community.</li>
+<li>Download reference intergenic sequences for species available in Bgee.</li>
+<li>Paralellize calls generation on a cluster with slurm queuing system.</li>
+<li>Merging calls from different libraries.</li>
+</ul>
+<p>If you find a bug or have any issues with <code>BgeeCall</code> please write a bug report in our <a href="https://github.com/BgeeDB/BgeeCall/issues">GitHub issues manager</a>.</p>
+<div id="how-presentabsent-calls-are-generated" class="section level2">
+<h2>How present/absent calls are generated</h2>
+<p>In Bgee RNA-Seq calls are generated using a threshold specific to each RNA-Seq library, calculated using reads mapped to reference intergenic regions. This is unlike the more usual use of an arbitrary threshold below which a gene is not considered as expressed (e.g log2(TPM) = 1).</p>
+<div id="bgee-database" class="section level3">
+<h3>Bgee database</h3>
+<p>Bgee is a database to retrieve and compare gene expression patterns in multiple animal species and produced from multiple data types (RNA-Seq, Affymetrix, in situ hybridization, and EST data). It notably integrates RNA-Seq libraries for 29 species.</p>
+</div>
+<div id="reference-intergenic-regions" class="section level3">
+<h3>Reference intergenic regions</h3>
+<p>Reference intergenic regions are defined in the <a href="https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq">Bgee RNA-Seq pipeline</a>. Candidate intergenic regions are defined using gene annotation data. For each species, over all available libraries, reads are mapped to these intergenic regions with <a href="https://github.com/pachterlab/kallisto">kallisto</a>, as well as to genes. This “intergenic expression” is deconvoluted to distinguish reference intergenic from non annotated genes, which have higher expression. Reference intergenic regions are then defined as intergenic regions with low expression level over all RNA-Seq libraries, relative to genes. This step allows not to consider regions wrongly considered as intergenic because of potential gene annotation quality problem as intergenic. For more information please refer to the <a href="https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq">Bgee RNA-Seq pipeline</a>.</p>
+</div>
+<div id="threshold-of-presentabsent" class="section level3">
+<h3>Threshold of present/absent</h3>
+<p>BgeeCall pipeline allows to download reference intergenic regions resulting from the expertise of the Bgee team. Moreover BgeeCall allows to use these reference intergenic regions to automatically generate calls for your own RNA-Seq libraries as long as the species is integrated to <a href="https://bgee.org/">Bgee</a>.</p>
+<p>By default BgeeCall calculate a pValue to define calls. By default genes are consider present if the pValue is lower or equal to 0.05. More information on this pValue and potential other approaches to generate the calls are available <a href="#cutoff_type">here</a></p>
+</div>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>In R:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>))</span>
+<span id="cb1-2"><a href="#cb1-2"></a>    <span class="kw">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a>BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;BgeeCall&quot;</span>)</span></code></pre></div>
+</div>
+<div id="how-to-use-the-bgeecall-package" class="section level2">
+<h2>How to use the BgeeCall package</h2>
+<p>BgeeCall is highly tunable. Do not hesitate to have a look at the reference manual to have a precise descripton of all slots of the 4 main S4 classes (AbundanceMetadata, KallistoMetadata, BgeeMetadata and UserMetadata) or of all available functions. BgeeCall needs kallisto to run. If you do not have kallisto installed you will find more information how to install it <a href="#install-kallisto">here</a></p>
+<div id="load-the-package" class="section level3">
+<h3>Load the package</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(BgeeCall)</span></code></pre></div>
+</div>
+<div id="quick-start" class="section level3">
+<h3>Quick start</h3>
+<p>With the BgeeCall package it is easy to generate present/absent gene expression calls. Generation of the kallisto transcriptome index can require a lot of time. As the time needed for this step depend on the size of the transcriptome we choose, as an example, the smallest transcriptome file among all species available on Bgee (C. elegans). To generate these calls you will need :</p>
+<ul>
+<li>a transcriptome</li>
+<li>gene annotations</li>
+<li>your RNA-Seq reads in fastq files</li>
+</ul>
+<p>For this vignette we created a toy fastq file example based on the SRX099901 RNA-Seq library using the <a href="http://bioconductor.org/packages/release/bioc/html/ShortRead.html">ShortRead</a> R package</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(<span class="st">&quot;ShortRead&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co"># keep 48.000 reads</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>sampler &lt;-<span class="st"> </span><span class="kw">FastqSampler</span>(<span class="kw">file.path</span>(<span class="st">&quot;absolute_path&quot;</span>,<span class="st">&quot;/SRX099901/SRR350955.fastq.gz&quot;</span>), <span class="dv">48000</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">set.seed</span>(<span class="dv">1</span>); SRR350955 &lt;-<span class="st"> </span><span class="kw">yield</span>(sampler)</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="kw">writeFastq</span>(<span class="dt">object =</span> SRR350955, </span>
+<span id="cb3-6"><a href="#cb3-6"></a>           <span class="dt">file =</span><span class="kw">file.path</span>( <span class="st">&quot;absolute_path&quot;</span>,<span class="st">&quot;SRX099901_subset&quot;</span>, <span class="st">&quot;SRR350955_subset.fastq.gz&quot;</span>), </span>
+<span id="cb3-7"><a href="#cb3-7"></a>           <span class="dt">mode =</span> <span class="st">&quot;w&quot;</span>, <span class="dt">full =</span> <span class="ot">FALSE</span>, <span class="dt">compress =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>In this example we used the Bioconductor AnnotationHub to load transcriptome and gene annotations but you can load them from wherever you want.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ah &lt;-<span class="st"> </span>AnnotationHub<span class="op">::</span><span class="kw">AnnotationHub</span>()</span>
+<span id="cb4-2"><a href="#cb4-2"></a>ah_resources &lt;-<span class="st"> </span>AnnotationHub<span class="op">::</span><span class="kw">query</span>(ah, <span class="kw">c</span>(<span class="st">&quot;Ensembl&quot;</span>, <span class="st">&quot;Caenorhabditis elegans&quot;</span>, <span class="st">&quot;84&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3"></a>annotation_object &lt;-<span class="st"> </span>ah_resources[[<span class="st">&quot;AH50789&quot;</span>]]</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># remove MtDNA not tag as C. elegans genome</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>annotation_object &lt;-<span class="st"> </span><span class="kw">dropSeqlevels</span>(annotation_object, <span class="st">&quot;MtDNA&quot;</span>, <span class="st">&quot;coarse&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>transcriptome_object &lt;-<span class="st"> </span>rtracklayer<span class="op">::</span><span class="kw">import.2bit</span>(ah_resources[[<span class="st">&quot;AH50453&quot;</span>]])</span></code></pre></div>
+<p>Once you have access to transcriptome, gene annotations and your RNA-Seq library, an object of class <code>UserMetadata</code> has to be created.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># create an object of class UserMetadata and specify the species ID</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;UserMetadata&quot;</span>, <span class="dt">species_id =</span> <span class="st">&quot;6239&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co"># import annotation and transcriptome in the user_BgeeCall object</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co"># it is possible to import them using an S4 object (GRanges, DNAStringSet) or a file (gtf, fasta)</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">setAnnotationFromObject</span>(user_BgeeCall, annotation_object, <span class="st">&quot;WBcel235_84&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">setTranscriptomeFromObject</span>(user_BgeeCall, transcriptome_object, <span class="st">&quot;WBcel235&quot;</span>)</span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co"># provide path to the directory of your RNA-Seq library</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">setRNASeqLibPath</span>(user_BgeeCall, </span>
+<span id="cb5-9"><a href="#cb5-9"></a>                                  <span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, </span>
+<span id="cb5-10"><a href="#cb5-10"></a>                                              <span class="st">&quot;SRX099901_subset&quot;</span>, </span>
+<span id="cb5-11"><a href="#cb5-11"></a>                                              <span class="dt">package =</span> <span class="st">&quot;BgeeCall&quot;</span>))</span></code></pre></div>
+<p>And that’s it… You can run the generation of your present/absent gene expression calls</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+<pre><code>#&gt; Querying Bgee to get intergenic release information...
+#&gt; Note: importing `abundance.h5` is typically faster than `abundance.tsv`
+#&gt; reading in files with read_tsv
+#&gt; 1 
+#&gt; summarizing abundance
+#&gt; summarizing counts
+#&gt; summarizing length
+#&gt; Note: importing `abundance.h5` is typically faster than `abundance.tsv`
+#&gt; reading in files with read_tsv
+#&gt; 1 
+#&gt; summarizing abundance
+#&gt; summarizing counts
+#&gt; summarizing length
+#&gt; Generate present/absent expression calls using pValuecutoff</code></pre>
+<p>Each analyze generates 5 files and return path to each one of them.</p>
+<ul>
+<li>calls_tsv_path : path to main tsv file with TPM, count, length, biotype, type, and presence/absence of expression summarized at gene level (or at the <a href="#transcript_level">transcript level</a> if it was requested)</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">head</span>(<span class="kw">read.table</span>(calls_output<span class="op">$</span>calls_tsv_path, <span class="dt">header =</span> <span class="ot">TRUE</span>), <span class="dt">n =</span> <span class="dv">5</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt;               id abundance counts  length        biotype  type    zScore</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; 1 WBGene00000001   27.0993      2 1556.20 protein_coding genic 1.6422092</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; 2 WBGene00000002    0.0000      0 1761.00 protein_coding genic        NA</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt; 3 WBGene00000003    0.0000      0 1549.00 protein_coding genic        NA</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt; 4 WBGene00000004   13.8730      1 1519.92 protein_coding genic 0.9143951</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt; 5 WBGene00000005    0.0000      0 1487.00 protein_coding genic        NA</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt;       pValue   call</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt; 1 0.05027333 absent</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt; 2         NA absent</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt; 3         NA absent</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt; 4 0.18025463 absent</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt; 5         NA absent</span></span></code></pre></div>
+<ul>
+<li>cutoff_info_file_path : path to tsv summary of the analyze containing the proportion of gene, protein coding and intergenic defined as expressed. It also contains the library ID and the present/absent TPM threshold</li>
+</ul>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">read.table</span>(calls_output<span class="op">$</span>cutoff_info_file_path)</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt;                             V1                 V2</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt; 1                    libraryId   SRX099901_subset</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; 2                    cutoffTPM            27.1747</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt; 3       proportionGenicPresent   17.8245677723828</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt; 4           numberGenicPresent               3928</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; 5                  numberGenic              22037</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; 6      proportionCodingPresent   19.1128282877684</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; 7          numberPresentCoding               3908</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt; 8                 numberCoding              20447</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt; 9  proportionIntergenicPresent 0.0233808744447042</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; 10     numberIntergenicPresent                  1</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt; 11            numberIntergenic               4277</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt; 12                pValueCutoff               0.05</span></span></code></pre></div>
+<ul>
+<li>abundance_tsv : path to tsv kallisto quant output file</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">head</span>(<span class="kw">read.table</span>(calls_output<span class="op">$</span>abundance_tsv, <span class="dt">header =</span> <span class="ot">TRUE</span>), <span class="dt">n =</span> <span class="dv">5</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt;    target_id length eff_length est_counts     tpm</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt; 1 Y110A7A.10   1787    1556.20          2 27.0993</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt; 2    F27C8.1   1940    1761.00          0  0.0000</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt; 3    F07C3.7   1728    1549.00          0  0.0000</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt; 4    F52H2.2   1739    1519.92          1 13.8730</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; 5 T13A10.10a   1734    1555.00          0  0.0000</span></span></code></pre></div>
+<ul>
+<li>TPM_distribution_path : path to plot in pdf reprensting density distribution of TPM values for all sequences, protein coding sequences, and intergenic sequences. The grey line corresponds to TPM threshold used to generate present/absent calls.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">openPDF</span>(calls_output<span class="op">$</span>TPM_distribution_path)</span></code></pre></div>
+<ul>
+<li>S4_slots_summary : path to tsv file containing a summary of values used for the most important slots of the three S4 classes (UserMetadata, KallistoMetadata, and BgeeMetadata).</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">read.table</span>(calls_output<span class="op">$</span>S4_slots_summary, <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt;                                     Slot.name</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt; 1                 AbundanceMetadata@tool_name</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt; 2                     AbundanceMetadata@txOut</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt; 3           AbundanceMetadata@ignoreTxVersion</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt; 4                    AbundanceMetadata@cutoff</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt; 5  AbundanceMetadata@read_size_kmer_threshold</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#&gt; 6             BgeeMetadata@intergenic_release</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt; 7                     UserMetadata@species_id</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co">#&gt; 8                     UserMetadata@reads_size</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co">#&gt; 9                UserMetadata@rnaseq_lib_path</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">#&gt; 10            UserMetadata@transcriptome_name</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="co">#&gt; 11               UserMetadata@annotation_name</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co">#&gt; 12           UserMetadata@simple_arborescence</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co">#&gt; 13                                 output_dir</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a><span class="co">#&gt;                                                                                                      Slot.value</span></span>
+<span id="cb12-17"><a href="#cb12-17"></a><span class="co">#&gt; 1                                                                                                      kallisto</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a><span class="co">#&gt; 2                                                                                                         FALSE</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co">#&gt; 3                                                                                                         FALSE</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="co">#&gt; 4                                                                                                          0.05</span></span>
+<span id="cb12-21"><a href="#cb12-21"></a><span class="co">#&gt; 5                                                                                                            50</span></span>
+<span id="cb12-22"><a href="#cb12-22"></a><span class="co">#&gt; 6                                                                                                           0.1</span></span>
+<span id="cb12-23"><a href="#cb12-23"></a><span class="co">#&gt; 7                                                                                                          6239</span></span>
+<span id="cb12-24"><a href="#cb12-24"></a><span class="co">#&gt; 8                                                                                                            51</span></span>
+<span id="cb12-25"><a href="#cb12-25"></a><span class="co">#&gt; 9                             /Users/sfonseca1/Documents/GitHub_projects/BgeeCall/inst/extdata/SRX099901_subset</span></span>
+<span id="cb12-26"><a href="#cb12-26"></a><span class="co">#&gt; 10                                                                                                     WBcel235</span></span>
+<span id="cb12-27"><a href="#cb12-27"></a><span class="co">#&gt; 11                                                                                                  WBcel235_84</span></span>
+<span id="cb12-28"><a href="#cb12-28"></a><span class="co">#&gt; 12                                                                                                         TRUE</span></span>
+<span id="cb12-29"><a href="#cb12-29"></a><span class="co">#&gt; 13 /Users/sfonseca1/Documents/GitHub_projects/BgeeCall/inst/extdata/intergenic_0.1/all_results/SRX099901_subset</span></span></code></pre></div>
+</div>
+<div id="generate-presentabsent-calls-for-more-than-one-rna-seq-library" class="section level3">
+<h3>Generate present/absent calls for more than one RNA-Seq library</h3>
+<p>You will potentialy be also interested to generate present/absent calls on different RNA-Seq libraries, potentially on different species, or using The main function <code>generate_presence_absence()</code> allows to generate present/absent calls from a UserMetadata object but also from a data frame or a tsv file depending on the arguments of the function you use. Please choose one of the three following arguments : - userMetadata : Allows to generate present/absent calls for one RNA-Seq library using one object of the class UserMetadata.<br />
+- userDataFrame : Provide a dataframe where each row correspond to one present/absent call generation. It allows to generate present/absent calls on different libraries, species, transcriptome, genome annotations, etc. - userFile : Similar to userDataFrame except that the information are stored in a tsv file. A template of this file called <code>userMetadataTemplate.tsv</code> is available at the root of the package.</p>
+<p>Columns of the dataframe or the tsv file are :</p>
+<ul>
+<li>species_id : The NCBI ID of the species.</li>
+<li>run_ids : The runs of the RNA-Seq library you want to use for the generation of the calls. Allows to generate expression calls for a subset of the runs of one RNA-Seq library as described in <a href="#run_ids">Generate calls for a subset of RNA-Seq runs</a>. If not interested by this option, leave the column empty.</li>
+<li>reads_size : The size of the reads of your RNA-Seq library.</li>
+<li>rnaseq_lib_path : Path to the directory containing all fastq files generated for this library. This directory can only contains single-end runs or paired-end runs.</li>
+<li>transcriptome_path : path to the transcriptome file.</li>
+<li>annotation_path : path to the genome annotation file. Works with GTF of GFF3 files.</li>
+<li>working_path : path to the working directory where results will be stored. Using the same working directory for different RNA-Seq libraries of the same species will allow to reuse previously generated data like the custom transcriptome index (generated from both transcriptome and reference intergenic sequences). By default the working path is defined by the <code>getwd()</code> function and correspond to the working directory of your R session. If not interested by this option, leave the column empty.</li>
+<li>output_directory : Both species results and RNA-Seq libraries results are by default stored at the same place using the value of the <code>working_path</code> column. However, this column allows you to define a different output_directory for RNA-Seq results. For instance it allows you to save calls information directly in the RNA-Seq directory. If not interested by this option, leave the column empty.</li>
+</ul>
+<p>Once the file has been fill in expression calls can be generated with :</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">userFile =</span> <span class="st">&quot;path_to_your_file.tsv&quot;</span>)</span></code></pre></div>
+</div>
+<div id="parallized-generation-of-presentabsent-calls-on-a-cluster" class="section level3">
+<h3>Parallized generation of present/absent calls on a cluster</h3>
+BgeeCall already implement everything you need to generate calls on a cluster if it uses slurm as queuing system. The same TSV file as described in the previous section will be used as input. In addition to tuning options available when running BgeeCall on your computer, It is possible to modify how slurm jobs are submitted. More information available in section <a href="#slurm_options">Modify slurm options</a> In order to optimize parallelization calls will be generated in 2 steps.<br />
+\itemize {
+
+Generate data at species level (e.g trancriptome with intergenic sequences, kallisto indexes)
+
+<p>Generate expression calls for each RNA-Seq libraries</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># generate kallisto indexes</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">generate_slurm_indexes</span>(<span class="dt">userFile =</span> <span class="st">&quot;path_to_your_file.tsv&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co"># generate expression calls</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="kw">generate_slurm_calls</span>(<span class="dt">userFile =</span> <span class="st">&quot;path_to_your_file.tsv&quot;</span>)</span></code></pre></div>
+</div>
+<div id="reference-intergenic-sequences" class="section level3">
+<h3>Reference intergenic sequences</h3>
+<div id="releases-of-reference-intergenic-sequences" class="section level4">
+<h4>Releases of reference intergenic sequences</h4>
+<p>Different releases of reference intergenic sequences are available. It is possible to list all these releases :</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">list_intergenic_release</span>()</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="co">#&gt; Downloading release information of reference intergenic sequences...</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="co">#&gt;     release releaseDate                             FTPURL</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="co">#&gt; 1       0.1  2018-12-21 ftp://ftp.bgee.org/intergenic/0.1/</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt; 2       0.2  2019-02-07 ftp://ftp.bgee.org/intergenic/0.2/</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="co">#&gt; 3 community  2019-07-22                                   </span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt; 4    custom  2019-07-22                                   </span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="co">#&gt;                                                    referenceIntergenicFastaURL</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="co">#&gt; 1 ftp://ftp.bgee.org/intergenic/0.1/ref_intergenic/SPECIES_ID_intergenic.fa.gz</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="co">#&gt; 2 ftp://ftp.bgee.org/intergenic/0.2/ref_intergenic/SPECIES_ID_intergenic.fa.gz</span></span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="co">#&gt; 3                                                                             </span></span>
+<span id="cb15-12"><a href="#cb15-12"></a><span class="co">#&gt; 4                                                                             </span></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="co">#&gt;   minimumVersionBgeeCall</span></span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="co">#&gt; 1                  0.9.9</span></span>
+<span id="cb15-15"><a href="#cb15-15"></a><span class="co">#&gt; 2                  0.9.9</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">#&gt; 3                  1.1.0</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="co">#&gt; 4                  1.1.0</span></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="co">#&gt;                                                                                                                                                                                                     description</span></span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="co">#&gt; 1                                                                                                                                                                  intergenic regions used to generate Bgee 14.</span></span>
+<span id="cb15-20"><a href="#cb15-20"></a><span class="co">#&gt; 2                                                                          cleaned intergenic sequences based on release 0.1 (remove blocks of Ns longer than 100 and sequences containing more than 5% of Ns).</span></span>
+<span id="cb15-21"><a href="#cb15-21"></a><span class="co">#&gt; 3                                                                           Release allowing to access to all reference intergenic sequences generated by the community and not present in Bgee for the moment.</span></span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="co">#&gt; 4 Release allowing to use your own FASTA reference intergenic sequences. When this release is selected BgeeCall will use the sequences at UserMetadata@custom_intergenic_path to generate present/absent calls.</span></span>
+<span id="cb15-23"><a href="#cb15-23"></a><span class="co">#&gt;                                                                            messageToUsers</span></span>
+<span id="cb15-24"><a href="#cb15-24"></a><span class="co">#&gt; 1                                                                                        </span></span>
+<span id="cb15-25"><a href="#cb15-25"></a><span class="co">#&gt; 2                         be careful, this intergenic release has not been tested by Bgee</span></span>
+<span id="cb15-26"><a href="#cb15-26"></a><span class="co">#&gt; 3 These reference intergenic sequences have not been generated by Bgee. Use with caution.</span></span>
+<span id="cb15-27"><a href="#cb15-27"></a><span class="co">#&gt; 4                              You decided to use your own reference intergenic sequences</span></span></code></pre></div>
+<p>It is then possible to choose one specific release to create a <code>BgeeMetadata</code> object. Always use the setter method <code>setIntergenicRelease()</code> when changing the release of an already existing BgeeMetadata object.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># create BgeeMetadata object and define one reference intergenic release</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>bgee &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;BgeeMetadata&quot;</span>, <span class="dt">intergenic_release =</span> <span class="st">&quot;0.1&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt; Querying Bgee to get intergenic release information...</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co"># change the reference intergenic release of your BgeeMetadata object</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>bgee &lt;-<span class="st"> </span><span class="kw">setIntergenicRelease</span>(bgee, <span class="st">&quot;0.2&quot;</span>)</span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt; IMPORTANT : be careful, this intergenic release has not been tested by Bgee</span></span></code></pre></div>
+<p>By default the reference intergenic release used when a <code>BgeeMetadata</code> object is created is the last stable one created by the Bgee team.</p>
+</div>
+<div id="core-reference-intergenic-from-bgee" class="section level4">
+<h4>Core reference intergenic from Bgee</h4>
+<p><code>Core reference intergenic</code> releases are created by the Bgee team when a lot of new RNA-Seq libraries have been manually curated for already existing species and/or for new species. These releases are the only ones with a release number (e.g “0.1”). Each of these releases contains reference intergenic sequences for a list of species. Bgee reference intergenic sequences have been generated using Bgee team expertise. The RNA-Seq libraries were manually curated as healthy and wild type. Quality Control have been done along all steps of generation of these sequences. Reference intergenic sequences have been selected from all potential intergenic regions (see <a href="https://github.com/BgeeDB/bgee_pipeline/tree/master/pipeline/RNA_Seq">Bgee pipeline</a>). BgeeCall allows to generate gene expression call from Bgee reference intergenic sequences for any RNA-Seq libraries as long as these sequences have been generated by the Bgee team. A tsv file containing all species available for current release of reference intergenic is available <a href="ftp://ftp.bgee.org/intergenic/current/species_info.tsv">here</a>. This file also contains a column describing the number of RNA-Seq libraries used to generated the reference intergenic sequences of each species. It is also possible to list in R all species for which Bgee reference intergenic sequences have been created :</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">list_bgee_ref_intergenic_species</span>(<span class="dt">myBgeeMetadata =</span> bgee)</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="co">#&gt;    speciesId              speciesName numberOfLibraries   genomeVersion</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt; 1       9606             Homo sapiens              5026       GRCh38.p5</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt; 2      10090             Mus musculus               133       GRCm38.p4</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#&gt; 3       9544           Macaca mulatta                90         MMUL1.0</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="co">#&gt; 4       7955              Danio rerio                67          GRCz10</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a><span class="co">#&gt; 5       8364       Xenopus tropicalis                66          JGI4.2</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a><span class="co">#&gt; 6       6239   Caenorhabditis elegans                50        WBcel235</span></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="co">#&gt; 7       9031            Gallus gallus                45         Galgal4</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="co">#&gt; 8      10116        Rattus norvegicus                36        Rnor_6.0</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a><span class="co">#&gt; 9       9913               Bos taurus                33          UMD3.1</span></span>
+<span id="cb17-12"><a href="#cb17-12"></a><span class="co">#&gt; 10     13616    Monodelphis domestica                19         monDom5</span></span>
+<span id="cb17-13"><a href="#cb17-13"></a><span class="co">#&gt; 11      9258 Ornithorhynchus anatinus                17           OANA5</span></span>
+<span id="cb17-14"><a href="#cb17-14"></a><span class="co">#&gt; 12      7240      Drosophila simulans                17 GCA_000259055.1</span></span>
+<span id="cb17-15"><a href="#cb17-15"></a><span class="co">#&gt; 13      9598          Pan troglodytes                15      CHIMP2.1.4</span></span>
+<span id="cb17-16"><a href="#cb17-16"></a><span class="co">#&gt; 14      7237 Drosophila pseudoobscura                14 GCA_000001765.2</span></span>
+<span id="cb17-17"><a href="#cb17-17"></a><span class="co">#&gt; 15      7227  Drosophila melanogaster                14           BDGP6</span></span>
+<span id="cb17-18"><a href="#cb17-18"></a><span class="co">#&gt; 16      9593          Gorilla gorilla                13       gorGor3.1</span></span>
+<span id="cb17-19"><a href="#cb17-19"></a><span class="co">#&gt; 17      9597             Pan paniscus                12      CHIMP2.1.4</span></span>
+<span id="cb17-20"><a href="#cb17-20"></a><span class="co">#&gt; 18      9823               Sus scrofa                10     Sscrofa10.2</span></span>
+<span id="cb17-21"><a href="#cb17-21"></a><span class="co">#&gt; 19     10141          Cavia porcellus                 9 Felis_catus_6.2</span></span>
+<span id="cb17-22"><a href="#cb17-22"></a><span class="co">#&gt; 20      9685              Felis catus                 9         cavPor3</span></span>
+<span id="cb17-23"><a href="#cb17-23"></a><span class="co">#&gt; 21      7230    Drosophila mojavensis                 8         EquCab2</span></span>
+<span id="cb17-24"><a href="#cb17-24"></a><span class="co">#&gt; 22      9796           Equus caballus                 8 GCA_000005175.1</span></span>
+<span id="cb17-25"><a href="#cb17-25"></a><span class="co">#&gt; 23      9986    Oryctolagus cuniculus                 6         eriEur1</span></span>
+<span id="cb17-26"><a href="#cb17-26"></a><span class="co">#&gt; 24      9615   Canis lupus familiaris                 6       CanFam3.1</span></span>
+<span id="cb17-27"><a href="#cb17-27"></a><span class="co">#&gt; 25      9365      Erinaceus europaeus                 6       OryCun2.0</span></span>
+<span id="cb17-28"><a href="#cb17-28"></a><span class="co">#&gt; 26      7244       Drosophila virilis                 4 GCA_000005245.1</span></span>
+<span id="cb17-29"><a href="#cb17-29"></a><span class="co">#&gt; 27     28377      Anolis carolinensis                 4       AnoCar2.0</span></span>
+<span id="cb17-30"><a href="#cb17-30"></a><span class="co">#&gt; 28      7217     Drosophila ananassae                 4 GCA_000005975.1</span></span>
+<span id="cb17-31"><a href="#cb17-31"></a><span class="co">#&gt; 29      7245        Drosophila yakuba                 4 GCA_000005115.1</span></span></code></pre></div>
+</div>
+<div id="community-reference-intergenic" class="section level4">
+<h4>Community reference intergenic</h4>
+<p>If you want to use BgeeCall on a species for which Bgee does not provide reference intergenic sequences you have the possibility to create them by yourself and share them with the Bgee community by following all steps of <a href="https://github.com/BgeeDB/reference_intergenic_standalone#protocol-to-generate-reference-intergenic-sequences">this tutorial</a>. Do not forget that the number of RNA-Seq libraries is a key point to the generation of precise reference intergenic sequences. It is possible to list in R all species for which reference intergenic sequences have been created by the community using the following code</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">list_community_ref_intergenic_species</span>()</span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt;   speciesId numberOfLibraries annotationVersion genomeVersion kallistoVersion</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt; 1     10036                15         MesAur1.0     MesAur1.0          0.46.0</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="co">#&gt; 2     13686               243            Si_gnG        Si_gnG          0.44.0</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt;                                                                                      url</span></span>
+<span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt; 1 https://zenodo.org/api/files/f46c7de0-d9a5-4ffd-a30e-4b08121ba446/ref_intergenic.fa.gz</span></span>
+<span id="cb18-7"><a href="#cb18-7"></a><span class="co">#&gt; 2 https://zenodo.org/api/files/5492ff2f-91a3-4101-8d67-78b8f8625cc6/ref_intergenic.fa.gz</span></span></code></pre></div>
+<p>If reference intergenic sequences of the species you are interested in are available only from the community release it is then possible to use this release to generate your present/absent calls</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># create a BgeeMetadata object using the community release</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>bgee &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;BgeeMetadata&quot;</span>, <span class="dt">intergenic_release =</span> <span class="st">&quot;community&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">bgeeMetadata =</span> bgee, <span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+</div>
+<div id="your-own-reference-intergenic" class="section level4">
+<h4>Your own reference intergenic</h4>
+<p>If you generated your own reference intergenic sequences follwowing <a href="https://github.com/BgeeDB/reference_intergenic_standalone#protocol-to-generate-reference-intergenic-sequences">this tuorial</a> but did not share them for the moment (do not forget to do it…), it is also possible to use BgeeCall with a file containing the sequences. In this case you need to select the custom release and provide the path to the file containing reference intergenic sequences :</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>bgee &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;BgeeMetadata&quot;</span>, <span class="dt">intergenic_release =</span> <span class="st">&quot;custom&quot;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2"></a>user_BgeeCall<span class="op">@</span>custom_intergenic_path =<span class="st"> &quot;path/to/custom/ref_intergenic.fa.gz&quot;</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">bgeeMetadata =</span> bgee, <span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+</div>
+</div>
+<div id="generate-presentabsent-calls-at-transcript-level-beta-version" class="section level3">
+<h3><a name="transcript_level"></a>Generate present/absent calls at transcript level (beta version)</h3>
+<p>kallisto generates TPMs at the transcript level. In the Bgee pipeline we summarize this expression at the gene level to calculate our present/absent calls. In <code>BgeeCall</code> it is now possible to generate present/absent calls at the transcript level. Be careful when using this feature as it has not been tested for the moment. To generate such calls you only have to create one object of the class <code>KallistoMetadata</code> and edit the value of one attribute</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">txOut =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb21-2"><a href="#cb21-2"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">myAbundanceMetadata =</span> kallisto, <span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+</div>
+<div id="tune-how-to-use-kallisto" class="section level3">
+<h3>Tune how to use kallisto</h3>
+<div id="install-kallisto" class="section level4">
+<h4>Download or reuse your own kallisto</h4>
+<p>By default <code>BgeeCall</code> suppose that kallisto is installed. If kallisto is not installed on your computer you can either :</p>
+<ul>
+<li>let BgeeCall automatically download the version 0.45 of kallisto. BgeeCall will use it to quantify abundance of transcripts. It will only be used by this package and will have no impact on your potential already existing version of kallisto.</li>
+</ul>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">download_kallisto =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">myAbundanceMetadata =</span> kallisto, <span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+<ul>
+<li>You can download and install kallisto by following the instructions on the official website : <a href="http://pachterlab.github.io/kallisto/download" class="uri">http://pachterlab.github.io/kallisto/download</a></li>
+</ul>
+</div>
+<div id="edit-kallisto-quant-attributes" class="section level4">
+<h4>Edit kallisto quant attributes</h4>
+<p>By default kallisto is run with the same parameters that we use in the RNA-Seq Bgee pipeline:</p>
+<ul>
+<li>single end : “-t 1 –single -l 180 -s 30 –bias”</li>
+<li>paired end : “-t 1 –bias”</li>
+</ul>
+<p>It is possible to modify them and use your favourite kallisto parameters</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">single_end_parameters =</span> <span class="st">&quot;-t 3 --single -l 150 -s 30&quot;</span>, <span class="dt">pair_end_parameters =</span> <span class="st">&quot;-t 2 -b --seed 36&quot;</span>)</span>
+<span id="cb23-2"><a href="#cb23-2"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">myAbundanceMetadata =</span> kallisto, <span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+</div>
+<div id="choose-between-two-kmer-size" class="section level4">
+<h4>Choose between two kmer size</h4>
+<p>By default 2 indexes with 2 different kmer sizes can be used by <code>BgeeCall</code> The default kmer size of kallisto (31) is used for libraries with reads length equal or larger than 50 bp. A kmer size of 15 is used for libraries with reads length smaller than 50 bp. We decided not to allow to tune kmers size because the generation of the index is time consuming and index generation takes even more time with small kmers size (&lt; 15bp). However it is possible to modify the threshold of read length allowing to choose between default and small kmer size.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># libraries with reads smaller than 70bp will use the index with kmer size = 15</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">read_size_kmer_threshold =</span> <span class="dv">70</span>)</span>
+<span id="cb24-3"><a href="#cb24-3"></a>calls_output &lt;-<span class="st"> </span><span class="kw">generate_calls_workflow</span>(<span class="dt">myAbundanceMetadata =</span> kallisto, <span class="dt">userMetadata =</span> user_BgeeCall)</span></code></pre></div>
+</div>
+</div>
+<div id="generate-calls-for-a-subset-of-rna-seq-runs" class="section level3">
+<h3><a name="run_ids"></a>Generate calls for a subset of RNA-Seq runs</h3>
+<p>By default gene expression calls are generated using all runs of the RNA-Seq library. It is possible to select only a subset of these runs.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># RNA-Seq run SRR350955_subsetof from the RNA-Seq library will be used to generate the calls</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">setRunIds</span>(user_BgeeCall, <span class="kw">c</span>(<span class="st">&quot;SRR350955_subset&quot;</span>))</span>
+<span id="cb25-3"><a href="#cb25-3"></a>calls_output &lt;-<span class="st"> </span><span class="kw">run_from_object</span>(<span class="dt">myUserMetadata =</span> user_BgeeCall)</span></code></pre></div>
+<p>When run IDs are selected, the name output directory combine the library ID and all selected run IDs. In our example the expression calls will be stored in the directory <code>SRX099901_SRR350955_subset</code>.</p>
+</div>
+<div id="cutoff_type" class="section level3">
+<h3>Modify present/absent threshold</h3>
+<div id="default-pvalue-approach" class="section level4">
+<h4>Default pValue approach</h4>
+<p>By default BgeeCall generate calls using a pValue approach. In order to generate the pValue per gene id we compute the numerical measure, Z-score, that describes the value relationship to the mean. The Z-score measure is done in terms of standards deviations from the referent mean, in this case using a set of reference intergenic regions, as specified in the formula below:</p>
+<p><span class="math display">\[ zScore = \frac {log2(tpmValue) - mean(log2(IntergenicTpmValues))}{sd(log2(IntergenicTpmValues))} \]</span> From the Z-score value, for each gene id, we compute a distribution of pValues using the following formula:</p>
+<p><span class="math display">\[ pValue = pnorm(zscore, lower.tail = FALSE) \]</span> Genes are consider present if the pValue is lower or equal to 0.05.</p>
+<p>By default all genes with an abundance higher than 0 (i.e having at least one read mapped to a transcript) and with a pValue lower or equal to 0.05 are considered as present. Other genes are called absent. It is possible to modify the pValue cutoff. Be careful when editing this value as it has a big impact on your present absent.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">cutoff =</span> <span class="fl">0.1</span>)</span></code></pre></div>
+</div>
+<div id="intergenic-threshold-approach" class="section level4">
+<h4>Intergenic threshold approach</h4>
+<p>Expression calls can also be generated using a threshold of intergenic sequences called present. This approach was used to generate Bgee expression calls until release 14 with the formula :</p>
+<p><span class="math display">\[ \frac {proportion\ of\ reference\ intergenic\ present}{proportion\ of\ protein\ coding\ present} = 0.05 \]</span> It is possible to change the cutoff value of this ratio.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># use intergenic approach with default cutoff ratio 0.05</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">cutoff_type =</span> <span class="st">&quot;intergenic&quot;</span>)</span>
+<span id="cb27-3"><a href="#cb27-3"></a><span class="co"># use intergenic approach with cutoff ratio 0.01</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a>kallisto &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">cutoff_type =</span> <span class="st">&quot;intergenic&quot;</span>, <span class="dt">cutoff =</span> <span class="fl">0.01</span>)</span></code></pre></div>
+</div>
+<div id="qvalue-threshold-approach" class="section level4">
+<h4>qValue threshold approach</h4>
+<p>The expression calls can also be generated using the qValue approach. In this approach we perform a linear interpolation for each density region, genic and reference intergenic, followed by the numerical integration. Then for each unique abundance value (TPM) we integrate and scale across the region. After that, the correspondent qValue for each gene id is computed following the formula:</p>
+<p><span class="math display">\[ qValue = \frac {intergenic}{intergenic + genic} \]</span></p>
+</div>
+</div>
+<div id="run-bgeecall-in-quiet-mode" class="section level3">
+<h3>Run BgeeCall in quiet mode</h3>
+<p>By default BgeeCall write output messages for all parts of the workflow. It is possible not to write any messages by changing the value of the slot verbose in the UserMetadata object. By default this value is set to true but it is possible to change it to false with this line :</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>user_BgeeCall<span class="op">@</span>verbose &lt;-<span class="st"> </span><span class="ot">FALSE</span></span></code></pre></div>
+</div>
+<div id="do-not-rerun-parts-of-the-pipeline" class="section level3">
+<h3>Do not rerun parts of the pipeline</h3>
+<p>Generation of present/absent expression calls is done in several steps. It is possible to force overwritting already existing intermediary files : - overwrite_index : slot of the object KallistoMetadata. The value has to be a logical. If FALSE (default), the index generation step is skiped if one index already exists. If TRUE, the kallisto index will be generated even if one index already exists. - overwrite_quant : slot of the object KallistoMetadata. The value has to be a logical. If FALSE (default), the kallisto quantification step is skiped if a quantification file already exists. If TRUE, the kallisto quantification step will be run even if a quantification file already exists. - overwrite_calls : slot of the object KallistoMetadata. The value has to be a logical. If FALSE, the generation of present/absent calls is skiped if an index already exists. If TRUE (default), the generation of present/absent calls will be run even if calls were already generated.</p>
+</div>
+<div id="generate-calls-with-a-simple-arborescence-of-directories" class="section level3">
+<h3>Generate calls with a simple arborescence of directories</h3>
+<p>By default the arborescence of directories created by <code>BgeeCall</code> is as simple as possible. the results will be created using the path <code>working_path/intergenic_release/all_results/libraryId</code>. Generating present/absent gene expression calls for the same RNA-Seq library using different transcriptome or annotation versions using this arborescence will overwrite previous results. The <code>UserMetadata</code> class has an attribute <code>simple_arborescence</code> that is <code>TRUE</code> by default. If <code>FALSE</code>, a complexe arborescence of directories containing the name of the annotation and transcriptome files will be created. This complex arborescence will then allow to generate present/absent calls for the same library using different version of transcriptome or annotaiton.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">setSimpleArborescence</span>(<span class="dt">userObject =</span> user_BgeeCall, <span class="dt">simpleArborescence =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb29-2"><a href="#cb29-2"></a>calls_output &lt;-<span class="st"> </span><span class="kw">run_from_object</span>(<span class="dt">myUserMetadata =</span> user_BgeeCall)</span></code></pre></div>
+</div>
+<div id="change-directory-where-calls-are-saved" class="section level3">
+<h3>Change directory where calls are saved</h3>
+<p>By default directories used to save present/absent calls are subdirectories of <code>UserMetadata@working_path</code>. However it is possible to select the directory where you want the calls to be generated.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>user_BgeeCall &lt;-<span class="st"> </span><span class="kw">setOutputDir</span>(user_BgeeCall, <span class="st">&quot;path/to/calls/for/this/library/&quot;</span>)</span></code></pre></div>
+<p>This output directory will only contains results generated at the RNA-Seq library level. All data generated at species level are still stored using the <code>UserMetadata@working_path</code>. They can then still be reused to generate calls from other libraries of the same species.</p>
+</div>
+<div id="modify-slurm-options" class="section level3">
+<h3><a name="slurm_options"></a>Modify slurm options</h3>
+<p>Two functions are available to run BgeeCall on a slurm queuing system. Parameters described below are available for both of them.</p>
+<div id="number-of-jobs" class="section level4">
+<h4>Number of jobs</h4>
+<p>The full idea of using a cluster is to parallelize your jobs. By default 10 jobs are run at the same time. It is possible to modify this number with the parameter <code>nodes</code>.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># run 50 jobs in parallel</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a><span class="kw">generate_slurm_indexes</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/file.tsv&quot;</span>, <span class="dt">nodes =</span> <span class="dv">50</span>)</span></code></pre></div>
+</div>
+<div id="do-not-submit-the-jobs" class="section level4">
+<h4>Do not submit the jobs</h4>
+<p>In order to be able to check files automatically generated to run the jobs it is possible to generate these files without submiting your jobs. More information on created files are available on the vignette of the (<a href="https://cran.r-project.org/web/packages/rslurm/vignettes/rslurm.html" class="uri">https://cran.r-project.org/web/packages/rslurm/vignettes/rslurm.html</a>)[rslurm package].</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># create temporary files but do not submit the jobs</span></span>
+<span id="cb32-2"><a href="#cb32-2"></a><span class="kw">generate_slurm_indexes</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/file.tsv&quot;</span>, <span class="dt">submit =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+</div>
+<div id="modify-slurm-options-1" class="section level4">
+<h4>Modify slurm options</h4>
+<p>A bash scirpt is automatically created to run the jobs. This script contains default slurm options (array, cpus-per-task, job-name, output). All other slurm options recognized by the sbatch command can be updated b creating a named list where name correspond to long name of options (e.g do not use ‘p’ but ‘partition’).</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># add slurm options to the sbatch script</span></span>
+<span id="cb33-2"><a href="#cb33-2"></a>slurm_options_index &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">account =</span> <span class="st">&quot;account&quot;</span>, <span class="dt">time =</span> <span class="st">&quot;2:00:00&quot;</span>, <span class="dt">partition =</span> <span class="st">&quot;partition&quot;</span>, <span class="dt">mem =</span> <span class="st">&quot;30G&quot;</span>)</span>
+<span id="cb33-3"><a href="#cb33-3"></a><span class="kw">generate_slurm_indexes</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/file.tsv&quot;</span>, <span class="dt">slurm_options =</span> slurm_options_index)</span></code></pre></div>
+</div>
+<div id="add-modules-to-your-environment" class="section level4">
+<h4>Add modules to your environment</h4>
+<p>In some cluster programs are not loaded by default. The modules parameter allows to load them by adding one line in the sbatch script. This option has been implemented to add modules but could potentially be used to add any custom line of code in the sbatch script.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="co"># load R 3.6.1 and kallisto in a cluster environment where software has to loaded manually</span></span>
+<span id="cb34-2"><a href="#cb34-2"></a>modules &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;module add R/3.6.1;&quot;</span>, <span class="st">&quot;module add kallisto;&quot;</span>)</span>
+<span id="cb34-3"><a href="#cb34-3"></a><span class="kw">generate_slurm_indexes</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/file.tsv&quot;</span>, <span class="dt">modules =</span> modules)</span></code></pre></div>
+</div>
+<div id="modify-bgeecall-objects" class="section level4">
+<h4>Modify BgeeCall objects</h4>
+<p>By default except for columns present in the tsv file all other slots of the 3 BgeeCall classes will use default values. In order to tune these parameters it is possible to create the objects and pass them to the slurm functions.  When generating these objects it is mandatory to keep the same name as in the example below.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># create BgeeCall objects and use them to generate indexes</span></span>
+<span id="cb35-2"><a href="#cb35-2"></a>kallistoMetadata &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;KallistoMetadata&quot;</span>, <span class="dt">download_kallisto=</span><span class="ot">TRUE</span>)</span>
+<span id="cb35-3"><a href="#cb35-3"></a>userMetadata &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;UserMetadata&quot;</span>, <span class="dt">working_path =</span> <span class="st">&quot;/path/to/working/dir&quot;</span>)</span>
+<span id="cb35-4"><a href="#cb35-4"></a>bgeeMetadata &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;BgeeMetadata&quot;</span>, <span class="dt">intergenic_release =</span> <span class="st">&quot;0.1&quot;</span>)</span>
+<span id="cb35-5"><a href="#cb35-5"></a><span class="kw">generate_slurm_indexes</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/file.tsv&quot;</span>, <span class="dt">kallistoMetadata =</span> kallistoMetadata, <span class="dt">bgeeMetadata =</span> bgeeMetadata, <span class="dt">userMetadata =</span> userMetadata)</span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="merging-multiple-libraries" class="section level2">
+<h2>Merging multiple libraries</h2>
+<p>In the BgeeCall package we have the possibility to perform calls of expression by merging/combine multiple libraries that belongs to a particular condition. In order to use this functionality, the calls at individual library need to be done by using the p-value or q-value approach, since this approaches provide for each <span class="math inline">\(gene_i\)</span> a quantitative metric.</p>
+<p>If the calls of expression genes, at individual library, was done using the pValue approach, then the merging will be done by using the Benjamini &amp; Hochberg method.</p>
+<p>For this method a set of pValues are collected, for each <span class="math inline">\(gene_i\)</span> across <span class="math inline">\(n\)</span> libraries, and then the referent p.adjusted values are computed. To call expressed genes in the merging, we verify if one of the p.adjusted values is lower then the cutoff (threshold value provided by the user), if yes, the <span class="math inline">\(gene_i\)</span> is classified as present for the condition, otherwise is absent.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>mergingLibraries &lt;-<span class="st"> </span><span class="kw">merging_libraries</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/userFile.tsv&quot;</span>, <span class="dt">approach =</span> <span class="st">&quot;BH&quot;</span>, <span class="dt">condition =</span> <span class="st">&quot;species_id&quot;</span>, <span class="dt">cutoff =</span> <span class="fl">0.05</span>, <span class="dt">outDir =</span> <span class="st">&quot;path/to/output_directory/&quot;</span>)</span></code></pre></div>
+<p>On the other side, if the approach used to call expressed genes, at individual library, was the qValue, then the merging will be done by using the inverse fdr correction, this means by applying the correspondent formula:</p>
+<p><span class="math display">\[ FDR_{inverse} = (1-((1-q)^{(\frac {1}{n})})) \]</span> where <span class="math inline">\(q\)</span> is the desired cut-off (threshold value provided by the user) and <span class="math inline">\(n\)</span> is the number of libraries.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="co"># merging libraries</span></span>
+<span id="cb37-2"><a href="#cb37-2"></a>mergingLibraries &lt;-<span class="st"> </span><span class="kw">merging_libraries</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/userFile.tsv&quot;</span>, <span class="dt">approach =</span> <span class="st">&quot;fdr_inverse&quot;</span>, <span class="dt">condition =</span> <span class="st">&quot;species_id&quot;</span>, <span class="dt">cutoff =</span> <span class="fl">0.05</span>, <span class="dt">outDir =</span> <span class="st">&quot;path/to/output_directory/&quot;</span>)</span></code></pre></div>
+<p>To call expressed genes in the merging condition, we verify if one of the libraries have a q-Value lower then the FDR_inverse, if yes, the <span class="math inline">\(gene_i\)</span> is classified as present, otherwise is classified as absent.</p>
+<div id="arguments-and-user-file-to-perform-the-merging" class="section level3">
+<h3>Arguments and user file to perform the merging</h3>
+<p>In the merging_libraries() function, different parameters need to be passed to the referent arguments: userFile, approach, condition, cutoff or outDir.</p>
+<p>In the userFile argument a path to a text file containing all information about the target libraries to be merged. This file should contain a fundamental column called: specied_id in order to run the merging_libraries() function. This column should not be empty and also an important request is that you should have at least 2 libraries to be processed, since this is a merging process.</p>
+<p>If you want to merge/combine libraries for a more detailed condition you need to add the correspondent extra columns to your user file. Note that the argument condition recognize the following parameters: specied_id, anatEntity, devStage, sex and strain. This means that your table columns also should have the same ID. The order of the columns are not relevant when the user file is structured, as well as, the order of the parameters passed to the condition argument.</p>
+<p>Is always recommended to use “-” instead of empty rows when some information is missing, as represented in the <strong>BgeeCall/inst/userMetadataTemplate_merging.tsv</strong></p>
+<p>The argument approach allow to specify the method that will be used to make the calls of expression in the merging libraries, and as described before, the condition argument will allow to specify the particular condition of interest, the condition argument allow to target the correspondent libraries where the merging will occur.</p>
+<p>More restricted cut-off can be applied to call expressed genes in the merging libraries for a target condition, for this the cutoff argument can be modified, otherwise by default is 0.05.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a></span>
+<span id="cb38-2"><a href="#cb38-2"></a><span class="co"># merging libraries where p-values were calculated</span></span>
+<span id="cb38-3"><a href="#cb38-3"></a>mergingLibraries_pValue &lt;-<span class="st"> </span><span class="kw">merging_libraries</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/userFile.tsv&quot;</span>, <span class="dt">approach =</span> <span class="st">&quot;BH&quot;</span>, <span class="dt">condition =</span> <span class="kw">c</span>(<span class="st">&quot;species_id&quot;</span>, <span class="st">&quot;anatEntity&quot;</span>, <span class="st">&quot;strain&quot;</span>), <span class="dt">cutoff =</span> <span class="fl">0.005</span>, <span class="dt">outDir =</span> <span class="st">&quot;path/to/output_directory/&quot;</span>)</span>
+<span id="cb38-4"><a href="#cb38-4"></a></span>
+<span id="cb38-5"><a href="#cb38-5"></a><span class="co"># merging libraries where q-values were calculated</span></span>
+<span id="cb38-6"><a href="#cb38-6"></a>mergingLibraries_qValue &lt;-<span class="st"> </span><span class="kw">merging_libraries</span>(<span class="dt">userFile =</span> <span class="st">&quot;path/to/userFile.tsv&quot;</span>, <span class="dt">approach =</span> <span class="st">&quot;fdr_inverse&quot;</span>, <span class="dt">condition =</span> <span class="kw">c</span>(<span class="st">&quot;species_id&quot;</span>, <span class="st">&quot;devStage&quot;</span> ,<span class="st">&quot;anatEntity&quot;</span>, <span class="st">&quot;strain&quot;</span>), <span class="dt">cutoff =</span> <span class="fl">0.001</span>, <span class="dt">outDir =</span> <span class="st">&quot;path/to/output_directory/&quot;</span>)</span></code></pre></div>
+<p>#Session Info</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="kw">sessionInfo</span>()</span>
+<span id="cb39-2"><a href="#cb39-2"></a><span class="co">#&gt; R version 4.0.0 (2020-04-24)</span></span>
+<span id="cb39-3"><a href="#cb39-3"></a><span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span></span>
+<span id="cb39-4"><a href="#cb39-4"></a><span class="co">#&gt; Running under: macOS High Sierra 10.13.6</span></span>
+<span id="cb39-5"><a href="#cb39-5"></a><span class="co">#&gt; </span></span>
+<span id="cb39-6"><a href="#cb39-6"></a><span class="co">#&gt; Matrix products: default</span></span>
+<span id="cb39-7"><a href="#cb39-7"></a><span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib</span></span>
+<span id="cb39-8"><a href="#cb39-8"></a><span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib</span></span>
+<span id="cb39-9"><a href="#cb39-9"></a><span class="co">#&gt; </span></span>
+<span id="cb39-10"><a href="#cb39-10"></a><span class="co">#&gt; locale:</span></span>
+<span id="cb39-11"><a href="#cb39-11"></a><span class="co">#&gt; [1] C/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span></span>
+<span id="cb39-12"><a href="#cb39-12"></a><span class="co">#&gt; </span></span>
+<span id="cb39-13"><a href="#cb39-13"></a><span class="co">#&gt; attached base packages:</span></span>
+<span id="cb39-14"><a href="#cb39-14"></a><span class="co">#&gt; [1] parallel  stats4    stats     graphics  grDevices utils     datasets </span></span>
+<span id="cb39-15"><a href="#cb39-15"></a><span class="co">#&gt; [8] methods   base     </span></span>
+<span id="cb39-16"><a href="#cb39-16"></a><span class="co">#&gt; </span></span>
+<span id="cb39-17"><a href="#cb39-17"></a><span class="co">#&gt; other attached packages:</span></span>
+<span id="cb39-18"><a href="#cb39-18"></a><span class="co">#&gt; [1] rtracklayer_1.48.0   GenomicRanges_1.40.0 GenomeInfoDb_1.24.2 </span></span>
+<span id="cb39-19"><a href="#cb39-19"></a><span class="co">#&gt; [4] IRanges_2.22.2       S4Vectors_0.26.1     BiocGenerics_0.34.0 </span></span>
+<span id="cb39-20"><a href="#cb39-20"></a><span class="co">#&gt; [7] BgeeCall_1.7.2      </span></span>
+<span id="cb39-21"><a href="#cb39-21"></a><span class="co">#&gt; </span></span>
+<span id="cb39-22"><a href="#cb39-22"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span id="cb39-23"><a href="#cb39-23"></a><span class="co">#&gt;   [1] bitops_1.0-6                  matrixStats_0.57.0           </span></span>
+<span id="cb39-24"><a href="#cb39-24"></a><span class="co">#&gt;   [3] fs_1.5.0                      usethis_1.6.3                </span></span>
+<span id="cb39-25"><a href="#cb39-25"></a><span class="co">#&gt;   [5] devtools_2.3.2                bit64_4.0.5                  </span></span>
+<span id="cb39-26"><a href="#cb39-26"></a><span class="co">#&gt;   [7] insight_0.11.0                progress_1.2.2               </span></span>
+<span id="cb39-27"><a href="#cb39-27"></a><span class="co">#&gt;   [9] httr_1.4.2                    rprojroot_2.0.2              </span></span>
+<span id="cb39-28"><a href="#cb39-28"></a><span class="co">#&gt;  [11] tools_4.0.0                   sjlabelled_1.1.7             </span></span>
+<span id="cb39-29"><a href="#cb39-29"></a><span class="co">#&gt;  [13] R6_2.5.0                      DBI_1.1.0                    </span></span>
+<span id="cb39-30"><a href="#cb39-30"></a><span class="co">#&gt;  [15] withr_2.3.0                   tidyselect_1.1.0             </span></span>
+<span id="cb39-31"><a href="#cb39-31"></a><span class="co">#&gt;  [17] prettyunits_1.1.1             processx_3.4.4               </span></span>
+<span id="cb39-32"><a href="#cb39-32"></a><span class="co">#&gt;  [19] bit_4.0.4                     curl_4.3                     </span></span>
+<span id="cb39-33"><a href="#cb39-33"></a><span class="co">#&gt;  [21] compiler_4.0.0                cli_2.2.0                    </span></span>
+<span id="cb39-34"><a href="#cb39-34"></a><span class="co">#&gt;  [23] Biobase_2.48.0                xml2_1.3.2                   </span></span>
+<span id="cb39-35"><a href="#cb39-35"></a><span class="co">#&gt;  [25] desc_1.2.0                    DelayedArray_0.14.1          </span></span>
+<span id="cb39-36"><a href="#cb39-36"></a><span class="co">#&gt;  [27] readr_1.4.0                   callr_3.5.1                  </span></span>
+<span id="cb39-37"><a href="#cb39-37"></a><span class="co">#&gt;  [29] askpass_1.1                   rappdirs_0.3.1               </span></span>
+<span id="cb39-38"><a href="#cb39-38"></a><span class="co">#&gt;  [31] stringr_1.4.0                 digest_0.6.27                </span></span>
+<span id="cb39-39"><a href="#cb39-39"></a><span class="co">#&gt;  [33] Rsamtools_2.4.0               rmarkdown_2.5                </span></span>
+<span id="cb39-40"><a href="#cb39-40"></a><span class="co">#&gt;  [35] XVector_0.28.0                htmltools_0.5.0              </span></span>
+<span id="cb39-41"><a href="#cb39-41"></a><span class="co">#&gt;  [37] pkgconfig_2.0.3               sessioninfo_1.1.1            </span></span>
+<span id="cb39-42"><a href="#cb39-42"></a><span class="co">#&gt;  [39] BSgenome_1.56.0               fastmap_1.0.1                </span></span>
+<span id="cb39-43"><a href="#cb39-43"></a><span class="co">#&gt;  [41] dbplyr_2.0.0                  rlang_0.4.8                  </span></span>
+<span id="cb39-44"><a href="#cb39-44"></a><span class="co">#&gt;  [43] rstudioapi_0.13               RSQLite_2.2.1                </span></span>
+<span id="cb39-45"><a href="#cb39-45"></a><span class="co">#&gt;  [45] shiny_1.5.0                   generics_0.1.0               </span></span>
+<span id="cb39-46"><a href="#cb39-46"></a><span class="co">#&gt;  [47] jsonlite_1.7.1                BiocParallel_1.22.0          </span></span>
+<span id="cb39-47"><a href="#cb39-47"></a><span class="co">#&gt;  [49] dplyr_1.0.2                   RCurl_1.98-1.2               </span></span>
+<span id="cb39-48"><a href="#cb39-48"></a><span class="co">#&gt;  [51] magrittr_2.0.1                GenomeInfoDbData_1.2.3       </span></span>
+<span id="cb39-49"><a href="#cb39-49"></a><span class="co">#&gt;  [53] Matrix_1.2-18                 Rcpp_1.0.5                   </span></span>
+<span id="cb39-50"><a href="#cb39-50"></a><span class="co">#&gt;  [55] Rhdf5lib_1.10.1               fansi_0.4.1                  </span></span>
+<span id="cb39-51"><a href="#cb39-51"></a><span class="co">#&gt;  [57] lifecycle_0.2.0               yaml_2.2.1                   </span></span>
+<span id="cb39-52"><a href="#cb39-52"></a><span class="co">#&gt;  [59] stringi_1.5.3                 SummarizedExperiment_1.18.2  </span></span>
+<span id="cb39-53"><a href="#cb39-53"></a><span class="co">#&gt;  [61] zlibbioc_1.34.0               AnnotationHub_2.20.2         </span></span>
+<span id="cb39-54"><a href="#cb39-54"></a><span class="co">#&gt;  [63] rhdf5_2.32.4                  pkgbuild_1.1.0               </span></span>
+<span id="cb39-55"><a href="#cb39-55"></a><span class="co">#&gt;  [65] BiocFileCache_1.12.1          grid_4.0.0                   </span></span>
+<span id="cb39-56"><a href="#cb39-56"></a><span class="co">#&gt;  [67] rslurm_0.5.0                  blob_1.2.1                   </span></span>
+<span id="cb39-57"><a href="#cb39-57"></a><span class="co">#&gt;  [69] promises_1.1.1                sjmisc_2.8.5                 </span></span>
+<span id="cb39-58"><a href="#cb39-58"></a><span class="co">#&gt;  [71] crayon_1.3.4                  lattice_0.20-41              </span></span>
+<span id="cb39-59"><a href="#cb39-59"></a><span class="co">#&gt;  [73] Biostrings_2.56.0             GenomicFeatures_1.40.1       </span></span>
+<span id="cb39-60"><a href="#cb39-60"></a><span class="co">#&gt;  [75] hms_0.5.3                     knitr_1.30                   </span></span>
+<span id="cb39-61"><a href="#cb39-61"></a><span class="co">#&gt;  [77] ps_1.4.0                      pillar_1.4.7                 </span></span>
+<span id="cb39-62"><a href="#cb39-62"></a><span class="co">#&gt;  [79] biomaRt_2.44.4                pkgload_1.1.0                </span></span>
+<span id="cb39-63"><a href="#cb39-63"></a><span class="co">#&gt;  [81] BiocVersion_3.11.1            XML_3.99-0.5                 </span></span>
+<span id="cb39-64"><a href="#cb39-64"></a><span class="co">#&gt;  [83] glue_1.4.2                    evaluate_0.14                </span></span>
+<span id="cb39-65"><a href="#cb39-65"></a><span class="co">#&gt;  [85] BiocManager_1.30.10           data.table_1.13.2            </span></span>
+<span id="cb39-66"><a href="#cb39-66"></a><span class="co">#&gt;  [87] remotes_2.2.0                 httpuv_1.5.4                 </span></span>
+<span id="cb39-67"><a href="#cb39-67"></a><span class="co">#&gt;  [89] vctrs_0.3.5                   testthat_3.0.0               </span></span>
+<span id="cb39-68"><a href="#cb39-68"></a><span class="co">#&gt;  [91] openssl_1.4.3                 purrr_0.3.4                  </span></span>
+<span id="cb39-69"><a href="#cb39-69"></a><span class="co">#&gt;  [93] assertthat_0.2.1              xfun_0.19                    </span></span>
+<span id="cb39-70"><a href="#cb39-70"></a><span class="co">#&gt;  [95] mime_0.9                      xtable_1.8-4                 </span></span>
+<span id="cb39-71"><a href="#cb39-71"></a><span class="co">#&gt;  [97] later_1.1.0.1                 roxygen2_7.1.1               </span></span>
+<span id="cb39-72"><a href="#cb39-72"></a><span class="co">#&gt;  [99] tibble_3.0.4                  GenomicAlignments_1.24.0     </span></span>
+<span id="cb39-73"><a href="#cb39-73"></a><span class="co">#&gt; [101] AnnotationDbi_1.50.3          memoise_1.1.0                </span></span>
+<span id="cb39-74"><a href="#cb39-74"></a><span class="co">#&gt; [103] tximport_1.16.1               interactiveDisplayBase_1.26.3</span></span>
+<span id="cb39-75"><a href="#cb39-75"></a><span class="co">#&gt; [105] ellipsis_0.3.1</span></span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
