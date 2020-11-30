@@ -369,9 +369,8 @@ generate_theoretical_pValue <- function(counts, pValueCutoff) {
 #'
 generate_qValue <- function(counts, qValueCutoff) {
     
-    ## select genic region
+    ## select genic and intergenic regions
     selected_genic <- counts$type %in% "genic"
-    ## select intergenic region
     selected_intergenic <- counts$type %in% "intergenic"
     
     ## collect the density distributions of genic and intergenic
@@ -382,8 +381,8 @@ generate_qValue <- function(counts, qValueCutoff) {
     genicRegion <- approxfun(dens_genic$x, dens_genic$y)
     intergenicRegion <- approxfun(dens_intergenic$x, dens_intergenic$y)
     ## numerical integration
-    numInt_geniRegion <- integrate(genicRegion, min(dens_genic$x), max(dens_genic$x), subdivisions=1000)$value
-    numInt_intergenicRegion <- integrate(intergenicRegion, min(dens_intergenic$x), max(dens_intergenic$x), subdivisions=1000)$value
+    numInt_genicRegion <- integrate(genicRegion, min(dens_genic$x), max(dens_genic$x), subdivisions=1000, rel.tol = .Machine$double.eps^0.01)$value
+    numInt_intergenicRegion <- integrate(intergenicRegion, min(dens_intergenic$x), max(dens_intergenic$x), subdivisions=1000, rel.tol = .Machine$double.eps^0.01)$value
     
     ## for each abundance value (TPM) collect the genic and intergenic linear interpolation
     interpolationInfo <- c()
@@ -399,9 +398,19 @@ generate_qValue <- function(counts, qValueCutoff) {
     colnames(interpolationInfo) <- c("log2TpmValue", "genicY","intergenicY")
     interpolationInfo$geneId <- counts$gene_id
     
-    ## calculate the qValue for each geneId in the library
-    qValueInfo <- c() 
+    ## Function to calculate q-Value per unique TPM
+    calculate_qValue <- function(log2Tpm, dens_genic, dens_intergenic, interpolationGenic, interpolationIntergenic, numInt_genic, numInt_intergenic){
+        unscaled_genic <- integrate(interpolationGenic, log2Tpm, max(dens_genic$x), subdivisions=1000, stop.on.error = FALSE)$value
+        scaled_genic <- unscaled_genic / numInt_genic
+        unscaled_intergenic <- integrate(interpolationIntergenic, log2Tpm, max(dens_intergenic$x), subdivisions=1000, stop.on.error = FALSE)$value
+        scaled_intergenic <- unscaled_intergenic / numInt_intergenic
+        ## calculate qValue for target gene
+        qValue <- scaled_intergenic / (scaled_intergenic + scaled_genic)
+        return(qValue)
+    }
     
+    ## Use the calculate_qValue function to calculate the q-Value for each unique log2 TPM value and perform the calls
+    qValueInfo <- c() 
     for (i in 1:nrow(interpolationInfo)) {
         
         log2TpmValue <- interpolationInfo$log2TpmValue[i]
@@ -418,45 +427,30 @@ generate_qValue <- function(counts, qValueCutoff) {
             ## retrieve log2TPM value where was possible to calculate the linear interpolation for genic and intergenic
             maxNumIntegration <- dplyr::filter(interpolationInfo, genicY != "NaN" & intergenicY != "NaN" )
             
-            ## if log2TPM value is a negative value (means peak more at left side and we have value to genicY_info and Na to intergenicY_info)
+            ## if log2TPM value is a negative value (means peak more at left side)
             ## we attribute qValue based on the minimum where was possible to calculate the linear interpolation for both of the types
             if(log2TpmValue < 0){
                 
                 log2TpmValue <- min(maxNumIntegration$log2TpmValue)
-                ## integrate for genic and intergenic region
-                unscaled_genic <- integrate(genicRegion, log2TpmValue, max(dens_genic$x), subdivisions=1000, stop.on.error = FALSE)$value
-                scaled_genic <- unscaled_genic / numInt_geniRegion
-                unscaled_intergenic <- integrate(intergenicRegion, log2TpmValue, max(dens_intergenic$x), subdivisions=1000, stop.on.error = FALSE)$value
-                scaled_intergenic <- unscaled_intergenic / numInt_intergenicRegion
-                ## calculate qValue for target gene
-                qValue <- scaled_intergenic / (scaled_intergenic + scaled_genic)
-                qValueInfo <- rbind(qValueInfo,qValue) 
+                qValue <- calculate_qValue(log2TpmValue, dens_genic, dens_intergenic, genicRegion,
+                                           intergenicRegion, numInt_genicRegion, numInt_intergenicRegion)
+                qValueInfo <- rbind(qValueInfo,qValue)       
                 
             } else {
                 
-                ## if log2TPM value is positive and the genicY_info is numeric and intergenicY_info is NA
-                ## this represent the values in the tail on the right side of the plot.
+                ## if log2TPM value is positive, this represent the values in the tail on the right side of the plot.
                 ## we attribute qValue for this cases based on the last log2TPM value where was possible to calculate the linear interpolation for both of the types
                 log2TpmValue <- max(maxNumIntegration$log2TpmValue)
-                ## integrate for genic and intergenic region
-                unscaled_genic <- integrate(genicRegion, log2TpmValue, max(dens_genic$x), subdivisions=1000, stop.on.error = FALSE)$value
-                scaled_genic <- unscaled_genic / numInt_geniRegion
-                unscaled_intergenic <- integrate(intergenicRegion, log2TpmValue, max(dens_intergenic$x), stop.on.error = FALSE, subdivisions=1000)$value
-                scaled_intergenic <- unscaled_intergenic / numInt_intergenicRegion
-                ## calculate qValue for target gene
-                qValue <- scaled_intergenic / (scaled_intergenic + scaled_genic)
-                qValueInfo <- rbind(qValueInfo,qValue)
+                qValue <- calculate_qValue(log2TpmValue, dens_genic, dens_intergenic, genicRegion,
+                                           intergenicRegion, numInt_genicRegion, numInt_intergenicRegion)
+                qValueInfo <- rbind(qValueInfo,qValue)    
             }
         } else {
             
-            ## integrate for genic and intergenic region for a particular log2TPM and than calculate qValue
-            unscaled_genic <- integrate(genicRegion, log2TpmValue, max(dens_genic$x), subdivisions=1000, stop.on.error = FALSE)$value
-            scaled_genic <- unscaled_genic / numInt_geniRegion
-            unscaled_intergenic <- integrate(intergenicRegion, log2TpmValue, max(dens_intergenic$x), subdivisions=1000, stop.on.error = FALSE)$value
-            scaled_intergenic <- unscaled_intergenic / numInt_intergenicRegion
-            ## calculate q-Value
-            qValue <- scaled_intergenic / (scaled_intergenic + scaled_genic)
-            qValueInfo <- rbind(qValueInfo,qValue)
+            ## calculate q-value using the linear interpolation info for a particular log2TPM value
+            qValue <- calculate_qValue(log2TpmValue, dens_genic, dens_intergenic, genicRegion,
+                                       intergenicRegion, numInt_genicRegion, numInt_intergenicRegion)
+            qValueInfo <- rbind(qValueInfo,qValue)     
         }
     }
     ## add qValue columns to the final table
