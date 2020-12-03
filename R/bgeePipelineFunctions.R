@@ -327,10 +327,10 @@ cutoff_info <- function(counts,
 #'
 generate_theoretical_pValue <- function(counts, pValueCutoff) {
     ## select values with TPM > 0 (because we will use log2 scale)
-    selected_intergenic <- dplyr::filter(counts, abundance > 0 & type == "intergenic")
+    selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
 
     ## select genic region from the library
-    selected_count <- dplyr::filter(counts, abundance > 0)  
+    selected_count <- filter(counts, abundance > 0)  
     ## calculate z-score for each gene_id using the reference intergenic 
     selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
     ## calculate p-values for each gene_id

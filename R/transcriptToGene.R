@@ -133,8 +133,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #' classes `BgeeMetadata`, `UserMetadata` and `AbundanceMetadata`
 #' 
 #' @author Julien Wollbrett
-#'
-#' @import rhdf5
+#' 
 #' @import tximport
 #'
 #' @export

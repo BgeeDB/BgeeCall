@@ -10,10 +10,6 @@
 #' @author Julien Wollbrett.
 #'
 #' @return The mapping between gene IDs and biotypes
-#'
-#' @import rtracklayer
-#' 
-#' @return the mapping between genes and biotypes
 #' 
 #' @noMd
 #' @noRd

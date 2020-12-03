@@ -17,7 +17,7 @@
 #'
 #' @return Mapping between transcript IDs, type (genic or intergenic) and biotypes
 #'
-#' @import rtracklayer
+#' @import Biostrings
 #'
 #' @noMd
 #' @noRd
