@@ -93,6 +93,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
       userMetadata@custom_intergenic_path <- customIntergenicPath
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
+    userMetadata <- setAnnotationFromFile(userMetadata, annotationPath =  as.character(annotation_path))
     merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                                        myUserMetadata = userMetadata)
     create_kallisto_index(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
