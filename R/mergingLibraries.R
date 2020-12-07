@@ -4,6 +4,7 @@
 #' column (species_id) specified/fill-up to perform the merging of libraries
 #'
 #' @param userFile A file provided by the user
+#' @param condition condition to considere for merging
 #'
 #' @author Sara Fonseca Costa
 #'
@@ -16,31 +17,27 @@
 #' @noMd
 #' @noRd
 #' 
-checkUserFile <- function(userFile){
+checkUserFile <- function(userFile, condition){
   
   ## read and check columns of input file
-  userFile <- fread(userFile)
-  idContition <- c("species_id", "anatEntity", "devStage", "sex","strain")
-  userFileCheck <- idContition %in% names(userFile)
+  userFileCheck <- condition %in% names(userFile)
   
+  if(!("species_id" %in% colnames(userFile)) | !("species_id" %in% condition)) {
+    stop("the condition \"species_id\" should exist and be fill-up in order to do the merging.\n",
+         "Please verify that \"species_id\" is present in your input file and that ",
+         "the condition is choosed to merge.")
+  }
+  
+  if(is_empty(userFile[,"species_id"]) ==TRUE) {
+    stop("Some rows have empty value for the \"species_id\" column.\n",
+         "\"species_id\" should always be provided.")
+  }
   ## no column is detected in the input file
-  if (any(userFileCheck) == FALSE){
-    stop("At least one condition (species_id) should exist and be fill-up in order to do the merging.", "\n",
-         "Please verify your input file.", "\n")
-  } 
-  ## exist columns specified but missing species_id column
-  else if (any(userFileCheck) == TRUE & userFileCheck[1] == FALSE){
-    stop("The condition/s where detected to perform the merging, but the species_id is missing", "\n",
-         "Please verify your input file.", "\n")
+  if (FALSE %in% userFileCheck){
+    stop("All provided merging condition should correspond to column name.\n",
+         "condition to merge: ", paste(condition, ""), "\n",
+         "column names :", paste(colnames(userFile), ""))
   }
-  ## exist column species_id but missing information (is NA)
-  else if (userFileCheck[1] == TRUE & is_empty(userFile$species_id) == TRUE) {
-    stop("The row species_id is specified but empty", "\n")
-    
-  } else {
-    conditionDataTable <- idContition[which(userFileCheck=="TRUE")]
-  }
-  return(list(userFile, conditionDataTable))
 }
 
 
@@ -52,7 +49,7 @@ checkUserFile <- function(userFile){
 #' The call of genes as present is done based on the assumption that at least one library 
 #' have an adjusted p-value < cutoff or have a q-value < fdr_inverse.
 #'
-#' @param AllFiles List with all libraries to be treated
+#' @param allFiles List with all libraries to be treated
 #' @param approach Approach selected to merge libraries, BH or fdr_inverse
 #' @param cutoff Threshold value to be applied to call expressed genes
 #'
@@ -66,9 +63,9 @@ checkUserFile <- function(userFile){
 #' @noMd
 #' @noRd
 #' 
-approachesMerging <- function(AllFiles, approach, cutoff){
+approachesMerging <- function(allFiles, approach, cutoff){
   
-  librariesData <- try(do.call("cbind", AllFiles), silent = TRUE) 
+  librariesData <- try(do.call("cbind", allFiles), silent = TRUE) 
   ## select gene_id
   select_info <- librariesData[,1]
   
@@ -135,7 +132,7 @@ approachesMerging <- function(AllFiles, approach, cutoff){
 #' @param userFile A file provided by the user with correspondent conditions
 #' @param approach Approach used to do the merging of libraries
 #' @param condition Condition/s where the merging should be done
-#' @param cutoff Cutoff that should be applied to call P/A genes
+#' @param cutoff Cutoff that should be applied to call Present/Absent genes
 #' @param outDir Directory where the output files should be saved
 #'
 #' @author Sara Fonseca Costa
@@ -156,401 +153,44 @@ approachesMerging <- function(AllFiles, approach, cutoff){
 merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL) {
 
   ## check user input
-  fileUser <- checkUserFile(userFile = userFile)
-  
-  ## check if condition/s provided in the user input file match the conditions specified by the user in the condition argument
-  userFileconditionDetected <- fileUser[[2]]
-  userConditionsToMerge <- condition %in% userFileconditionDetected
+  userFile <- read.table(file = userFile, header = TRUE, sep = "\t")
+  checkUserFile(userFile = userFile, condition = condition)
 
-  if ('FALSE' %in% userConditionsToMerge){
-    stop("One of the parameters provided in the condition argument is not detected in the user input file.", "\n",
-         "Check the input file OR the parameters name provide in the condition that should be: ", "\n", "species_id","\n", "anatEntity", "\n", "devStage", "\n", "sex", "\n", "strain", "\n")
-  } else {
+  # retrieve unique condition combination to merge
+  uniqueCondition <- unique(userFile[condition])
+  
+  # init variable used to keep only libraries corresponding to one condition
+  filtered_libraries <- userFile
+  
+  for(currentRowIndex in seq(nrow(uniqueCondition))) {
+    currentRow <- uniqueCondition[currentRowIndex,]
+    # init name of the file where merged libraries will be stored depending on condition
+    conditionFileName = ""
     
-    if ((length(condition)==1) == TRUE & condition[1] == "species_id"){
-      
-      message("Merging will be done for condition c(species)", "\n")
-      
-      for (species in unique(fileUser[[1]]$species_id)) {
-      ## collect libraries from each species
-      librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species]
-      ## collect files of individual call
-      AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-      message("Using ", length(AllFiles), " libraries for the condition: species_id = ", species ,"\n")
-      AllFiles <- lapply(AllFiles, read.delim)
-      ## perform the calls and export information of the merging
-      callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-      write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-      }
-      } else if ((length(condition)==2) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)]) {
-        
-        message("Merging will be done for condition c(species, anatEntity)", "\n")
-        if(is_empty(fileUser[[1]]$anatEntity) == TRUE){
-          stop("The column anatEntity is empty")
-        }
-        
-        for (species in unique(fileUser[[1]]$species_id)) {
-          for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-            ## collect libraries from each species and from each anatomical entity
-            librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity]
-            if (is_empty(librariesSpecies) == TRUE){
-            } else {
-            ## collect files of individual call
-            AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-            message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity, ")" ,"\n")
-            AllFiles <- lapply(AllFiles, read.delim)
-            ## perform the calls and export information of the merging
-            callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-            write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=",anatEntity,".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-            }
-          }
-        }
-        } else if ((length(condition)==2) == TRUE & "species_id" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)]) {
-          message("Merging will be done for condition c(species, devStage)", "\n")
-          if(is_empty(fileUser[[1]]$devStage) == TRUE){
-            stop("The column devStage is empty")
-          }
-          
-          for (species in unique(fileUser[[1]]$species_id)) {
-            for (devStage in unique(fileUser[[1]]$devStage)) {
-              ## collect libraries from each species and from each developmental stage
-              librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$devStage == devStage]
-              if (is_empty(librariesSpecies) == TRUE){
-              } else {
-              ## collect files of individual call
-              AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-              message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", devStage, ")" ,"\n")
-              AllFiles <- lapply(AllFiles, read.delim)
-              ## perform the calls and export information of the merging
-              callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-              write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_devStage=", devStage, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-              }
-            }
-          }
-          } else if ((length(condition)==2) == TRUE & "species_id" %in% condition[1:length(condition)] & "sex" %in% condition[1:length(condition)]){
-            message("Merging will be done for condition c(species, sex)", "\n")
-            if(is_empty(fileUser[[1]]$sex) == TRUE){
-              stop("The column sex is empty")
-            }
-              
-              for (species in unique(fileUser[[1]]$species_id)) {
-                for (sex in unique(fileUser[[1]]$sex)) {
-                  ## collect libraries from each species and from each sex
-                  librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$sex == sex]
-                  if (is_empty(librariesSpecies) == TRUE){
-                  } else {
-                  ## collect files of individual call
-                  AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                  message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", sex, ")" ,"\n")
-                  AllFiles <- lapply(AllFiles, read.delim)
-                  ## perform the calls and export information of the merging
-                  callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                  write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_sex=", sex, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                  }
-                }
-              }
-              } else if ((length(condition)==2) == TRUE & "species_id" %in% condition[1:length(condition)] & "strain" %in% condition[1:length(condition)]){
-                message("Merging will be done for condition c(species, strain)", "\n")
-                if(is_empty(fileUser[[1]]$strain) == TRUE){
-                  stop("The column strain is empty")
-                }
-                  
-                  for (species in unique(fileUser[[1]]$species_id)) {
-                    for (strain in unique(fileUser[[1]]$strain)) {
-                      ## collect libraries from each species and from each strain
-                      librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$strain == strain]
-                      if (is_empty(librariesSpecies) == TRUE){
-                      } else {
-                      ## collect files of individual call
-                      AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                      message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", strain, ")" ,"\n")
-                      AllFiles <- lapply(AllFiles, read.delim)
-                      ## perform the calls and export information of the merging
-                      callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                      write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_strain=", strain, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                      }
-                    }
-                  }
-                  } else if ((length(condition)==3) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)]& "devStage" %in% condition[1:length(condition)]){
-                    message("Merging will be done for condition c(species, anatEntity, devStage)", "\n")
-                    if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$devStage) == TRUE){
-                      stop("The column anatEntity or devStage are empty")
-                    }
-                    
-                    for (species in unique(fileUser[[1]]$species_id)) {
-                      for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                        for (devStage in unique(fileUser[[1]]$devStage)) {
-                          
-                          ## collect libraries from each species and from each anatomical entity and from each developmental stage
-                          librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$devStage == devStage]
-                          if (is_empty(librariesSpecies) == TRUE){
-                          } else {
-                          ## collect files of individual call
-                          AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                          message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", devStage, ")" ,"\n")
-                          AllFiles <- lapply(AllFiles, read.delim)
-                          ## perform the calls and export information of the merging
-                          callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                          write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_devStage=", devStage, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                          }
-                        }
-                      }
-                    }
-                    } else if ((length(condition)==3) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)]& "sex" %in% condition[1:length(condition)]){
-                      message("Merging will be done for condition c(species, anatEntity, sex)", "\n")
-                      if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$sex) == TRUE){
-                        stop("The column anatEntity or sex are empty")
-                      }
-                        
-                        for (species in unique(fileUser[[1]]$species_id)) {
-                          for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                            for (sex in unique(fileUser[[1]]$sex)) {
-                              
-                              ## collect libraries from each species, from each anatomical entity and from sex
-                              librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$sex == sex]
-                              if (is_empty(librariesSpecies) == TRUE){
-                              } else {
-                              ## collect files of individual call
-                              AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                              message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", sex, ")" ,"\n")
-                              AllFiles <- lapply(AllFiles, read.delim)
-                              ## perform the calls and export information of the merging
-                              callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                              write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_sex=", sex, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                              }
-                            }
-                          }
-                        }
-                        } else if ((length(condition)==3) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)]& "strain" %in% condition[1:length(condition)]){
-                          message("Merging will be done for condition c(species, anatEntity, strain)", "\n")
-                          if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                            stop("The column anatEntity or strain are empty")
-                          }
-                          
-                          for (species in unique(fileUser[[1]]$species_id)) {
-                            for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                              for (strain in unique(fileUser[[1]]$strain)) {
-                                ## collect libraries from each species, from each anatomical entity and from strain
-                                librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$strain == strain]
-                                if (is_empty(librariesSpecies) == TRUE){
-                                } else {
-                                ## collect files of individual call
-                                AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", strain, ")" ,"\n")
-                                AllFiles <- lapply(AllFiles, read.delim)
-                                ## perform the calls and export information of the merging
-                                callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_strain", strain, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                }
-                              }
-                            }
-                          }
-                          } else if ((length(condition)==3) == TRUE & "species_id" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)]& "sex" %in% condition[1:length(condition)]){
-                            message("Merging will be done for condition c(species, devStage, sex)", "\n")
-                            if(is_empty(fileUser[[1]]$devStage) == TRUE | is_empty(fileUser[[1]]$sex) == TRUE){
-                              stop("The column devStage or sex are empty")
-                            }
-                            
-                            for (species in unique(fileUser[[1]]$species_id)) {
-                              for (devStage in unique(fileUser[[1]]$devStage)) {
-                                for (sex in unique(fileUser[[1]]$sex)) {
-                                  ## collect libraries from each species, from each developmental stage and from sex
-                                  librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$devStage == devStage & fileUser[[1]]$sex == sex]
-                                  if (is_empty(librariesSpecies) == TRUE){
-                                  } else {
-                                  ## collect files of individual call
-                                  AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                  message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", devStage,",", sex, ")" ,"\n")
-                                  AllFiles <- lapply(AllFiles, read.delim)
-                                  ## perform the calls and export information of the merging
-                                  callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                  write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_devStage=", devStage, "_sex=", sex, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                  }
-                                }
-                              }
-                            }
-                            } else if ((length(condition)==3) == TRUE & "species_id" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)]& "strain" %in% condition[1:length(condition)]){
-                              message("Merging will be done for condition c(species, devStage, strain)", "\n")
-                              if(is_empty(fileUser[[1]]$devStage) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                                stop("The column devStage or strain are empty")
-                              }
-                              
-                              for (species in unique(fileUser[[1]]$species_id)) {
-                                for (devStage in unique(fileUser[[1]]$devStage)) {
-                                  for (strain in unique(fileUser[[1]]$strain)) {
-                                    ## collect libraries from each species, from each developmental stage and from strain
-                                    librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$devStage == devStage & fileUser[[1]]$strain == strain]
-                                    if (is_empty(librariesSpecies) == TRUE){
-                                    } else {
-                                    ## collect files of individual call
-                                    AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                    message("Using ", length(AllFiles), " libraries for the condition: c(species_id, devStage, strain) = c(", species ,",", devStage,",", strain, ")" ,"\n")
-                                    AllFiles <- lapply(AllFiles, read.delim)
-                                    ## perform the calls and export information of the merging
-                                    callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                    write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_devStage=", devStage, "_strain=", strain, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                    }
-                                  }
-                                }
-                              }
-                              } else if ((length(condition)==3) == TRUE & "species_id" %in% condition[1:length(condition)] & "sex" %in% condition[1:length(condition)]& "strain" %in% condition[1:length(condition)]){
-                                message("Merging will be done for condition c(species, sex, strain)", "\n")
-                                if(is_empty(fileUser[[1]]$sex) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                                  stop("The column sex or strain are empty")
-                                }
-                                
-                                for (species in unique(fileUser[[1]]$species_id)) {
-                                  for (sex in unique(fileUser[[1]]$sex)) {
-                                    for (strain in unique(fileUser[[1]]$strain)) {
-                                      ## collect libraries from each species, from each sex and from strain
-                                      librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$sex == sex & fileUser[[1]]$strain == strain]
-                                      if (is_empty(librariesSpecies) == TRUE){
-                                      } else {
-                                      ## collect files of individual call
-                                      AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                      message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", sex,",", strain, ")" ,"\n")
-                                      AllFiles <- lapply(AllFiles, read.delim)
-                                      ## perform the calls and export information of the merging
-                                      callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                      write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_sex=", sex, "_strain=", strain, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                      }
-                                    }
-                                  }
-                                }
-                                } else if ((length(condition)==4) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)] & "sex" %in% condition[1:length(condition)]){
-                                  message("Merging will be done for condition c(species, anatEntity, devStage, sex)", "\n")
-                                  if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$devStage) == TRUE | is_empty(fileUser[[1]]$sex) == TRUE){
-                                    stop("The column anatEntity or devStage or sex are empty")
-                                  }
-                                  
-                                  for (species in unique(fileUser[[1]]$species_id)) {
-                                    for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                                      for (devStage in unique(fileUser[[1]]$devStage)) {
-                                        for (sex in unique(fileUser[[1]]$sex)){
-                                          ## collect libraries from each species, from each anatEntity, from each devStage and from sex
-                                          librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$devStage == devStage & fileUser[[1]]$sex == sex]
-                                          if (is_empty(librariesSpecies) == TRUE){
-                                          } else {
-                                          ## collect files of individual call
-                                          AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                          message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", devStage,",", sex, ")" ,"\n")
-                                          AllFiles <- lapply(AllFiles, read.delim)
-                                          ## perform the calls and export information of the merging
-                                          callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                          write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_devStage=", devStage, "_sex=", sex,".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                } else if ((length(condition)==4) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)] & "strain" %in% condition[1:length(condition)]){
-                                  message("Merging will be done for condition c(species, anatEntity, devStage, strain)", "\n")
-                                  if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$devStage) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                                    stop("The column anatEntity or devStage or strain are empty")
-                                  }
-                                  
-                                  for (species in unique(fileUser[[1]]$species_id)) {
-                                    for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                                      for (devStage in unique(fileUser[[1]]$devStage)) {
-                                        for (strain in unique(fileUser[[1]]$strain)){
-                                          ## collect libraries from each species, from each anatEntity, from each devStage and from each strain
-                                          librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$devStage == devStage & fileUser[[1]]$strain == strain]
-                                          if (is_empty(librariesSpecies) == TRUE){
-                                          } else {
-                                            ## collect files of individual call
-                                            AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                            message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", devStage,",", strain, ")" ,"\n")
-                                            AllFiles <- lapply(AllFiles, read.delim)
-                                            ## perform the calls and export information of the merging
-                                            callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                            write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_devStage=", devStage, "_strain=", strain,".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                } else if ((length(condition)==4) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)] & "sex" %in% condition[1:length(condition)] & "strain" %in% condition[1:length(condition)]){
-                                  message("Merging will be done for condition c(species, anatEntity, sex, strain)", "\n")
-                                  if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$sex) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                                    stop("The column anatEntity or sex or strain are empty")
-                                  }
-                                  
-                                  for (species in unique(fileUser[[1]]$species_id)) {
-                                    for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                                      for (sex in unique(fileUser[[1]]$sex)) {
-                                        for (strain in unique(fileUser[[1]]$strain)){
-                                          ## collect libraries from each species, from each anatEntity, from sex and from each strain
-                                          librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$sex == sex & fileUser[[1]]$strain == strain]
-                                          if (is_empty(librariesSpecies) == TRUE){
-                                          } else {
-                                            ## collect files of individual call
-                                            AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                            message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", sex,",", strain, ")" ,"\n")
-                                            AllFiles <- lapply(AllFiles, read.delim)
-                                            ## perform the calls and export information of the merging
-                                            callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                            write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_sex=", sex, "_strain=", strain,".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                } else if ((length(condition)==4) == TRUE & "species_id" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)] & "sex" %in% condition[1:length(condition)] & "strain" %in% condition[1:length(condition)]){
-                                  message("Merging will be done for condition c(species, devStage, sex, strain)", "\n")
-                                  if(is_empty(fileUser[[1]]$devStage) == TRUE | is_empty(fileUser[[1]]$sex) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                                    stop("The column devStage or sex or strain are empty")
-                                  }
-                                  
-                                  for (species in unique(fileUser[[1]]$species_id)) {
-                                    for (devStage in unique(fileUser[[1]]$devStage)) {
-                                      for (sex in unique(fileUser[[1]]$sex)) {
-                                        for (strain in unique(fileUser[[1]]$strain)){
-                                          ## collect libraries from each species, from each devStage, from sex and from each strain
-                                          librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$devStage == devStage & fileUser[[1]]$sex == sex & fileUser[[1]]$strain == strain]
-                                          if (is_empty(librariesSpecies) == TRUE){
-                                          } else {
-                                            ## collect files of individual call
-                                            AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                            message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", devStage,",", sex,",", strain, ")" ,"\n")
-                                            AllFiles <- lapply(AllFiles, read.delim)
-                                            ## perform the calls and export information of the merging
-                                            callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                            write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_devStage=", devStage, "_sex=", sex, "_strain=", strain,".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                } else if ((length(condition)==5) == TRUE & "species_id" %in% condition[1:length(condition)] & "anatEntity" %in% condition[1:length(condition)] & "devStage" %in% condition[1:length(condition)] & "sex" %in% condition[1:length(condition)] & "strain" %in% condition[1:length(condition)]){
-                                    message("Merging will be done for condition c(species, anatEntity, devStage, sex, strain)", "\n")
-                                    if(is_empty(fileUser[[1]]$anatEntity) == TRUE | is_empty(fileUser[[1]]$devStage) == TRUE | is_empty(fileUser[[1]]$sex) == TRUE | is_empty(fileUser[[1]]$strain) == TRUE){
-                                      stop("The column anatEntity or devStage or sex or strain are empty")
-                                    }
-                                    
-                                    for (species in unique(fileUser[[1]]$species_id)) {
-                                      for (anatEntity in unique(fileUser[[1]]$anatEntity)) {
-                                        for (devStage in unique(fileUser[[1]]$devStage)) {
-                                          for (sex in unique(fileUser[[1]]$sex)){
-                                            for (strain in unique(fileUser[[1]]$strain)) {
-                                              ## collect libraries from each species, from each anatEntity, from each devStage, from sex and from each strain
-                                              librariesSpecies <- fileUser[[1]]$output_directory[fileUser[[1]]$species_id == species & fileUser[[1]]$anatEntity == anatEntity & fileUser[[1]]$devStage == devStage & fileUser[[1]]$sex == sex & fileUser[[1]]$strain == strain]
-                                              if (is_empty(librariesSpecies) == TRUE){
-                                              } else {
-                                              ## collect files of individual call
-                                              AllFiles <- list.files(librariesSpecies, pattern="gene_level_abundance\\+calls.tsv", full.names=T, recursive = TRUE)
-                                              message("Using ", length(AllFiles), " libraries for the condition: c(", species ,",", anatEntity,",", devStage,",", sex, ",", strain, ")" ,"\n")
-                                              AllFiles <- lapply(AllFiles, read.delim)
-                                              ## perform the calls and export information of the merging
-                                              callsFile <- approachesMerging(AllFiles = AllFiles, approach = approach, cutoff = cutoff)
-                                              write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff,"_species=", species, "_anatEntity=", anatEntity, "_devStage=", devStage, "_sex=", sex, "_strain=", strain,".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  } else if ((length(condition)<=4) == TRUE & !"species_id" %in% condition[1:length(condition)]){
-                                    stop("In the condition argument is missing species_id to perform the merging across libraries.", "\n")
-                                  }
+    # for each unique condition
+    for(currentColumnIndex in seq(length(currentRow))) {
+      # update name of file for each condition
+      conditionFileName = paste0(conditionFileName, "_", condition[currentColumnIndex], "=", 
+                                 currentRow[[currentColumnIndex]])
+      filtered_libraries <- filtered_libraries[filtered_libraries[[condition[currentColumnIndex]]] == 
+                                                 currentRow[[currentColumnIndex]],]
+    }
+    
+    #retrieve all abundance files corresponding to condition
+    allFiles <- list.files(filtered_libraries$output_directory, pattern="gene_level_abundance\\+calls.tsv", 
+                           full.names=T, recursive = TRUE)
+    message("Using ", length(allFiles), " libraries for condition: ", paste(condition,""), 
+      " with values: ",paste(currentRow, ""))
+    allFiles <- lapply(allFiles, read.delim)
+    
+    #merge calls based on condition
+    callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff)
+    
+    #write file with merged results
+    write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff, 
+                  conditionFileName, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
+    
+    #take all rows of the input file into consideration before filtering on an other set of condition
+    filtered_libraries <- userFile
   }
 }
