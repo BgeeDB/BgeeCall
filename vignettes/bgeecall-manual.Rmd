@@ -1,6 +1,6 @@
 ---
 title: "automatic RNA-Seq present/absent gene expression calls generation"
-author: "Julien Wollbrett, Marc Robinson-Rechavi, Frederic Bastian"
+author: "Julien Wollbrett, Sara Fonseca Costa, Marc Robinson-Rechavi, Frederic Bastian"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -351,6 +351,28 @@ Generation of present/absent expression calls is done in several steps. It is po
  - overwrite_index : slot of the object KallistoMetadata. The value has to be a logical. If FALSE (default), the index generation step is skiped if one index already exists. If TRUE, the kallisto index will be generated even if one index already exists. 
  - overwrite_quant : slot of the object KallistoMetadata. The value has to be a logical. If FALSE (default), the kallisto quantification step is skiped if a quantification file already exists. If TRUE, the kallisto quantification step will be run even if a quantification file already exists. 
  - overwrite_calls : slot of the object KallistoMetadata. The value has to be a logical. If FALSE, the generation of present/absent calls is skiped if an index already exists. If TRUE (default), the generation of present/absent calls will be run even if calls were already generated.
+ 
+### Ignore transcript version
+
+It can happen that calls are generated using transcriptome or annotations containing transcript version (number after a dot in transcript IDs e.g ENSMUST00000082908.2) and annotations or transcriptome without transcript version. This is problematic when using tximport to transform abundance at transcript level to abundance at gene level and result in an error.
+
+```
+Error in .local(object, ...) : 
+  None of the transcripts in the quantification files are present
+  in the first column of tx2gene. Check to see that you are using
+  the same annotation for both.
+Example IDs (file): [, ...]
+Example IDs (tx2gene): [ENSMUST00000193812, ENSMUST00000082908, ENSMUST00000192857, ...]
+  This can sometimes (not always) be fixed using 'ignoreTxVersion' or 'ignoreAfterBar'.
+Calls: do.call ... tximport -> summarizeToGene -> summarizeToGene -> .local
+Execution halted
+```
+
+To solve this error tximport implemented an option called ignoreTxVersion that remove the transcript version from both transcriptome and annotations. It is possible to use this option by modifying the value of the slot ignoreTxVersion (default FALSE) of the S4 class KallistoMetadata.
+
+```{r}
+kallisto <- new("KallistoMetadata", ignoreTxVersion = TRUE)
+```
 
 ### Generate calls with a simple arborescence of directories
 By default the arborescence of directories created by `BgeeCall` is as simple as possible. the results will be created using the path `working_path/intergenic_release/all_results/libraryId`. Generating present/absent gene expression calls for the same RNA-Seq library using different transcriptome or annotation versions using this arborescence will overwrite previous results. 

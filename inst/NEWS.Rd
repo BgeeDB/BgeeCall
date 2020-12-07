@@ -43,3 +43,12 @@
     \item Add ?BgeeCall documentation with link to main functions
   }
 }
+
+\section{Version 1.7.3 (2020-12)} {
+  \itemize{
+    \item Add approaches based on pValue and qValue to generate present/absent calls
+    \item Default approach to generate calls is pValue
+    \item Add function ```merging_libraries``` allowing to merge calls per condition
+    
+}
+}

@@ -1,14 +1,14 @@
 Package: BgeeCall
 Type: Package
 Title: Automatic RNA-Seq present/absent gene expression calls generation
-Version: 1.7.2
-Date: 2020-06
+Version: 1.7.3
+Date: 2020-12
 Authors@R: 
 	c(person("Julien", "Wollbrett", 
 		role = c("aut", "cre"), 
 		email = "julien.wollbrett@unil.ch"),
     person("Julien", "Roux", role = "aut"),
-    person("Sara", "Fonseca Costa", role = "ctb"),
+    person("Sara", "Fonseca Costa", role = "aut"),
     person("Marc", "Robinson Rechavi", role = "ctb"),
     person("Frederic", "Bastian", role = "aut"))
 Description: BgeeCall allows to generate present/absent gene expression calls without using an arbitrary cutoff like TPM<1. 
