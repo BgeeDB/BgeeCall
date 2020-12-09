@@ -44,6 +44,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #'
 #' @author Julien Wollbrett
 #' @author Julien Roux
+#' @author Sara Fonseca Costa
 #' 
 #' @return path to the 4 output files
 #'
@@ -159,9 +160,20 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
                                                   abundance[, c("id", "zScore", "pValue", "call")], 
                                                   by = "id")
+        } else if (myAbundanceMetadata@cutoff_type == 'qValue') {
+            abundance <- generate_qValue(counts =abundance,
+                                         myAbundanceMetadata@cutoff)
+            
+            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$qValue <= 0.05]))
+            # such cutoff does not exist for the qValue approach
+            r_cutoff <- NULL
+            # abundances without intergenic
+            abundance_without_intergenic <- merge(abundance_without_intergenic, 
+                                                  abundance[, c("id", "qValue", "call")], 
+                                                  by = "id")
         } else {
             stop("unknown cutoff type : ", myAbundanceMetadata@cutoffType, ". Should be 
-            \"pValue\" or \"intergenic\"")
+            \"pValue\" or \"intergenic\" or \"qValue\"")
         }
             
         
