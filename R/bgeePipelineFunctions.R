@@ -426,7 +426,7 @@ generate_qValue <- function(counts, qValueCutoff) {
         } else if (log2TpmValue != "-Inf" & (is.na(intergenicY_info) == TRUE & is.na(genicY_info) == FALSE) | (is.na(intergenicY_info) == FALSE & is.na(genicY_info) == TRUE)){
             
             ## retrieve log2TPM value where was possible to calculate the linear interpolation for genic and intergenic
-            maxNumIntegration <- dplyr::filter(interpolationInfo, genicY != "NaN" & intergenicY != "NaN" )
+            maxNumIntegration <- filter(interpolationInfo, genicY != "NaN" & intergenicY != "NaN" )
             
             ## if log2TPM value is a negative value (means peak more at left side)
             ## we attribute qValue based on the minimum where was possible to calculate the linear interpolation for both of the types
