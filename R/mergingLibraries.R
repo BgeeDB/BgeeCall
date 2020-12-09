@@ -177,7 +177,7 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     }
     
     #retrieve all abundance files corresponding to condition
-    allFiles <- list.files(filtered_libraries$output_directory, pattern="gene_level_abundance\\+calls.tsv", 
+    allFiles <- list.files(path = filtered_libraries$output_directory, pattern="gene_level_abundance\\+calls.tsv", 
                            full.names=T, recursive = TRUE)
     message("Using ", length(allFiles), " libraries for condition: ", paste(condition,""), 
       " with values: ",paste(currentRow, ""))
