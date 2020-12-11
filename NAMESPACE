@@ -38,7 +38,7 @@ import(sjmisc)
 import(tximport)
 importFrom(GenomicFeatures, makeTxDbFromGRanges)
 importFrom(dplyr, filter)
-importFrom(Biostrings, readDNAStringSet)
+importFrom(Biostrings, readDNAStringSet, writeXStringSet)
 importFrom("grDevices", "dev.off", "pdf")
 importFrom("graphics", "arrows", "axis", "legend", "lines", "par",
     "plot","mtext")
