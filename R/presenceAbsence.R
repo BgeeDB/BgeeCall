@@ -110,10 +110,8 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         tximportObject_without_intergenic <- abundance_without_intergenic(myAbundanceMetadata, 
             myBgeeMetadata, myUserMetadata)
     
-        # transform tximportObect in order to easily
-        # process information
-        abundance <- transform_tximport(tximportObject, 
-        biotype_mapping)
+        # transform tximportObect in order to easily process information
+        abundance <- transform_tximport(tximportObject, biotype_mapping)
         # transform tximportObject without intergenic in
         # order to easily process information
         abundance_without_intergenic <- transform_tximport(tximportObject_without_intergenic, 
@@ -129,7 +127,16 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             message("Generate present/absent expression calls using ",
                 myAbundanceMetadata@cutoff_type, "cutoff")
         }
-    
+        # init variables not used in all approaches. Will be used to add a line in the cutoff info file
+        # if not null
+        # only used in intergenic approach
+        r_cutoff <- NULL
+        #only used in pvalue approach
+        mean_pvalue<- NULL
+        #only used in pvalue approach
+        sd_pvalue <- NULL
+
+
         if(myAbundanceMetadata@cutoff_type == 'intergenic') {
             if(isTRUE(myUserMetadata@verbose)) {
                 results <- calculate_abundance_cutoff(abundance, 
@@ -150,12 +157,12 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                                   by = "id")
         # generate calls and calculate abundance_cutoff
         }else if (myAbundanceMetadata@cutoff_type == 'pValue') {
-            abundance <- generate_theoretical_pValue(counts =abundance,
+            pvalue_generated <- generate_theoretical_pValue(counts =abundance,
                                                      myAbundanceMetadata@cutoff)
-
+            abundance <- pvalue_generated$counts_with_pValue
+            mean_pvalue <- pvalue_generated$mean
+            sd_pvalue <- pvalue_generated$sd
             abundance_cutoff <- min(na.omit(abundance$abundance[abundance$pValue <= 0.05]))
-            # such cutoff does not exist for the pValue approach
-            r_cutoff <- NULL
             # abundances without intergenic
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
                                                   abundance[, c("id", "zScore", "pValue", "call")], 
@@ -165,8 +172,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                          myAbundanceMetadata@cutoff)
             
             abundance_cutoff <- min(na.omit(abundance$abundance[abundance$qValue <= 0.05]))
-            # such cutoff does not exist for the qValue approach
-            r_cutoff <- NULL
+
             # abundances without intergenic
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
                                                   abundance[, c("id", "qValue", "call")], 
@@ -196,8 +202,8 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     
         # generate cutoff info file
         cutoff_info_file <- cutoff_info(counts = abundance, column = "call", abundance_cutoff = abundance_cutoff, 
-                                        r_cutoff = r_cutoff, myUserMetadata = myUserMetadata, 
-                                        myAbundanceMetadata = myAbundanceMetadata)
+                                        r_cutoff = r_cutoff, mean_pvalue=mean_pvalue, sd_pvalue=sd_pvalue, 
+                                        myUserMetadata = myUserMetadata, myAbundanceMetadata = myAbundanceMetadata)
         dev.off()
         
 

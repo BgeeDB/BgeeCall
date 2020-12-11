@@ -236,8 +236,10 @@ plot_distributions <- function(counts,
 #' @param column Name of the column containing presence/absence information
 #' @param TPM_cutoff TPM cutoff below which calls are considered as absent
 #' @param r_cutoff Proportion of intergenic regions considered as present
+#' @param mean_pvalue mean information. Provided only when pvalue approach is used
+#' @param sd_pvalue standard deviation. Provided only when pvalue approach is used 
 #' @param myUserMetadata A Reference Class UserMetadata object.
-#' This object has to be edited before running kallisto @seealso UserMetadata.R
+#' @param myAbundanceMetadata A Reference Class AbundanceMetadata object.
 #'
 #' @return summary statistics to export in cutoff info file
 #'
@@ -247,9 +249,8 @@ plot_distributions <- function(counts,
 #' @noMd
 #' @noRd
 #'
-cutoff_info <- function(counts,
-    column, abundance_cutoff, r_cutoff,
-    myUserMetadata, myAbundanceMetadata) {
+cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=NULL, 
+    sd_pvalue=NULL, myUserMetadata, myAbundanceMetadata) {
     ## Calculate summary statistics to export in cutoff
     ## info file
     genic_present <- sum(counts[[column]][counts$type ==
@@ -301,8 +302,10 @@ cutoff_info <- function(counts,
         to_export <- c(to_export, r_cutoff)
         names(to_export)[length(to_export)] <- "ratioIntergenicCodingPresent"
     } else if(myAbundanceMetadata@cutoff_type == "pValue") {
-        to_export <- c(to_export, myAbundanceMetadata@cutoff)
-        names(to_export)[length(to_export)] <- "pValueCutoff"
+        to_export <- c(to_export, myAbundanceMetadata@cutoff, mean_pvalue, sd_pvalue)
+        names(to_export)[length(to_export)-2] <- "pValueCutoff"
+        names(to_export)[length(to_export)-1] <- "meanIntergenic"
+        names(to_export)[length(to_export)] <- "sdIntergenic"
     } else if(myAbundanceMetadata@cutoff_type == "qValue") {
         to_export <- c(to_export, myAbundanceMetadata@cutoff)
         names(to_export)[length(to_export)] <- "qValueCutoff"
@@ -321,9 +324,8 @@ cutoff_info <- function(counts,
 #' @param counts A list of estimated counts
 #' @param pValueCutoff the pValue cutoff
 #'
-#' @return counts with zscore, pvalue and calls
+#' @return counts with zscore, pvalue and calls, but also the mean and the sd of ref. intergenic
 #' 
-#' @author Julien Wollbrett
 #' @author Sara Fonseca Costa
 #'
 #' @noMd
@@ -347,7 +349,9 @@ generate_theoretical_pValue <- function(counts, pValueCutoff) {
     
     counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
                                            is.na(counts_with_pValue$pValue)), "absent", "present")
-    return(counts_with_pValue)
+    mean <- 2^(mean(log2(selected_intergenic$abundance)))
+    sd <- 2^(sd(log2(selected_intergenic$abundance)))
+    return(list(counts_with_pValue = counts_with_pValue, mean = mean, sd = sd))
 }
 
 #' @title Generate qValue
