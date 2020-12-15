@@ -28,7 +28,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #'
 #' @description Generate presence absence calls. It correponds to 
 #' the last part of the generation of the expression calls workflow. 
-#' It runs the last part of the workflow generating presetn/absent 
+#' It runs the last part of the workflow generating present/absent 
 #' expression calls. 
 #' This function should only be used by advanced user who already 
 #' manually run all previous parts of the pipeline.
@@ -96,7 +96,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     
         # run tximport for file with intergenic regions (if
         # myAbundanceMetadata@txOut = FALSE, then tximport
-        # will summurarize transcript level estimates at
+        # will summarize transcript level estimates at
         # gene level)
         tximportObject <- run_tximport(myAbundanceMetadata = myAbundanceMetadata, 
             myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
@@ -162,7 +162,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             abundance <- pvalue_generated$counts_with_pValue
             mean_pvalue <- pvalue_generated$mean
             sd_pvalue <- pvalue_generated$sd
-            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$pValue <= 0.05]))
+            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$pValue <= myAbundanceMetadata@cutoff]))
             # abundances without intergenic
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
                                                   abundance[, c("id", "zScore", "pValue", "call")], 
@@ -171,7 +171,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             abundance <- generate_qValue(counts =abundance,
                                          myAbundanceMetadata@cutoff)
             
-            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$qValue <= 0.05]))
+            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$qValue <= myAbundanceMetadata@cutoff]))
 
             # abundances without intergenic
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
