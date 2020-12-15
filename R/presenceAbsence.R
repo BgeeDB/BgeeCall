@@ -28,7 +28,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #'
 #' @description Generate presence absence calls. It correponds to 
 #' the last part of the generation of the expression calls workflow. 
-#' It runs the last part of the workflow generating presetn/absent 
+#' It runs the last part of the workflow generating present/absent 
 #' expression calls. 
 #' This function should only be used by advanced user who already 
 #' manually run all previous parts of the pipeline.
@@ -77,7 +77,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     
     # check if calls have to be created
     if (file.exists(file.path(output_path, 
-            myAbundanceMetadata@gene_calls_file_name)) & !myAbundanceMetadata@overwrite_calls ){
+                              paste0(myAbundanceMetadata@gene_calls_file_name, myAbundanceMetadata@cutoff_type, ".tsv"))) & !myAbundanceMetadata@overwrite_calls ){
         if(isTRUE(myUserMetadata@verbose)) {
             message("no need to regenerate calls")
         }
@@ -96,14 +96,14 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     
         # run tximport for file with intergenic regions (if
         # myAbundanceMetadata@txOut = FALSE, then tximport
-        # will summurarize transcript level estimates at
+        # will summarize transcript level estimates at
         # gene level)
         tximportObject <- run_tximport(myAbundanceMetadata = myAbundanceMetadata, 
             myBgeeMetadata = myBgeeMetadata, myUserMetadata = myUserMetadata)
     
         # recalculate TPM without intergenic regions and
         # run tximport (if myAbundanceMetadata@txOut =
-        # FALSE, then tximport will summurarize at
+        # FALSE, then tximport will summarize at
         # transcript level estimates at gene level)
     
         # remove intergenic
@@ -162,7 +162,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             abundance <- pvalue_generated$counts_with_pValue
             mean_pvalue <- pvalue_generated$mean
             sd_pvalue <- pvalue_generated$sd
-            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$pValue <= 0.05]))
+            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$pValue <= myAbundanceMetadata@cutoff]))
             # abundances without intergenic
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
                                                   abundance[, c("id", "zScore", "pValue", "call")], 
@@ -171,7 +171,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             abundance <- generate_qValue(counts =abundance,
                                          myAbundanceMetadata@cutoff)
             
-            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$qValue <= 0.05]))
+            abundance_cutoff <- min(na.omit(abundance$abundance[abundance$qValue <= myAbundanceMetadata@cutoff]))
 
             # abundances without intergenic
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
@@ -181,17 +181,15 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             stop("unknown cutoff type : ", myAbundanceMetadata@cutoffType, ". Should be 
             \"pValue\" or \"intergenic\" or \"qValue\"")
         }
-            
-        
-    
+   
         # generate name of output file
-        calls_file_name <- myAbundanceMetadata@gene_calls_file_name
-        cutoff_info_file_name <- myAbundanceMetadata@gene_cutoff_file_name
-        distribution_file_name <- myAbundanceMetadata@gene_distribution_file_name
+        calls_file_name <- paste0(myAbundanceMetadata@gene_calls_file_name, myAbundanceMetadata@cutoff_type, ".tsv")
+        cutoff_info_file_name <- paste0(myAbundanceMetadata@gene_cutoff_file_name,  myAbundanceMetadata@cutoff_type, ".tsv")
+        distribution_file_name <- paste0(myAbundanceMetadata@gene_distribution_file_name,  myAbundanceMetadata@cutoff_type, ".pdf")
         if (myAbundanceMetadata@txOut) {
-            calls_file_name <- myAbundanceMetadata@transcript_calls_file_name
-            cutoff_info_file_name <- myAbundanceMetadata@transcript_cutoff_file_name
-            distribution_file_name <- myAbundanceMetadata@transcript_distribution_file_name
+            calls_file_name <- paste0(myAbundanceMetadata@transcript_calls_file_name,  myAbundanceMetadata@cutoff_type, ".tsv")
+            cutoff_info_file_name <- paste0(myAbundanceMetadata@transcript_cutoff_file_name,  myAbundanceMetadata@cutoff_type, ".tsv")
+            distribution_file_name <- paste0(myAbundanceMetadata@transcript_distribution_file_name,  myAbundanceMetadata@cutoff_type, ".pdf")
         }
     
         # generate pdf plot
