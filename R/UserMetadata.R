@@ -55,6 +55,7 @@ UserMetadata <- setClass(
         annotation_name = "character",
         annotation_object = "GRanges",
         working_path = "character",
+        gtf_source = "character",
         simple_arborescence = "logical",
         output_dir = "character",
         verbose = "logical",
@@ -64,6 +65,7 @@ UserMetadata <- setClass(
     # Set the default values for the slots.
     prototype = prototype(
         working_path = getwd(),
+        gtf_source = "ensembl",
         reads_size = 51,
         simple_arborescence = TRUE,
         output_dir = "",

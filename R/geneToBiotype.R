@@ -65,8 +65,16 @@ create_gene_to_biotype <- function(myAbundanceMetadata = new("AbundanceMetadata"
         gtf <- as.data.frame(myUserMetadata@annotation_object)
         gtf_gene <- gtf[gtf$source != "intergenic", 
             ]
-        gene_to_biotype <- as.data.frame(unique(cbind(gtf_gene$gene_id, 
-            gtf_gene$gene_biotype)))
+        
+        if (myUserMetadata@gtf_source == "ensembl"){
+            gene_to_biotype <- as.data.frame(unique(cbind(gtf_gene$gene_id, 
+                                                          gtf_gene$gene_biotype)))
+        } else if (myUserMetadata@gtf_source == "gencode"){
+            gene_to_biotype <- as.data.frame(unique(cbind(gtf_gene$gene_id, 
+                                                          gtf_gene$gene_type)))
+        } else {
+            warning("The annotation file should be provided from ensembl or gencode.")
+        }
         gene_to_biotype[, 3] <- "genic"
         names(gene_to_biotype) <- column_names
         
