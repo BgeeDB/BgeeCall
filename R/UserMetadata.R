@@ -24,6 +24,7 @@
 #' @slot annotation_object Object containing annotations from GTF or GFF file
 #' @slot working_path Working directory. By default the working directory is
 #' defined with the `getwd()` function.
+#' @slot gtf_source The source name from where the gtf file comes from. By default is ensembl.
 #' @slot simple_arborescence logical allowing to create a simple arborescence
 #' of directory. If `TRUE` (default), all results will be on the same directory
 #' (working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you
@@ -55,6 +56,7 @@ UserMetadata <- setClass(
         annotation_name = "character",
         annotation_object = "GRanges",
         working_path = "character",
+        gtf_source = "character",
         simple_arborescence = "logical",
         output_dir = "character",
         verbose = "logical",
@@ -64,6 +66,7 @@ UserMetadata <- setClass(
     # Set the default values for the slots.
     prototype = prototype(
         working_path = getwd(),
+        gtf_source = "ensembl",
         reads_size = 51,
         simple_arborescence = TRUE,
         output_dir = "",

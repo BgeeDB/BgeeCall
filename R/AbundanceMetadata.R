@@ -118,13 +118,13 @@ AbundanceMetadata <- setClass(
         tx2biotype_file = "tx2biotype.tsv",
         tx2biotype_file_without_tx_version = "tx2biotype_without_tx_version.tsv",
         gene2biotype_file = "gene2biotype.tsv",
-        transcript_calls_file_name = "transcript_level_abundance+calls.tsv",
-        gene_calls_file_name = "gene_level_abundance+calls.tsv",
-        transcript_cutoff_file_name = "transcript_cutoff_info_file.tsv",
-        gene_cutoff_file_name = "gene_cutoff_info_file.tsv",
+        transcript_calls_file_name = "transcript_level_abundance+calls",
+        gene_calls_file_name = "gene_level_abundance+calls",
+        transcript_cutoff_file_name = "transcript_cutoff_info_file",
+        gene_cutoff_file_name = "gene_cutoff_info_file",
         transcript_distribution_file_name = 
-            "transcript_TPM_genic_intergenic+cutoff.pdf",
-        gene_distribution_file_name = "gene_TPM_genic_intergenic+cutoff.pdf"
+            "transcript_TPM_genic_intergenic+cutoff",
+        gene_distribution_file_name = "gene_TPM_genic_intergenic+cutoff"
     )
     
 )

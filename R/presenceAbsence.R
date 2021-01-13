@@ -77,12 +77,16 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     
     # check if calls have to be created
     if (file.exists(file.path(output_path, 
-            myAbundanceMetadata@gene_calls_file_name)) & !myAbundanceMetadata@overwrite_calls ){
+                              paste0(myAbundanceMetadata@gene_calls_file_name, ".tsv"))) & !myAbundanceMetadata@overwrite_calls ){
         if(isTRUE(myUserMetadata@verbose)) {
             message("no need to regenerate calls")
         }
-    }
-    else {
+    } else if (file.exists(file.path(output_path, 
+                                     paste0(myAbundanceMetadata@gene_calls_file_name, "_", myAbundanceMetadata@cutoff_type, ".tsv"))) & !myAbundanceMetadata@overwrite_calls ){
+      if(isTRUE(myUserMetadata@verbose)) {
+        message("no need to regenerate calls")
+      }
+    } else {
         # biotype mapping information will depend on
         # summarization at gene level or not
         biotype_mapping <- ""
@@ -103,7 +107,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
     
         # recalculate TPM without intergenic regions and
         # run tximport (if myAbundanceMetadata@txOut =
-        # FALSE, then tximport will summurarize at
+        # FALSE, then tximport will summarize at
         # transcript level estimates at gene level)
     
         # remove intergenic
@@ -181,19 +185,30 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             stop("unknown cutoff type : ", myAbundanceMetadata@cutoffType, ". Should be 
             \"pValue\" or \"intergenic\" or \"qValue\"")
         }
-            
         
-    
-        # generate name of output file
-        calls_file_name <- myAbundanceMetadata@gene_calls_file_name
-        cutoff_info_file_name <- myAbundanceMetadata@gene_cutoff_file_name
-        distribution_file_name <- myAbundanceMetadata@gene_distribution_file_name
-        if (myAbundanceMetadata@txOut) {
-            calls_file_name <- myAbundanceMetadata@transcript_calls_file_name
-            cutoff_info_file_name <- myAbundanceMetadata@transcript_cutoff_file_name
-            distribution_file_name <- myAbundanceMetadata@transcript_distribution_file_name
+        if (myAbundanceMetadata@cutoff_type == "pValue"){
+            # generate name of output file for default approach (without approach extension)
+            calls_file_name <- paste0(myAbundanceMetadata@gene_calls_file_name, ".tsv")
+            cutoff_info_file_name <- paste0(myAbundanceMetadata@gene_cutoff_file_name, ".tsv")
+            distribution_file_name <- paste0(myAbundanceMetadata@gene_distribution_file_name, ".pdf")
+            if (myAbundanceMetadata@txOut) {
+                calls_file_name <- paste0(myAbundanceMetadata@transcript_calls_file_name, ".tsv")
+                cutoff_info_file_name <- paste0(myAbundanceMetadata@transcript_cutoff_file_name, ".tsv")
+                distribution_file_name <- paste0(myAbundanceMetadata@transcript_distribution_file_name, ".pdf")
+            }  
+            
+        } else {
+            # generate name of output file with approach extension
+            calls_file_name <- paste0(myAbundanceMetadata@gene_calls_file_name, "_", myAbundanceMetadata@cutoff_type, ".tsv")
+            cutoff_info_file_name <- paste0(myAbundanceMetadata@gene_cutoff_file_name,  "_", myAbundanceMetadata@cutoff_type, ".tsv")
+            distribution_file_name <- paste0(myAbundanceMetadata@gene_distribution_file_name,  "_", myAbundanceMetadata@cutoff_type, ".pdf")
+            if (myAbundanceMetadata@txOut) {
+                calls_file_name <- paste0(myAbundanceMetadata@transcript_calls_file_name,  "_", myAbundanceMetadata@cutoff_type, ".tsv")
+                cutoff_info_file_name <- paste0(myAbundanceMetadata@transcript_cutoff_file_name,  "_", myAbundanceMetadata@cutoff_type, ".tsv")
+                distribution_file_name <- paste0(myAbundanceMetadata@transcript_distribution_file_name, "_",  myAbundanceMetadata@cutoff_type, ".pdf")
+            }
         }
-    
+  
         # generate pdf plot
         pdf(file = file.path(output_path, distribution_file_name), 
             width = 6, height = 5)
