@@ -24,7 +24,7 @@ path to the 4 output files
 \description{
 Generate presence absence calls. It correponds to 
 the last part of the generation of the expression calls workflow. 
-It runs the last part of the workflow generating presetn/absent 
+It runs the last part of the workflow generating present/absent 
 expression calls. 
 This function should only be used by advanced user who already 
 manually run all previous parts of the pipeline.

@@ -19,7 +19,7 @@ merging_libraries(
 
 \item{condition}{Condition/s where the merging should be done}
 
-\item{cutoff}{Cutoff that should be applied to call P/A genes}
+\item{cutoff}{Cutoff that should be applied to call Present/Absent genes}
 
 \item{outDir}{Directory where the output files should be saved}
 }
@@ -34,9 +34,12 @@ or using the q-values of the libraries using the fdr_inverse method.
 }
 \examples{
 \dontrun{
-callsMerging_species <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'BH', condition = 'species_id', cutoff = 0.05, outDir = 'PATH_OUTPUT')
-callsMerging_species_sex <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', condition = c(species_id, sex), cutoff = 0.01, outDir = 'PATH_OUTPUT')
-callsMerging_all <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', condition = c(species_id, anatEntity, devStage, sex, strain), cutoff = 0.05, outDir = 'PATH_OUTPUT')
+callsMerging_species <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'BH', 
+condition = 'species_id', cutoff = 0.05, outDir = 'PATH_OUTPUT')
+callsMerging_species_sex <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', 
+condition = c(species_id, sex), cutoff = 0.01, outDir = 'PATH_OUTPUT')
+callsMerging_all <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', 
+condition = c(species_id, anatEntity, devStage, sex, strain), cutoff = 0.05, outDir = 'PATH_OUTPUT')
 }
 
 }

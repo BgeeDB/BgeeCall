@@ -10,8 +10,6 @@
 #' 
 #' @export
 #' 
-#' @noMd
-#' @noRd
 
 get_summary_stats <- function(userFile, outDir){
   
