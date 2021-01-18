@@ -13,6 +13,7 @@
 #' 
 #' @import data.table
 #' @import sjmisc
+#' @import dplyr
 #' 
 #' @noMd
 #' @noRd
@@ -83,7 +84,7 @@ approachesMerging <- function(allFiles, approach, cutoff){
     ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
     allInfo <- data.frame(select_info, collect_padjValues)
     ## provide info just about id and minimum_pValue detected
-    allInfo <- allInfo %>% select("select_info", "minimum_pValue")
+    allInfo <- allInfo %>% dplyr::select("select_info", "minimum_pValue")
     colnames(allInfo)[1] <- c("id")
     
     ## perform the calls
@@ -104,7 +105,7 @@ approachesMerging <- function(allFiles, approach, cutoff){
     ## data frame with all information (gene_id + minimum q-Value detected of all libraries)
     allInfo <- data.frame(select_info, select_qValue)
     ## provide info just about id and minimum_qValue detected
-    allInfo <- allInfo %>% select("select_info", "minimum_qValue")
+    allInfo <- allInfo %>% dplyr::select("select_info", "minimum_qValue")
     colnames(allInfo)[1] <- c("id")
     
     ## Calculate FDR inverse
@@ -141,9 +142,12 @@ approachesMerging <- function(allFiles, approach, cutoff){
 #' 
 #' @examples 
 #' \dontrun{
-#' callsMerging_species <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'BH', condition = 'species_id', cutoff = 0.05, outDir = 'PATH_OUTPUT')
-#' callsMerging_species_sex <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', condition = c(species_id, sex), cutoff = 0.01, outDir = 'PATH_OUTPUT')
-#' callsMerging_all <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', condition = c(species_id, anatEntity, devStage, sex, strain), cutoff = 0.05, outDir = 'PATH_OUTPUT')
+#' callsMerging_species <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'BH', 
+#' condition = 'species_id', cutoff = 0.05, outDir = 'PATH_OUTPUT')
+#' callsMerging_species_sex <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', 
+#' condition = c(species_id, sex), cutoff = 0.01, outDir = 'PATH_OUTPUT')
+#' callsMerging_all <- merging_libraries(userFile = 'PATH_USER_FILE', approach = 'fdr_inverse', 
+#' condition = c(species_id, anatEntity, devStage, sex, strain), cutoff = 0.05, outDir = 'PATH_OUTPUT')
 #' }
 #' 
 #' @return A dataframe containing the minimum quantitative value (p-value or q-value) and 
@@ -177,8 +181,13 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     }
     
     #retrieve all abundance files corresponding to condition
-    allFiles <- list.files(path = file.path(filtered_libraries$output_directory), pattern="gene_level_abundance\\+calls.tsv", 
-                           full.names=T, recursive = TRUE)
+    if (approach == "BH"){
+      allFiles <- list.files(path = file.path(filtered_libraries$output_directory), pattern="gene_level_abundance\\+calls.tsv", 
+                             full.names=T, recursive = TRUE)  
+    } else {
+      allFiles <- list.files(path = file.path(filtered_libraries$output_directory), pattern="gene_level_abundance\\+calls_qValue.tsv", 
+                             full.names=T, recursive = TRUE)
+    }
     message("Using ", length(allFiles), " libraries for condition: ", paste(condition,""), 
       " with values: ",paste(currentRow, ""))
     allFiles <- lapply(allFiles, read.delim)
