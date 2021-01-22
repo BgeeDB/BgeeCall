@@ -334,8 +334,8 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
 #' @import dplyr
 #'
 generate_theoretical_pValue <- function(counts, pValueCutoff) {
-    ## select values with TPM > 0 (because we will use log2 scale)
-    selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+    ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
+    selected_intergenic <- filter(counts, abundance > 1e-6 & type == "intergenic")
 
     ## select genic region from the library
     selected_count <- filter(counts, abundance > 0)  
