@@ -315,11 +315,11 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 second_file_path <- file.path(myUserMetadata@rnaseq_lib_path, second_files[i])
                 #check if it is an encrypted run. If it is one, update the path to the run
                 # to allow to decrypt it
-                if( file.exists(paste0(first_file_path,".enc")) ) {
-                    first_file_path <- gsub("FASTQ_PATH", paste0(first_file_path, ".enc"), 
-                        myUserMetadata$encripted_pattern)
-                    second_file_path <- gsub("FASTQ_PATH", paste0(second_file_path, ".enc"), 
-                                            myUserMetadata$encripted_pattern)
+                if( grepl("enc$", first_file_path, perl = TRUE) ) {
+                    first_file_path <- gsub("FASTQ_PATH", first_file_path, 
+                        myUserMetadata@encripted_pattern)
+                    second_file_path <- gsub("FASTQ_PATH", second_file_path, 
+                        myUserMetadata@encripted_pattern)
                 }
                 fastq_files_names = paste(fastq_files_names,first_file_path,
                     second_file_path, sep = " ")
@@ -343,14 +343,29 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
             #check if it is an encrypted run. If it is one, update the path to the run
             # to allow to decrypt it
             single_end_file_path <- file.path(myUserMetadata@rnaseq_lib_path, fastq_files[i])
-            if( file.exists(paste0(fastq_files[i],".enc")) ) {
-                single_end_file_path <- gsub("FASTQ_PATH", paste0(single_end_file_path, ".enc"), 
-                    myUserMetadata$encripted_pattern)
+            if( grepl("enc$", first_file_path, perl = TRUE) ) {
+                single_end_file_path <- gsub("FASTQ_PATH", single_end_file_path, 
+                    myUserMetadata@encripted_pattern)
             }
             fastq_files_names = paste(fastq_files_names, single_end_file_path, sep = " ")
         }
     }
     return(fastq_files_names)
+}
+
+#' @title get is_encrypted_library files
+#'
+#' @description detect if a library is encrypted
+#'
+#' @noMd
+#' @noRd
+#'
+is_encrypted_library <- function(myUserMetadata) {
+  fastq_files <- get_fastq_files(myUserMetadata)
+  if (grepl("enc$", fastq_files[1], perl = TRUE)) {
+    return(TRUE)
+  }
+  return(FALSE)
 }
 
 #' @title get fastq files
@@ -368,9 +383,10 @@ get_fastq_files <- function(myUserMetadata) {
     fastq_files <- ""
     i <- 1
     for (library_file in library_files) {
-        if (grepl(".fq$", library_file) || grepl(".fq.gz$",
-            library_file) || grepl(".fastq.gz$", library_file) ||
-            grepl(".fastq$", library_file)) {
+        if (grepl(".fq$", library_file) || grepl(".fq.gz$", library_file) 
+            || grepl(".fastq.gz$" , library_file) || grepl(".fastq$", library_file)
+            || grepl(".fq.enc$" , library_file) || grepl(".fq.gz.enc$" , library_file)
+            || grepl(".fastq.enc$" , library_file) || grepl(".fastq.gz.enc$" , library_file)) {
             fastq_files[i] <- library_file
             i <- i + 1
         }
