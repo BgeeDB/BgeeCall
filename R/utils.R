@@ -316,9 +316,9 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 #check if it is an encrypted run. If it is one, update the path to the run
                 # to allow to decrypt it
                 if( file.exists(paste0(first_file_path,".enc")) ) {
-                    first_file_path <- gsub("FASTQ_PATH", first_file_path, 
+                    first_file_path <- gsub("FASTQ_PATH", paste0(first_file_path, ".enc"), 
                         myUserMetadata$encripted_pattern)
-                    second_file_path <- gsub("FASTQ_PATH", second_file_path, 
+                    second_file_path <- gsub("FASTQ_PATH", paste0(second_file_path, ".enc"), 
                                             myUserMetadata$encripted_pattern)
                 }
                 fastq_files_names = paste(fastq_files_names,first_file_path,
@@ -344,7 +344,7 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
             # to allow to decrypt it
             single_end_file_path <- file.path(myUserMetadata@rnaseq_lib_path, fastq_files[i])
             if( file.exists(paste0(fastq_files[i],".enc")) ) {
-                single_end_file_path <- gsub("FASTQ_PATH", single_end_file_path, 
+                single_end_file_path <- gsub("FASTQ_PATH", paste0(single_end_file_path, ".enc"), 
                     myUserMetadata$encripted_pattern)
             }
             fastq_files_names = paste(fastq_files_names, single_end_file_path, sep = " ")
