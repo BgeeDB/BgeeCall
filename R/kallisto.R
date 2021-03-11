@@ -276,7 +276,7 @@ potential already installed version of Kallisto.")
         
         # can not use system2 function for encrypted libraries as it needs to well manage piped 
         # commands
-        if(is_encrypted_library(myBgeeMetadata)) {
+        if(is_encrypted_library(myUserMetadata)) {
           system(paste("echo \"", paste(kallisto_exec_path, kallisto_args), "\" | bash"))
         } else {
           system2(command = kallisto_exec_path, args = kallisto_args)

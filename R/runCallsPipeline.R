@@ -84,7 +84,8 @@ generate_calls_workflow <- function(abundanceMetadata = new("KallistoMetadata"),
                                     bgeeMetadata = new("BgeeMetadata"),
                                     userMetadata = NULL,
                                     userDataFrame = NULL,
-                                    userFile = NULL) {
+                                    userFile = NULL,
+                                    checkTxVersion = FALSE) {
     if (is.null(userMetadata) && is.null(userDataFrame) &&
         is.null(userFile)) {
         stop("one of the parameters userMetadata, userDataFrame or userFile
@@ -98,7 +99,8 @@ generate_calls_workflow <- function(abundanceMetadata = new("KallistoMetadata"),
                 run_from_object(
                     myAbundanceMetadata = abundanceMetadata,
                     myBgeeMetadata = bgeeMetadata,
-                    myUserMetadata = userMetadata
+                    myUserMetadata = userMetadata,
+                    checkTxVersion = checkTxVersion
                 )
             )
         } else if (typeof(userMetadata) == "list" &&
@@ -108,7 +110,8 @@ generate_calls_workflow <- function(abundanceMetadata = new("KallistoMetadata"),
                     run_from_object(
                         myAbundanceMetadata = abundanceMetadata,
                         myBgeeMetadata = bgeeMetadata,
-                        myUserMetadata = userMetadata[[i]]
+                        myUserMetadata = userMetadata[[i]],
+                        checkTxVersion = checkTxVersion
                     )
             }
             return(results)
@@ -126,7 +129,8 @@ generate_calls_workflow <- function(abundanceMetadata = new("KallistoMetadata"),
                 myAbundanceMetadata = abundanceMetadata,
                 myBgeeMetadata = bgeeMetadata,
                 myUserMetadata = myUserMetadata,
-                userMetadataDataFrame = userDataFrame
+                userMetadataDataFrame = userDataFrame,
+                checkTxVersion = checkTxVersion
             )
         )
         # run workflow when userDataFrame is not null
@@ -143,7 +147,8 @@ information allowing to generate UserMetadata objects"
                 myAbundanceMetadata = abundanceMetadata,
                 myBgeeMetadata = bgeeMetadata,
                 myUserMetadata = userMetadata,
-                userMetadataFile = userFile
+                userMetadataFile = userFile,
+                checkTxVersion = checkTxVersion
             )
         )
     } else {
@@ -206,21 +211,24 @@ information allowing to generate UserMetadata objects"
 run_from_object <-
     function(myAbundanceMetadata = new("KallistoMetadata"),
         myBgeeMetadata = new("BgeeMetadata"),
-        myUserMetadata) {
-        if (myAbundanceMetadata@tool_name == "kallisto") {
-            run_kallisto(myAbundanceMetadata, myBgeeMetadata,
-                myUserMetadata)
-        } else {
-            stop(
-                paste0(
-                    "The myAbundanceMetadata object should be an instance of
-                KallistoMetadata"
-                )
-            )
-        }
-        calls_output <- generate_presence_absence(myAbundanceMetadata,
-            myBgeeMetadata, myUserMetadata)
-        return(calls_output)
+        myUserMetadata, checkTxVersion) {
+      if(checkTxVersion) {
+        myAbundanceMetadata@ignoreTxVersion <- should_ignore_tx_version(myUserMetadata)
+      }
+      if (myAbundanceMetadata@tool_name == "kallisto") {
+          run_kallisto(myAbundanceMetadata, myBgeeMetadata,
+              myUserMetadata)
+      } else {
+          stop(
+              paste0(
+                  "The myAbundanceMetadata object should be an instance of
+              KallistoMetadata"
+              )
+          )
+      }
+      calls_output <- generate_presence_absence(myAbundanceMetadata,
+          myBgeeMetadata, myUserMetadata)
+      return(calls_output)
     }
 
 #' @title generate present/absent calls from a data frame
@@ -254,7 +262,7 @@ run_from_object <-
 #'
 run_from_dataframe <-function(myAbundanceMetadata = new("KallistoMetadata"),
         myBgeeMetadata = new("BgeeMetadata"), myUserMetadata = NULL, 
-        userMetadataDataFrame) {
+        userMetadataDataFrame, checkTxVersion) {
     all_results <- list()
     for (row_number in seq_len(nrow(userMetadataDataFrame))) {
         ## init myUserMetadata object
@@ -262,7 +270,9 @@ run_from_dataframe <-function(myAbundanceMetadata = new("KallistoMetadata"),
             init_userMetadata_from_dataframe(userMetadataDataFrame, myUserMetadata, row_number)
         
         # run pipeline
-        result <- run_from_object(myAbundanceMetadata, myBgeeMetadata, user_metadata)
+        result <- run_from_object(myAbundanceMetadata = myAbundanceMetadata, 
+            myBgeeMetadata = myBgeeMetadata, myUserMetadata = user_metadata, 
+            checkTxVersion = checkTxVersion)
         all_results <- c(all_results, list(result))
     }
     return(all_results)
@@ -305,10 +315,10 @@ run_from_dataframe <-function(myAbundanceMetadata = new("KallistoMetadata"),
 #'
 run_from_file <-
     function(myAbundanceMetadata = new("KallistoMetadata"), myBgeeMetadata = new("BgeeMetadata"), 
-             myUserMetadata = NULL, userMetadataFile) {
+             myUserMetadata = NULL, userMetadataFile, checkTxVersion) {
     user_metadata_df <- read.table(userMetadataFile, header = TRUE, sep = "\t", comment.char = "#")
     output_files <- run_from_dataframe(myAbundanceMetadata, myBgeeMetadata, myUserMetadata, 
-                                       user_metadata_df)
+                                       user_metadata_df, checkTxVersion)
     return(output_files)
 }
 
