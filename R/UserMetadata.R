@@ -41,6 +41,10 @@
 #' downloaded. If not NULL BgeeCall will merge this local reference intergenic
 #' file with the transcriptome. Except if you generated your own intergenic
 #' regions always keep it NULL.
+#' @slot encrypted_pattern Allows to manage encrypted libraries. If a fastq file with
+#' the suffix .enc is found for a run, this slot will allow to use a string pattern
+#' to decrypt it. . This encrypted_pattern needs to contain the string FASTQ_PATH that
+#' will be transformed to the actual path to the fastq file. 
 UserMetadata <- setClass(
     # Set the name for the class
     Class = "UserMetadata",
@@ -60,7 +64,8 @@ UserMetadata <- setClass(
         simple_arborescence = "logical",
         output_dir = "character",
         verbose = "logical",
-        custom_intergenic_path = "character"
+        custom_intergenic_path = "character",
+        encripted_pattern = "character"
     ),
     
     # Set the default values for the slots.

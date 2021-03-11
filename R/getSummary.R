@@ -9,8 +9,7 @@
 #' @author Sara Fonseca Costa
 #' 
 #' @export
-#' @noMd
-#' @noRd
+#' 
 
 get_summary_stats <- function(userFile, outDir){
   
@@ -33,7 +32,7 @@ get_summary_stats <- function(userFile, outDir){
       selectStats <- t(readFiles[1:11, ])[2,]
       approach <- readFiles[12,1]
       cutoff <- readFiles[12,2]
-    
+      
       if(approach == "pValueCutoff"){
         mean <- readFiles[13,2]
         standard_deviation <- readFiles[14,2]

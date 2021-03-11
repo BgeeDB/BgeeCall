@@ -19,6 +19,9 @@ Thes most important functions are :
   \item generate_slurm_calls : generate present/absent calls for a list of libraries 
   on a cluster with slurm queuing system. Indexes have to be generated first with the function
   `generate_slurm_indexes`
+  \item merging_libraries : merge calls from different libraries corresponding to the 
+  same condition. Extremely useful if different libraries correspond to same condition 
+  (e.g. same anatomical entity from same species)
 }
 For more details please have a look at the vignette with the command \strong{vignette("BgeeCall")}
 }

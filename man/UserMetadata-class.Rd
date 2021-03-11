@@ -42,6 +42,8 @@ of output repositories.}
 \item{\code{working_path}}{Working directory. By default the working directory is
 defined with the `getwd()` function.}
 
+\item{\code{gtf_source}}{The source name from where the gtf file comes from. By default is ensembl.}
+
 \item{\code{simple_arborescence}}{logical allowing to create a simple arborescence
 of directory. If `TRUE` (default), all results will be on the same directory
 (working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you
