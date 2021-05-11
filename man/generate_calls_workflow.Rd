@@ -9,7 +9,8 @@ generate_calls_workflow(
   bgeeMetadata = new("BgeeMetadata"),
   userMetadata = NULL,
   userDataFrame = NULL,
-  userFile = NULL
+  userFile = NULL,
+  checkTxVersion = FALSE
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ if the reads size is lower than 51 abundance quantification will be run from an 
 the same than for userDataFrame (see above). a template of this file is
 available at the root of the package and accessible with the command
 system.file('userMetadataTemplate.tsv', package = 'BgeeCall')}
+
+\item{checkTxVersion}{boolean used to define if BgeeCall check rather transcript version
+should be removed. Default value is FALSE}
 }
 \value{
 paths to the 5 results files (see vignette for more details)

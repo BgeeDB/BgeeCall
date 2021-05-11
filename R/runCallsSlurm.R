@@ -158,8 +158,8 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
 #' slurm_apply automatically divides params in chunks of approximately equal size to 
 #' send to each node. Less nodes are allocated if the parameter set is too small to 
 #' use all CPUs on the requested nodes. By default this number is 10.
-
-
+#' @param checkTxVersion boolean used to define if BgeeCall check rather transcript version
+#' should be removed. Default value is FALSE
 #' 
 #' @return generate calls
 #' 

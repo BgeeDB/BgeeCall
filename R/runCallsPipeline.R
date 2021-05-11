@@ -40,7 +40,9 @@
 #' the same than for userDataFrame (see above). a template of this file is
 #' available at the root of the package and accessible with the command
 #' system.file('userMetadataTemplate.tsv', package = 'BgeeCall')
-#'
+#' 
+#' @param checkTxVersion boolean used to define if BgeeCall check rather transcript version
+#' should be removed. Default value is FALSE
 #'
 #' @author Julien Wollbrett
 #'
@@ -244,7 +246,9 @@ run_from_object <-
 #' to generate UserMetadata objects. This data frame must contains 7 columns
 #' (species_id, run_ids, reads_size, rnaseq_lib_path, transcriptome_path,
 #' annotation_path, working_path)
-#'
+#' @param checkTxVersion boolean used to define if BgeeCall check rather transcript version
+#' should be removed. Default value is FALSE
+#' 
 #' @author Julien Wollbrett
 #'
 #' @return paths to the 4 output files generated per call generation
@@ -300,7 +304,9 @@ run_from_dataframe <-function(myAbundanceMetadata = new("KallistoMetadata"),
 #' - transcriptome_path : path to transcriptome file
 #' - annotation_path : path to annotation file
 #' - working_path : root of the output directory
-#'
+#' @param checkTxVersion boolean used to define if BgeeCall check rather transcript version
+#' should be removed. Default value is FALSE
+#' 
 #' @author Julien Wollbrett
 #'
 #' @return paths to the 4 output files generated per call generation
