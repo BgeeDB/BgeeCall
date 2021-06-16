@@ -14,7 +14,8 @@ generate_slurm_calls(
   rscript_path = NULL,
   modules = NULL,
   submit = TRUE,
-  nodes = 10
+  nodes = 10,
+  checkTxVersion = FALSE
 )
 }
 \arguments{
@@ -57,6 +58,9 @@ value is TRUE}
 slurm_apply automatically divides params in chunks of approximately equal size to 
 send to each node. Less nodes are allocated if the parameter set is too small to 
 use all CPUs on the requested nodes. By default this number is 10.}
+
+\item{checkTxVersion}{boolean used to define if BgeeCall check rather transcript version
+should be removed. Default value is FALSE}
 }
 \value{
 generate calls

@@ -267,7 +267,6 @@ download_fasta_intergenic <-
 #'
 get_merged_fastq_file_names <- function(myUserMetadata) {
     fastq_files <- get_fastq_files(myUserMetadata)
-    
     # filter list of fastq files if run_ids are provided
     if (length(myUserMetadata@run_ids) != 0) {
         fastq_files <- unique(grep(
@@ -303,25 +302,25 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
             )
         }
         for (i in seq_along(first_files)) {
-            run_1 <- sub("^([^_]+).*", "\\1", first_files[i],
-                perl = TRUE)
-            run_2 <- sub("^([^_]+).*", "\\1", second_files[i],
-                perl = TRUE)
+            run_1 <- sub("^([^_]+).*", "\\1", first_files[i], perl = TRUE)
+            run_2 <- sub("^([^_]+).*", "\\1", second_files[i], perl = TRUE)
             if (run_1 == run_2) {
                 # combine all fastq_files in a character like A_1
                 # A_2 B_1 B_2 ...
-                fastq_files_names = paste(
-                    fastq_files_names,
-                    file.path(
-                        myUserMetadata@rnaseq_lib_path,
-                        first_files[i]
-                    ),
-                    file.path(
-                        myUserMetadata@rnaseq_lib_path,
-                        second_files[i]
-                    ),
-                    sep = " "
-                )
+                
+                first_file_path <- file.path(myUserMetadata@rnaseq_lib_path, first_files[i])
+                second_file_path <- file.path(myUserMetadata@rnaseq_lib_path, second_files[i])
+                
+                #check if it is an encrypted run. If it is one, update the path to the run
+                # to allow to decrypt it
+                if( grepl("enc$", first_file_path, perl = TRUE) ) {
+                    first_file_path <- gsub("FASTQ_PATH", first_file_path, 
+                        myUserMetadata@encripted_pattern)
+                    second_file_path <- gsub("FASTQ_PATH", second_file_path, 
+                        myUserMetadata@encripted_pattern)
+                }
+                fastq_files_names = paste(fastq_files_names,first_file_path,
+                    second_file_path, sep = " ")
             }
         }
     } else {
@@ -337,16 +336,34 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 )
             )
         }
+        # will merge fastq files for single end libraries
         for (i in seq_along(fastq_files)) {
-            fastq_files_names = paste(
-                fastq_files_names,
-                file.path(myUserMetadata@rnaseq_lib_path,
-                    fastq_files[i]),
-                sep = " "
-            )
+            #check if it is an encrypted run. If it is one, update the path to the run
+            # to allow to decrypt it
+            single_end_file_path <- file.path(myUserMetadata@rnaseq_lib_path, fastq_files[i])
+            if( grepl("enc$", single_end_file_path, perl = TRUE) ) {
+                single_end_file_path <- gsub("FASTQ_PATH", single_end_file_path, 
+                    myUserMetadata@encripted_pattern)
+            }
+            fastq_files_names = paste(fastq_files_names, single_end_file_path, sep = " ")
         }
     }
     return(fastq_files_names)
+}
+
+#' @title get is_encrypted_library files
+#'
+#' @description detect if a library is encrypted
+#'
+#' @noMd
+#' @noRd
+#'
+is_encrypted_library <- function(myUserMetadata) {
+  fastq_files <- get_fastq_files(myUserMetadata)
+  if (grepl("enc$", fastq_files[1], perl = TRUE)) {
+    return(TRUE)
+  }
+  return(FALSE)
 }
 
 #' @title get fastq files
@@ -364,12 +381,16 @@ get_fastq_files <- function(myUserMetadata) {
     fastq_files <- ""
     i <- 1
     for (library_file in library_files) {
-        if (grepl(".fq$", library_file) || grepl(".fq.gz$",
-            library_file) || grepl(".fastq.gz$", library_file) ||
-            grepl(".fastq$", library_file)) {
+        if (grepl(".fq$", library_file) || grepl(".fq.gz$", library_file) 
+            || grepl(".fastq.gz$" , library_file) || grepl(".fastq$", library_file)
+            || grepl(".fq.enc$" , library_file) || grepl(".fq.gz.enc$" , library_file)
+            || grepl(".fastq.enc$" , library_file) || grepl(".fastq.gz.enc$" , library_file)) {
             fastq_files[i] <- library_file
             i <- i + 1
         }
+    }
+    if(fastq_files == "") {
+      stop("no fastq files in the directory : myUserMetadata@rnaseq_lib_path")
     }
     return(fastq_files)
 }
@@ -739,6 +760,47 @@ check_run_ids <- function(ids) {
     }
     return(ids)
 }
+
+## function checking if the ignoreTxVersion slot of the AbundanceMetadata object has to be TRUE or FALSE
+## trancript_id in transcriptome file and gtf file can be "different" in many species (see release 102 of ensembl).
+## This difference comes from the presence/absence of transcript version (e.g 0.1 in transcript_id ENSGALT00000103863.1) in the gtf and/or the transcriptome file.
+## If transcript version is present only in one file, then it has to be removed in both files.
+## If not removed, txImport will not be able to summarize abundance at gene level.
+## programmaticaly checking the value of ignoreTxVersion is time consuming that is why this function is not run by default.
+## However, it is mandatory to check this value if libraries coming from different species have to be analyzed
+should_ignore_tx_version <- function(userMetadata) {
+  ## get transcript_id names from transcriptome file
+  transcriptome <- names(userMetadata@transcriptome_object)
+  transcriptome <- strsplit(transcriptome, "\\s+")
+  transcriptome <- lapply(transcriptome, `[[`, 1)
+  transcriptome <- as.data.frame(unlist(transcriptome))
+  transcriptome$ID <- seq(1, nrow(transcriptome), by=1)
+  colnames(transcriptome)[1] <- "transcript_id"
+  transcriptome <- transcriptome[complete.cases(transcriptome[ , 1:2]),]
+  
+  ## get transcript_id names from gtf file
+  gtf <- userMetadata@annotation_object
+  gtf <- as.data.frame(gtf$transcript_id)
+  gtf <- as.data.frame(gtf[complete.cases(gtf[ , 1]),])
+  colnames(gtf) <- "transcript_id"
+  gtf <- as.data.frame(unique(gtf$transcript_id))
+  gtf$Identifier <- seq(1, nrow(gtf), by=1)
+  colnames(gtf)[1] <- "transcript_id"
+  
+  ## merge info from transcriptome and gtf file 
+  allInfo <- merge(transcriptome, gtf, by ="transcript_id")
+  
+  ## check if they are compatible
+  check_compatibility <- nrow(allInfo) == 0
+  
+  if (check_compatibility == FALSE & nrow(allInfo) == nrow(transcriptome)){
+    ignoreTxVersion <- FALSE
+  } else {
+    ignoreTxVersion <- TRUE
+  }
+  return(ignoreTxVersion)
+}
+
 
 quiet <- function(x) { 
     sink(tempfile()) 

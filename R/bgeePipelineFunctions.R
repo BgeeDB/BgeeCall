@@ -236,8 +236,10 @@ plot_distributions <- function(counts,
 #' @param column Name of the column containing presence/absence information
 #' @param TPM_cutoff TPM cutoff below which calls are considered as absent
 #' @param r_cutoff Proportion of intergenic regions considered as present
+#' @param mean_pvalue mean information. Provided only when pvalue approach is used
+#' @param sd_pvalue standard deviation. Provided only when pvalue approach is used 
 #' @param myUserMetadata A Reference Class UserMetadata object.
-#' This object has to be edited before running kallisto @seealso UserMetadata.R
+#' @param myAbundanceMetadata A Reference Class AbundanceMetadata object.
 #'
 #' @return summary statistics to export in cutoff info file
 #'
@@ -247,9 +249,8 @@ plot_distributions <- function(counts,
 #' @noMd
 #' @noRd
 #'
-cutoff_info <- function(counts,
-    column, abundance_cutoff, r_cutoff,
-    myUserMetadata, myAbundanceMetadata) {
+cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=NULL, 
+    sd_pvalue=NULL, myUserMetadata, myAbundanceMetadata) {
     ## Calculate summary statistics to export in cutoff
     ## info file
     genic_present <- sum(counts[[column]][counts$type ==
@@ -301,24 +302,31 @@ cutoff_info <- function(counts,
         to_export <- c(to_export, r_cutoff)
         names(to_export)[length(to_export)] <- "ratioIntergenicCodingPresent"
     } else if(myAbundanceMetadata@cutoff_type == "pValue") {
+        to_export <- c(to_export, myAbundanceMetadata@cutoff, mean_pvalue, sd_pvalue)
+        names(to_export)[length(to_export)-2] <- "pValueCutoff"
+        names(to_export)[length(to_export)-1] <- "meanIntergenic"
+        names(to_export)[length(to_export)] <- "sdIntergenic"
+    } else if(myAbundanceMetadata@cutoff_type == "qValue") {
         to_export <- c(to_export, myAbundanceMetadata@cutoff)
-        names(to_export)[length(to_export)] <- "pValueCutoff"
+        names(to_export)[length(to_export)] <- "qValueCutoff"
     } else {
         stop("unknown cutoff type : ", myAbundanceMetadata@cutoff_type, ". Should be 
-        \"pValue\" or \"intergenic\"")
+        \"pValue\" or \"intergenic\" or \"qValue\"")
     }
     return(to_export)
 }
 
 #' @title Generate theoretical pValue
 #'
-#' @description Uses reference intergenic to calculate a present/absent pValue.
+#' @description Uses reference intergenic to calculate a pValue per gene id
 #' Then uses the pValue cutoff provided by user to generate present/absent calls
 #'
-#' @param counts A list of extimated counts
+#' @param counts A list of estimated counts
 #' @param pValueCutoff the pValue cutoff
 #'
-#' @return counts with zscore, pvalue and calls
+#' @return counts with zscore, pvalue and calls, but also the mean and the sd of ref. intergenic
+#' 
+#' @author Sara Fonseca Costa
 #'
 #' @noMd
 #' @noRd
@@ -326,22 +334,134 @@ cutoff_info <- function(counts,
 #' @import dplyr
 #'
 generate_theoretical_pValue <- function(counts, pValueCutoff) {
-    ## select values with TPM > 0 (because we will use log2 scale)
-    selected_intergenic <- dplyr::filter(counts, abundance > 0 & type == "intergenic")
+    ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
+    selected_intergenic <- filter(counts, abundance > 1e-6 & type == "intergenic")
 
     ## select genic region from the library
-    selected_count <- dplyr::filter(counts, abundance > 0)  
+    selected_count <- filter(counts, abundance > 0)  
+
     ## calculate z-score for each gene_id using the reference intergenic 
     selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
     ## calculate p-values for each gene_id
-    
     selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
     counts_with_pValue <- merge(counts, selected_count[, c("id", "zScore", "pValue")], 
                                 by = "id", all.x=TRUE)
-
+    
     counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
-                                          is.na(counts_with_pValue$pValue)), "absent", "present")
-    return(counts_with_pValue)
+                                           is.na(counts_with_pValue$pValue)), "absent", "present")
+    mean <- 2^(mean(log2(selected_intergenic$abundance)))
+    sd <- 2^(sd(log2(selected_intergenic$abundance)))
+    return(list(counts_with_pValue = counts_with_pValue, mean = mean, sd = sd))
+}
+
+#' @title Generate qValue
+#'
+#' @description Calculate a qValue based on the ratio
+#' intergenic/(intergenic+genic) for each gene id.
+#' Then uses the qValue cutoff provided by user to generate present/absent calls
+#'
+#' @param counts A list of estimated counts
+#' @param qValueCutoff the qValue cutoff
+#'
+#' @return counts with qvalue and calls
+#' 
+#' @author Sara Fonseca Costa
+#'
+#' @noMd
+#' @noRd
+#' 
+#' @import dplyr
+#'
+generate_qValue <- function(counts, qValueCutoff) {
+    
+    ## select genic and intergenic regions
+    selected_genic <- counts$type %in% "genic"
+    selected_intergenic <- counts$type %in% "intergenic"
+    
+    ## collect the density distributions of genic and intergenic
+    dens_genic <- density(log2(counts$abundance[selected_genic] + 10^-6))
+    dens_intergenic <- density(log2(counts$abundance[selected_intergenic] + 10^-6))
+    
+    ## perform the linear interpolation for each type
+    genicRegion <- approxfun(dens_genic$x, dens_genic$y)
+    intergenicRegion <- approxfun(dens_intergenic$x, dens_intergenic$y)
+    ## numerical integration
+    numInt_genicRegion <- integrate(genicRegion, min(dens_genic$x), max(dens_genic$x), subdivisions=1000, rel.tol = .Machine$double.eps^0.01)$value
+    numInt_intergenicRegion <- integrate(intergenicRegion, min(dens_intergenic$x), max(dens_intergenic$x), subdivisions=1000, rel.tol = .Machine$double.eps^0.01)$value
+    
+    ## for each abundance value (TPM) collect the genic and intergenic linear interpolation
+    interpolationInfo <- c()
+    for (i in 1:nrow(counts)) {
+        log2TpmValue <- log2(counts$abundance[i])
+        genicY <- genicRegion(log2TpmValue)
+        intergenicY <- intergenicRegion(log2TpmValue)
+        ## create an info table
+        geneInfo <- c(log2TpmValue, genicY,intergenicY)
+        interpolationInfo <- rbind(interpolationInfo, geneInfo)
+    }
+    interpolationInfo <- data.frame(interpolationInfo)
+    colnames(interpolationInfo) <- c("log2TpmValue", "genicY","intergenicY")
+    interpolationInfo$geneId <- counts$gene_id
+    
+    ## Function to calculate q-Value per unique TPM
+    calculate_qValue <- function(log2Tpm, dens_genic, dens_intergenic, interpolationGenic, interpolationIntergenic, numInt_genic, numInt_intergenic){
+        unscaled_genic <- integrate(interpolationGenic, log2Tpm, max(dens_genic$x), subdivisions=1000, stop.on.error = FALSE)$value
+        scaled_genic <- unscaled_genic / numInt_genic
+        unscaled_intergenic <- integrate(interpolationIntergenic, log2Tpm, max(dens_intergenic$x), subdivisions=1000, stop.on.error = FALSE)$value
+        scaled_intergenic <- unscaled_intergenic / numInt_intergenic
+        ## calculate qValue for target gene
+        qValue <- scaled_intergenic / (scaled_intergenic + scaled_genic)
+        return(qValue)
+    }
+    
+    ## Use the calculate_qValue function to calculate the q-Value for each unique log2 TPM value and perform the calls
+    qValueInfo <- c() 
+    for (i in 1:nrow(interpolationInfo)) {
+        
+        log2TpmValue <- interpolationInfo$log2TpmValue[i]
+        genicY_info <- interpolationInfo$genicY[i]
+        intergenicY_info <- interpolationInfo$intergenicY[i]
+        
+        ## attribute qValue = 1 to inf log2TPM values and to values with Na to genicY_info and intergenicY_info (peak on left side of the plot)
+        if ( log2TpmValue == "-Inf" | log2TpmValue != "-Inf" & is.na(genicY_info) == TRUE & is.na(intergenicY_info) == TRUE){
+            qValue <- "1"
+            qValueInfo <- rbind(qValueInfo,qValue)
+            
+        } else if (log2TpmValue != "-Inf" & (is.na(intergenicY_info) == TRUE & is.na(genicY_info) == FALSE) | (is.na(intergenicY_info) == FALSE & is.na(genicY_info) == TRUE)){
+            
+            ## retrieve log2TPM value where was possible to calculate the linear interpolation for genic and intergenic
+            maxNumIntegration <- filter(interpolationInfo, genicY != "NaN" & intergenicY != "NaN" )
+            
+            ## if log2TPM value is a negative value (means peak more at left side)
+            ## we attribute qValue based on the minimum where was possible to calculate the linear interpolation for both of the types
+            if(log2TpmValue < 0){
+                
+                log2TpmValue <- min(maxNumIntegration$log2TpmValue)
+                qValue <- calculate_qValue(log2TpmValue, dens_genic, dens_intergenic, genicRegion,
+                                           intergenicRegion, numInt_genicRegion, numInt_intergenicRegion)
+                qValueInfo <- rbind(qValueInfo,qValue)       
+                
+            } else {
+                
+                ## if log2TPM value is positive, this represent the values in the tail on the right side of the plot.
+                ## we attribute qValue for this cases based on the last log2TPM value where was possible to calculate the linear interpolation for both of the types
+                log2TpmValue <- max(maxNumIntegration$log2TpmValue)
+                qValue <- calculate_qValue(log2TpmValue, dens_genic, dens_intergenic, genicRegion,
+                                           intergenicRegion, numInt_genicRegion, numInt_intergenicRegion)
+                qValueInfo <- rbind(qValueInfo,qValue)    
+            }
+        } else {
+            
+            ## calculate q-value using the linear interpolation info for a particular log2TPM value
+            qValue <- calculate_qValue(log2TpmValue, dens_genic, dens_intergenic, genicRegion,
+                                       intergenicRegion, numInt_genicRegion, numInt_intergenicRegion)
+            qValueInfo <- rbind(qValueInfo,qValue)     
+        }
+    }
+    ## add qValue columns to the final table
+    counts$qValue <- as.numeric(qValueInfo[,1])
+    counts$call <- ifelse(counts$qValue <= qValueCutoff , "present", "absent")
+    return(counts)
 }
 
 #' @title Recalculate TPMs
@@ -349,7 +469,7 @@ generate_theoretical_pValue <- function(counts, pValueCutoff) {
 #' @description Recalculate TPMs using functions from
 #' ```https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/```
 #'
-#' @param counts A list of extimated counts
+#' @param counts A list of estimated counts
 #' @param effLen A list of effective length
 #'
 #' @return A list of recalculated TPMs

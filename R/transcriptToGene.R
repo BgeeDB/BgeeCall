@@ -96,8 +96,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         # 'select()' returned 1:1 mapping between keys and columns
         tx2gene <- suppressMessages(as.data.frame(biomaRt::select(txdb, 
             k, "GENEID", "TXNAME")))
-        intergenic_tx2gene <- intergenic_tx2gene(myBgeeMetadata, 
-            myUserMetadata)
+        intergenic_tx2gene <- intergenic_tx2gene(myBgeeMetadata = myBgeeMetadata, 
+            myUserMetadata = myUserMetadata)
         
         # Remove the transcript version that can be present
         # in transcript id of gtf files
@@ -240,18 +240,21 @@ abundance_without_intergenic <- function(myAbundanceMetadata,
         myBgeeMetadata, myUserMetadata)
     abundance <- read.table(abundance_file, header = TRUE, 
         sep = "\t")
+    
     abundance_without_intergenic <- 
         abundance[which(abundance[[myAbundanceMetadata@transcript_id_header]] %in% 
         tx2gene_without_intergenic$TXNAME), ]
-    temp_abundance_file_without_intergenic <- file.path(output_path, 
-        file_without_intergenic_name)
-    write.table(abundance_without_intergenic, temp_abundance_file_without_intergenic, 
-        sep = "\t", row.names = FALSE)
     
     # calculate corrected TPM value
     abundance_without_intergenic[myAbundanceMetadata@abundance_header] <- 
         countToTpm(abundance_without_intergenic[[myAbundanceMetadata@count_header]], 
         abundance_without_intergenic[[myAbundanceMetadata@eff_length_header]])
+    
+    temp_abundance_file_without_intergenic <- file.path(output_path, 
+        file_without_intergenic_name)
+    write.table(abundance_without_intergenic, temp_abundance_file_without_intergenic, 
+        sep = "\t", row.names = FALSE)
+
     if(isTRUE(myUserMetadata@verbose)) {
         txi_without_intergenic <- tximport(temp_abundance_file_without_intergenic, 
             type = myAbundanceMetadata@tool_name, tx2gene = tx2gene_without_intergenic, 

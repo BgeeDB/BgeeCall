@@ -17,7 +17,7 @@
 #'
 #' @return Mapping between transcript IDs, type (genic or intergenic) and biotypes
 #'
-#' @import rtracklayer
+#' @import Biostrings
 #'
 #' @noMd
 #' @noRd
@@ -47,8 +47,16 @@ load_transcript_to_biotype <- function(myAbundanceMetadata,
         gtf = as.data.frame(myUserMetadata@annotation_object)
         gtf_transcript <- gtf[gtf$type == "transcript", 
             ]
-        transcript_to_biotype <- as.data.frame(unique(cbind(gtf_transcript$transcript_id, 
-            gtf_transcript$transcript_biotype)))
+        
+        if (myUserMetadata@gtf_source == "ensembl"){
+            transcript_to_biotype <- as.data.frame(unique(cbind(gtf_transcript$transcript_id, 
+                                                                gtf_transcript$transcript_biotype)))
+        } else if (myUserMetadata@gtf_source == "gencode"){
+            transcript_to_biotype <- as.data.frame(unique(cbind(gtf_transcript$transcript_id, 
+                                                                gtf_transcript$transcript_type)))
+        } else {
+            warning("The annotation file should be provided from ensembl or gencode.")
+        }
         transcript_to_biotype[, 3] <- "genic"
         names(transcript_to_biotype) <- column_names
         if (myAbundanceMetadata@ignoreTxVersion) {

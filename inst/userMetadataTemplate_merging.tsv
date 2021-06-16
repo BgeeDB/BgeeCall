@@ -1,0 +1,7 @@
+species_id	run_ids	reads_size	rnaseq_lib_path	transcriptome_path	annotation_path	output_directory	custom_intergenic_path 	anatEntity	devStage	sex	strain
+7272		75	PATH/TO/SRX001/	PATH/TO/Drosophila_cdna_48	PATH/TO/Drosophila_gtf_48.gtf	PATH/TO/SRX001/		UBERON:6003007	FBdv:00007079	-	Oregon-R
+7272		75	PATH/TO/SRX002/	PATH/TO/Drosophila_cdna_48	PATH/TO/Drosophila_gtf_48.gtf	PATH/TO/SRX002/		UBERON:6003007	FBdv:00007079	-	Oregon-R
+7272		75	PATH/TO/SRX003/	PATH/TO/Drosophila_cdna_48	PATH/TO/Drosophila_gtf_48.gtf	PATH/TO/SRX003/		UBERON:0005399	 - 	M	-
+7272		75	PATH/TO/SRX004/	PATH/TO/Drosophila_cdna_48	PATH/TO/Drosophila_gtf_48.gtf	PATH/TO/SRX004/		UBERON:0005399	 - 	M	-
+9606		100	PATH/TO/SRX005/	PATH/TO/Homo_cdna_84	PATH/TO/Homo_gtf_84.gtf	PATH/TO/SRX005/		UBERON:0001870	HsapDv:0000136	F	-
+9606		100	PATH/TO/SRX006/	PATH/TO/Homo_cdna_84	PATH/TO/Homo_gtf_84.gtf	PATH/TO/SRX006/		UBERON:0001870	HsapDv:0000136	F	-

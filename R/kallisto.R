@@ -98,7 +98,10 @@ potential already installed version of Kallisto.\n")
     need_to_generate_index <- TRUE
     if(!isTRUE(myKallistoMetadata@overwrite_index)) {
         if ((myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
-            file.exists(transcriptome_index_path)) || (myUserMetadata@reads_size < 
+            file.exists(transcriptome_index_path)) || 
+            (is.na(myUserMetadata@reads_size) == "TRUE" && 
+             file.exists(transcriptome_index_path)) ||
+            (myUserMetadata@reads_size < 
             myKallistoMetadata@read_size_kmer_threshold && 
             file.exists(transcriptome_k15_index_path))) {
             if(isTRUE(myUserMetadata@verbose)) {
@@ -112,8 +115,8 @@ potential already installed version of Kallisto.\n")
             message("Start generation of kallisto index files.\n")
         }
         
-        # create kallisto index with default kmer size
-        if (myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
+        # create kallisto index with default kmer size also when user not provide the read_size information
+        if (myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold || is.na(myUserMetadata@reads_size) == "TRUE" && 
             !file.exists(transcriptome_index_path)) {
             kallisto_args <- paste0(" index -i ", transcriptome_index_path,
                 " ", transcriptome_path)
@@ -122,6 +125,7 @@ potential already installed version of Kallisto.\n")
         
         # create kallisto index with kmer size equal to 15
         if (myUserMetadata@reads_size < myKallistoMetadata@read_size_kmer_threshold && 
+            is.na(myUserMetadata@reads_size) == "FALSE" &&
             !file.exists(transcriptome_k15_index_path)) {
             kallisto_k15_args <- paste0(" index -k 15 -i ", 
                 transcriptome_k15_index_path, " ", transcriptome_path)
@@ -249,11 +253,12 @@ potential already installed version of Kallisto.")
     
         # if read size < 50nt use transcriptome index with
         # small kmer size
-        if (myUserMetadata@reads_size < 50) {
+        if (myUserMetadata@reads_size < 50 && 
+            is.na(myUserMetadata@reads_size) == "FALSE") {
             kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
                 myKallistoMetadata@k15_index_file))
         }
-    
+ 
         # check library folder and test if _1 and _2 files
         # are present
         fastq_files <- get_merged_fastq_file_names(myUserMetadata)
@@ -268,7 +273,14 @@ potential already installed version of Kallisto.")
       
         message("Will run kallisto using this command line : ", 
             paste(kallisto_exec_path, kallisto_args))
-        system2(command = kallisto_exec_path, args = kallisto_args)
+        
+        # can not use system2 function for encrypted libraries as it needs to well manage piped 
+        # commands
+        if(is_encrypted_library(myUserMetadata)) {
+          system(paste("echo \"", paste(kallisto_exec_path, kallisto_args), "\" | bash"))
+        } else {
+          system2(command = kallisto_exec_path, args = kallisto_args)
+        }
     }
 }
 

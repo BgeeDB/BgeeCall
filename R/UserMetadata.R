@@ -24,6 +24,7 @@
 #' @slot annotation_object Object containing annotations from GTF or GFF file
 #' @slot working_path Working directory. By default the working directory is
 #' defined with the `getwd()` function.
+#' @slot gtf_source The source name from where the gtf file comes from. By default is ensembl.
 #' @slot simple_arborescence logical allowing to create a simple arborescence
 #' of directory. If `TRUE` (default), all results will be on the same directory
 #' (working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you
@@ -40,6 +41,10 @@
 #' downloaded. If not NULL BgeeCall will merge this local reference intergenic
 #' file with the transcriptome. Except if you generated your own intergenic
 #' regions always keep it NULL.
+#' @slot encrypted_pattern Allows to manage encrypted libraries. If a fastq file with
+#' the suffix .enc is found for a run, this slot will allow to use a string pattern
+#' to decrypt it. . This encrypted_pattern needs to contain the string FASTQ_PATH that
+#' will be transformed to the actual path to the fastq file. 
 UserMetadata <- setClass(
     # Set the name for the class
     Class = "UserMetadata",
@@ -55,15 +60,18 @@ UserMetadata <- setClass(
         annotation_name = "character",
         annotation_object = "GRanges",
         working_path = "character",
+        gtf_source = "character",
         simple_arborescence = "logical",
         output_dir = "character",
         verbose = "logical",
-        custom_intergenic_path = "character"
+        custom_intergenic_path = "character",
+        encripted_pattern = "character"
     ),
     
     # Set the default values for the slots.
     prototype = prototype(
         working_path = getwd(),
+        gtf_source = "ensembl",
         reads_size = 51,
         simple_arborescence = TRUE,
         output_dir = "",

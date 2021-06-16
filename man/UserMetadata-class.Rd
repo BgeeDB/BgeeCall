@@ -42,6 +42,8 @@ of output repositories.}
 \item{\code{working_path}}{Working directory. By default the working directory is
 defined with the `getwd()` function.}
 
+\item{\code{gtf_source}}{The source name from where the gtf file comes from. By default is ensembl.}
+
 \item{\code{simple_arborescence}}{logical allowing to create a simple arborescence
 of directory. If `TRUE` (default), all results will be on the same directory
 (working_path/intergenic_release/all_results/libraryId). Use `FALSE` if you
@@ -61,5 +63,10 @@ fasta file. If NULL (by default) the reference intergenic fasta file will be
 downloaded. If not NULL BgeeCall will merge this local reference intergenic
 file with the transcriptome. Except if you generated your own intergenic
 regions always keep it NULL.}
+
+\item{\code{encrypted_pattern}}{Allows to manage encrypted libraries. If a fastq file with
+the suffix .enc is found for a run, this slot will allow to use a string pattern
+to decrypt it. . This encrypted_pattern needs to contain the string FASTQ_PATH that
+will be transformed to the actual path to the fastq file.}
 }}
 

@@ -93,6 +93,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
       userMetadata@custom_intergenic_path <- customIntergenicPath
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
+    userMetadata <- setAnnotationFromFile(userMetadata, annotationPath =  as.character(annotation_path))
     merge_transcriptome_and_intergenic(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                                        myUserMetadata = userMetadata)
     create_kallisto_index(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
@@ -157,8 +158,8 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
 #' slurm_apply automatically divides params in chunks of approximately equal size to 
 #' send to each node. Less nodes are allocated if the parameter set is too small to 
 #' use all CPUs on the requested nodes. By default this number is 10.
-
-
+#' @param checkTxVersion boolean used to define if BgeeCall check rather transcript version
+#' should be removed. Default value is FALSE
 #' 
 #' @return generate calls
 #' 
@@ -177,7 +178,7 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
                                    userMetadata = new("UserMetadata"), userFile, 
                                    submit_sh_template = NULL, slurm_options = NULL,
                                    rscript_path = NULL, modules = NULL, submit = TRUE, 
-                                   nodes = 10) {
+                                   nodes = 10, checkTxVersion = FALSE) {
   user_df <- read.table(file = userFile, header = TRUE, sep = "\t")
 
   #use both rscript_path and modules variables to tune the bash template script
@@ -201,6 +202,9 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
     }
     userMetadata <- setTranscriptomeFromFile(userMetadata, transcriptomePath = as.character(transcriptome_path))
     userMetadata <- setAnnotationFromFile(userMetadata, annotationPath =  as.character(annotation_path))
+    if(checkTxVersion) {
+      kallistoMetadata@ignoreTxVersion <- should_ignore_tx_version(userMetadata)
+    }
     run_kallisto(myKallistoMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
                  myUserMetadata = userMetadata)
     generate_presence_absence(myAbundanceMetadata = kallistoMetadata, myBgeeMetadata = bgeeMetadata, 
@@ -209,8 +213,9 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
   
   sjobs <- rslurm::slurm_apply(f = calls_wrapper, params = user_df, jobname = "generate_calls", 
                                nodes = nodes, cpus_per_node = 1, submit = submit, 
-                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
-                               sh_template = submit_sh_template, rscript_path = rscript_path, slurm_options = slurm_options)
+                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata", 
+                               "checkTxVersion"), sh_template = submit_sh_template, 
+                               rscript_path = rscript_path, slurm_options = slurm_options)
   return(sjobs)
 }
 # internal function hacking the rscript_path variable of rslurm to automatically add

@@ -12,14 +12,18 @@
 #' transcript ID if TRUE (default = FALSE)
 #' @slot cutoff_type Defines the approach used to generate present/absent calls.
 #' default value is 'pValue', allowing calls to be generated using a pValue.
-#' Other possible value is 'intergenic' allowing to use a ratio of intergenic
-#' sequences considered as present as a threshold.  
+#' Other possible values are 'intergenic' allowing to use a ratio of intergenic
+#' sequences considered as present as a threshold, or use qValue allowing calls
+#' to be generated from a qValue.
 #' @slot cutoff numeric value of the cutoff used to generate the present/absent
 #' calls. If value of the slot cutoff_type is 'pValue' this cutoff will correspond
 #' to the highest pValue allowing to define a gene as present. If value of the slot 
 #' cutoff_type is 'intergenic' this cutoff will correspond to the proportion of 
-#' intergenic present divided by proportion of protein coding present. The default
-#' value is 0.05. Be careful when modifying this value as it could have a huge impact 
+#' intergenic present divided by proportion of protein coding present. 
+#' If value of the slot cutoff_type is 'qValue' this cutoff will correspond to the
+#' highest qValue allowing to define a gene as present. The qValue is calculated
+#' based on the proportion of intergenic/(intergenic + genic) at each unique abundance value (TPM).
+#' The default value is 0.05. Be careful when modifying this value as it could have a huge impact 
 #' on present/absent calls.
 #' @slot full_transcriptome_file Name of the fasta file containing both 
 #' transcriptomic and intergenic regions. This file is created by the pipeline.
@@ -114,13 +118,13 @@ AbundanceMetadata <- setClass(
         tx2biotype_file = "tx2biotype.tsv",
         tx2biotype_file_without_tx_version = "tx2biotype_without_tx_version.tsv",
         gene2biotype_file = "gene2biotype.tsv",
-        transcript_calls_file_name = "transcript_level_abundance+calls.tsv",
-        gene_calls_file_name = "gene_level_abundance+calls.tsv",
-        transcript_cutoff_file_name = "transcript_cutoff_info_file.tsv",
-        gene_cutoff_file_name = "gene_cutoff_info_file.tsv",
+        transcript_calls_file_name = "transcript_level_abundance+calls",
+        gene_calls_file_name = "gene_level_abundance+calls",
+        transcript_cutoff_file_name = "transcript_cutoff_info_file",
+        gene_cutoff_file_name = "gene_cutoff_info_file",
         transcript_distribution_file_name = 
-            "transcript_TPM_genic_intergenic+cutoff.pdf",
-        gene_distribution_file_name = "gene_TPM_genic_intergenic+cutoff.pdf"
+            "transcript_TPM_genic_intergenic+cutoff",
+        gene_distribution_file_name = "gene_TPM_genic_intergenic+cutoff"
     )
     
 )
