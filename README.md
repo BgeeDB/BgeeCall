@@ -1,4 +1,6 @@
 # BgeeCall, a R package for automatic RNA-Seq present/absent gene expression calls generation
+[![Bioc](http://www.bioconductor.org/shields/years-in-bioc/BgeeCall.svg)](https://www.bioconductor.org/packages/devel/bioc/html/BgeeCall.html#since)
+[![Twitter](https://img.shields.io/twitter/follow/Bgeedb?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=Bgeedb)
 
 `BgeeCall` is a collection of functions that uses [Bgee](https://bgee.org/) expertise to create gene expression present/absent calls
 
