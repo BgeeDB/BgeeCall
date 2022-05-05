@@ -16,7 +16,7 @@ Description: BgeeCall allows to generate present/absent gene expression calls wi
     libraries of each species integrated in Bgee (https://bgee.org).
 Depends: R (>= 3.6)
 Imports: GenomicFeatures, tximport, Biostrings, rtracklayer, biomaRt, jsonlite, methods, dplyr, data.table, sjmisc, grDevices, graphics, stats, utils, rslurm, rhdf5
-License: GPL-3
+License: GPL-3 + file LICENSE
 URL: https://github.com/BgeeDB/BgeeCall
 BugReports: https://github.com/BgeeDB/BgeeCall/issues
 VignetteBuilder: knitr
