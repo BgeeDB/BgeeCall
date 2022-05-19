@@ -44,7 +44,7 @@ list_intergenic_release <- function(release = NULL) {
 # package
 listIntergenicReleases <- function(removeFile = TRUE) {
     ## query FTP to get file describing all releases
-    releaseUrl <- "ftp://ftp.bgee.org/intergenic/intergenic_release.tsv"
+    releaseUrl <- "https://bgee.org/ftp/intergenic/intergenic_release.tsv"
     success <- try(download.file(url = releaseUrl, 
         quiet = TRUE, destfile = file.path(getwd(), 
             "release.tsv.tmp")), silent = TRUE)
