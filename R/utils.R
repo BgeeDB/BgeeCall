@@ -378,7 +378,7 @@ get_fastq_files <- function(myUserMetadata) {
     # all files of the library directory
     library_files <-
         list.files(path = myUserMetadata@rnaseq_lib_path)
-    fastq_files <- ""
+    fastq_files <- list()
     i <- 1
     for (library_file in library_files) {
         if (grepl(".fq$", library_file) || grepl(".fq.gz$", library_file) 
@@ -389,7 +389,7 @@ get_fastq_files <- function(myUserMetadata) {
             i <- i + 1
         }
     }
-    if(fastq_files == "") {
+    if (!length(fastq_files)) {
       stop("no fastq files in the directory : myUserMetadata@rnaseq_lib_path")
     }
     return(fastq_files)
