@@ -41,6 +41,46 @@ checkUserFile <- function(userFile, condition){
   }
 }
 
+pValueMergeViaMedian <- function(pvalCollected, weightValues=c()){
+  correctedMedianPval = c()
+  if(!length(weightValues)){
+    for(row in 1:nrow(pvalCollected)){
+      pvalCollected = as.double(pvalCollected[row,]) 
+      MedianPval = median(pvalCollected, na.rm = TRUE)
+      correctedMedianPval = append(correctedMedianPval, 2*MedianPval)
+      correctedMedianPval[correctedMedianPval > 1] = 1
+    }
+  } else {
+    for(row in 1:nrow(pvalCollected)){
+      pvalCollected = as.double(pvalCollected[row,])
+      medianPval = weighted.median(pvalCollected, weightValues, na.rm = TRUE)
+      correctedMedianPval = append(correctedMedianPval, 2*medianPval)
+      correctedMedianPval[correctedMedianPval > 1] = 1
+  }
+  }
+  return(correctedMedianPval)
+}
+
+pValueMergeViaMean <- function(pvalCollected, weightValues=c()){
+  correctedMeanPval = c()
+  if(!length(weightValues)){
+    for(row in 1:nrow(pvalCollected)){
+      pvalCollected = as.double(pvalCollected[row,]) 
+      meanPval = mean(pvalCollected, na.rm = TRUE)
+      correctedMeanPval = append(correctedMeanPval, 2*meanPval)
+      correctedMeanPval[correctedMeanPval > 1] = 1
+    }
+  } else {
+    for(row in 1:nrow(pvalCollected)){
+      pvalCollected = as.double(pvalCollected[row,])
+      weightedPvalues = pvalCollected * weightValues
+      meanPval = sum(weightedPvalues)
+      correctedMeanPval = append(correctedMeanPval, 2*meanPval)
+      correctedMeanPval[correctedMeanPval > 1] = 1
+  }
+  }
+  return(correctedMedianPval)
+}
 
 #' @title Approaches used to merge/combine libraries
 #'
@@ -64,7 +104,7 @@ checkUserFile <- function(userFile, condition){
 #' @noMd
 #' @noRd
 #' 
-approachesMerging <- function(allFiles, approach, cutoff){
+approachesMerging <- function(allFiles, approach, cutoff, weights=FALSE, weightValues=c()){
   
   librariesData <- try(do.call("cbind", allFiles), silent = TRUE) 
   ## select gene_id
@@ -94,7 +134,36 @@ approachesMerging <- function(allFiles, approach, cutoff){
     
     return(allInfo)
     
-  } else if (approach == "fdr_inverse"){
+  } else if (approach == "Median" || approach == "Mean"){
+    
+    ## select all pValues column from all libraries
+    select_pValue = librariesData[, grepl("^pValue", names(librariesData))]
+    if(is_empty(select_pValue) == TRUE){
+      stop("can not find pvalues", "\n")
+    }
+    ## calculate the p.adjusted values using a vector of original pValues for each gene_id
+    collect_padjValues <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
+    collect_padjValues <- as.data.frame(t(collect_padjValues))
+    if(approach == "Median"){
+      collect_padjValues$minimum_pValue <- pValueMergeViaMedian(collect_padjValues, weightValues)
+    }
+    else {
+      collect_padjValues$minimum_pValue <- pValueMergeViaMean(collect_padjValues, weightValues)
+    }
+    ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
+    allInfo <- data.frame(select_info, collect_padjValues)
+    ## provide info just about id and minimum_pValue detected
+    allInfo <- allInfo %>% dplyr::select("select_info", "minimum_pValue")
+    colnames(allInfo)[1] <- c("id")
+    
+    ## perform the calls
+    allInfo$call <- ifelse(allInfo$minimum_pValue <= as.numeric(cutoff), "present", "absent")
+    ## replace NA (that are values = 0 in the abundance) per absent calls
+    allInfo$call[is.na(allInfo$call)] <- "absent"
+    
+    return(allInfo)
+
+    }  else if (approach == "fdr_inverse"){
     
     ## select all qValues column from all libraries
     select_qValue = librariesData[, grepl("^qValue", names(librariesData))]
@@ -154,7 +223,7 @@ approachesMerging <- function(allFiles, approach, cutoff){
 #' the calls to each gene id for the referent condition.
 #' 
 #' 
-merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL) {
+merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL, weights=FALSE) {
 
   ## check user input
   userFile <- read.table(file = userFile, header = TRUE, sep = "\t")
@@ -181,7 +250,7 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     }
     
     #retrieve all abundance files corresponding to condition
-    if (approach == "BH"){
+    if (approach == "BH" || approach == "Median" || approach == "Mean"){
       allFiles <- list.files(path = file.path(filtered_libraries$output_directory), pattern="gene_level_abundance\\+calls.tsv", 
                              full.names=T, recursive = TRUE)  
     } else {
@@ -193,8 +262,12 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     allFiles <- lapply(allFiles, read.delim)
     
     #merge calls based on condition
-    callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff)
-    
+    if(weights == FALSE){
+      callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=FALSE)
+    } else {
+      weightValues = userFile["weights"]
+      callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=TRUE, w_values = weightValues)
+    }
     #write file with merged results
     write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff, 
                   conditionFileName, ".tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
