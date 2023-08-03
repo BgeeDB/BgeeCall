@@ -62,7 +62,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' }
 #'
 generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"), 
-    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata) {
+    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata, method="Normal", pvalueCorrection="None") {
     
     system.file()
     # load data
@@ -76,12 +76,12 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                         myBgeeMetadata, myUserMetadata)
     
     # check if calls have to be created
-    if (file.exists(file.path(output_path, 
+    if(file.exists(file.path(output_path, 
                               paste0(myAbundanceMetadata@gene_calls_file_name, ".tsv"))) & !myAbundanceMetadata@overwrite_calls ){
         if(isTRUE(myUserMetadata@verbose)) {
             message("no need to regenerate calls")
         }
-    } else if (file.exists(file.path(output_path, 
+    } else if(file.exists(file.path(output_path, 
                                      paste0(myAbundanceMetadata@gene_calls_file_name, "_", myAbundanceMetadata@cutoff_type, ".tsv"))) & !myAbundanceMetadata@overwrite_calls ){
       if(isTRUE(myUserMetadata@verbose)) {
         message("no need to regenerate calls")
@@ -90,7 +90,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         # biotype mapping information will depend on
         # summarization at gene level or not
         biotype_mapping <- ""
-        if (myAbundanceMetadata@txOut) {
+        if(myAbundanceMetadata@txOut) {
             biotype_mapping <- load_transcript_to_biotype(myAbundanceMetadata, 
                 myBgeeMetadata, myUserMetadata)
         } else {
@@ -160,9 +160,10 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                                   abundance[, c("id", "call")], 
                                                   by = "id")
         # generate calls and calculate abundance_cutoff
-        }else if (myAbundanceMetadata@cutoff_type == 'pValue') {
+        } else if(myAbundanceMetadata@cutoff_type == 'pValue') {
             pvalue_generated <- generate_theoretical_pValue(counts =abundance,
-                                                     myAbundanceMetadata@cutoff)
+                                                     myAbundanceMetadata@cutoff, 
+                                                     method=method, pvalueCorrection=pvalueCorrection)
             abundance <- pvalue_generated$counts_with_pValue
             mean_pvalue <- pvalue_generated$mean
             sd_pvalue <- pvalue_generated$sd
@@ -171,7 +172,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             abundance_without_intergenic <- merge(abundance_without_intergenic, 
                                                   abundance[, c("id", "zScore", "pValue", "call")], 
                                                   by = "id")
-        } else if (myAbundanceMetadata@cutoff_type == 'qValue') {
+        } else if(myAbundanceMetadata@cutoff_type == 'qValue') {
             abundance <- generate_qValue(counts =abundance,
                                          myAbundanceMetadata@cutoff)
             
@@ -186,7 +187,7 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
             \"pValue\" or \"intergenic\" or \"qValue\"")
         }
         
-        if (myAbundanceMetadata@cutoff_type == "pValue"){
+        if(myAbundanceMetadata@cutoff_type == "pValue"){
             # generate name of output file for default approach (without approach extension)
             calls_file_name <- paste0(myAbundanceMetadata@gene_calls_file_name, ".tsv")
             cutoff_info_file_name <- paste0(myAbundanceMetadata@gene_cutoff_file_name, ".tsv")
