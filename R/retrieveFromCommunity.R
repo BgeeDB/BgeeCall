@@ -25,8 +25,8 @@ list_community_ref_intergenic_species <- function() {
         jsonlite::fromJSON(txt = "https://zenodo.org/api/records/?communities=bgee_intergenic")
     datasets <- NULL
     datasets_index <- 1
-    for (records_index in seq_len(nrow(community))) {
-        record <- community[records_index, ]
+    for (records_index in seq_len(nrow(community$hits$hits))) {
+        record <- community$hits$hits[records_index, ]
         keywords <- unlist(record$metadata$keywords)
         species_id <- unlist(strsplit(x = as.character(keywords[grep("speciesId", keywords)]), split = ":"))[2]
         annotation_version <- unlist(strsplit(x = as.character(keywords[grep("annotationVersion", keywords)]), split = ":"))[2]
@@ -35,11 +35,10 @@ list_community_ref_intergenic_species <- function() {
         kallisto_version <- unlist(strsplit(x = as.character(keywords[grep("kallistoVersion", keywords)]), split = ":"))[2]
         urls <- as.data.frame(record$files)
         # test presence of all mandatory metadata
-        if (!(is.null(urls$links$download) ||
-            is.null(species_id))) {
+        if (! is.null(urls$links$self) && ! is.null(species_id)) {
             # mandatory to have at least one file when uploading new dataset
             for (url_index in seq_len(nrow(urls))) {
-                if (grepl(basename(urls[url_index, ]$links$download),
+                if (grepl(basename(urls[url_index, ]$key),
                     paste0("ref_intergenic.fa.gz"))) {
                     datasets$speciesId[datasets_index] <- as.character(species_id)
                     if (is.null(number_libraries)) {
