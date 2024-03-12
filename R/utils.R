@@ -390,7 +390,7 @@ get_fastq_files <- function(myUserMetadata) {
         }
     }
     if (!length(fastq_files)) {
-      stop("no fastq files in the directory : myUserMetadata@rnaseq_lib_path")
+      stop("no fastq files in the directory : ", myUserMetadata@rnaseq_lib_path)
     }
     return(fastq_files)
 }
