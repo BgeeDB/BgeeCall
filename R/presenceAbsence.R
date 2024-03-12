@@ -41,10 +41,13 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' (optional).
 #' @param myBgeeMetadata A Class BgeeMetadata object (optional).
 #' @param myUserMetadata A Class UserMetadata object.
+#' @param method A string indicating the method to use to calculate the pValue.
+#' @param pvalueCorrection A string indicating the method to use to correct the pValue.
 #'
 #' @author Julien Wollbrett
 #' @author Julien Roux
 #' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
 #' 
 #' @return path to the 4 output files
 #'

@@ -323,10 +323,13 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
 #'
 #' @param counts A list of estimated counts
 #' @param pValueCutoff the pValue cutoff
+#' @param method the method to use for the pValue calculation
+#' @param pvalueCorrection the method to use for the pValue correction
 #'
 #' @return counts with zscore, pvalue and calls, but also the mean and the sd of ref. intergenic
 #' 
 #' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
 #'
 #' @noMd
 #' @noRd

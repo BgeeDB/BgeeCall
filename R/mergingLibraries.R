@@ -55,6 +55,7 @@ checkUserFile <- function(userFile, condition){
 #' @param cutoff Threshold value to be applied to call expressed genes
 #'
 #' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
 #'
 #' @return data frame with minimum pValue or qValue detected (dependent of the approach selected) and the calls
 #' 
@@ -143,6 +144,7 @@ approachesMerging <- function(allFiles, approach, cutoff){
 #' @param outDir Directory where the output files should be saved
 #'
 #' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
 #' 
 #' @export
 #' 
@@ -210,6 +212,26 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
   }
 }
 
+#' @title Pvalue averaging
+#'
+#' @description Combined p-values for each gene Id using the mean or median averaging method
+#'
+#' @param pval_collect A data frame containing the p-values for each gene id of each library
+#' @param method Method used to calculate the mean p-value
+#' @param w_values A vector of weights to be used in the mean p-value calculation
+#'
+#' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
+#' 
+#' @export
+#' 
+#' @examples 
+#' \dontrun{
+  #' Pvalue_averaging(pval_collect = pval_collect, w_values = c(0.5, 0.5), method = "mean")
+#' }
+#' 
+#' @return A dataframe containing the consensus p-value for each gene id
+#' 
 Pvalue_averaging <- function(pval_collect, w_values=c(), method="mean"){
   #Calculate the mean p-value for each gene_id
   corrected_mean_pval = c()
