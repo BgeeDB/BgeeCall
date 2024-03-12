@@ -70,15 +70,21 @@ approachesMerging <- function(allFiles, approach, cutoff){
   ## select gene_id
   select_info <- librariesData[,1]
   
-  if (approach == "BH"){
+  if (approach != "fdr_inverse"){
     
     ## select all pValues column from all libraries
     select_pValue = librariesData[, grepl("^pValue", names(librariesData))]
     if(is_empty(select_pValue) == TRUE){
-      stop("Select the appropriated method for your quantitative metric: BH for p-values OR fdr_inverse for q-values", "\n")
+      stop("Select the appropriated method for your quantitative metric: BH, Mean or Median for p-values OR fdr_inverse for q-values", "\n")
     }
     ## calculate the p.adjusted values using a vector of original pValues for each gene_id
-    collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
+    if approach == "BH"{
+      collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
+    } else if approach == "Mean"{
+      collect_padjValues <- apply(select_pValue, 1, function (x) Pvalue_averaging(x[1:length(select_pValue)], method = "mean"))
+    } else if approach == "Median"{
+      collect_padjValues <- apply(select_pValue, 1, function (x) Pvalue_averaging(x[1:length(select_pValue)], method = "median"))
+    }
     collect_padjValues <- as.data.frame(t(collect_padjValues))
     collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE))) 
     ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
@@ -181,7 +187,7 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     }
     
     #retrieve all abundance files corresponding to condition
-    if (approach == "BH"){
+    if (approach == "BH" || approach == "Median" || approach == "Mean"){
       allFiles <- list.files(path = file.path(filtered_libraries$output_directory), pattern="gene_level_abundance\\+calls.tsv", 
                              full.names=T, recursive = TRUE)  
     } else {
@@ -202,4 +208,36 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     #take all rows of the input file into consideration before filtering on an other set of condition
     filtered_libraries <- userFile
   }
+}
+
+Pvalue_averaging <- function(pval_collect, w_values=c(), method="mean"){
+  #Calculate the mean p-value for each gene_id
+  corrected_mean_pval = c()
+  #If no weights are provided, the mean p-value is calculated without weights
+  if(!length(w_values)){
+    for(row in 1:nrow(pval_collect)){
+      if method == "mean"{
+      mean_pval = mean(as.double(pval_collect[row,]), na.rm = TRUE)
+      } else if method == "median"{
+      mean_pval = median(as.double(pval_collect[row,]), na.rm = TRUE)
+      }
+      corrected_mean_pval = append(corrected_mean_pval, 2*mean_pval)
+      corrected_mean_pval[corrected_mean_pval > 1] = 1
+    }
+  } else {
+  #If weights are provided, the mean p-value is calculated with weights
+    for(row in 1:nrow(pval_collect)){
+      pvals = as.double(pval_collect[row,])
+      if method == "mean"{
+        w_pvals = pvals * w_values
+        mean_pval = sum(w_pvals)
+      } else if method == "median"{
+        mean_pval = weighted.median(pvals, w_values, na.rm = TRUE)
+      }
+      corrected_mean_pval = append(corrected_mean_pval, 2*mean_pval)
+      corrected_mean_pval[corrected_mean_pval > 1] = 1
+  }
+  }
+  #Return the corrected mean p-values for each gene_id
+  return(corrected_mean_pval)
 }
