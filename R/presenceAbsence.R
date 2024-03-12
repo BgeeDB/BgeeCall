@@ -62,7 +62,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' }
 #'
 generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"), 
-    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata) {
+    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata, method="Normal", pvalueCorrection="None") {
     
     system.file()
     # load data
@@ -161,8 +161,10 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                                   by = "id")
         # generate calls and calculate abundance_cutoff
         }else if (myAbundanceMetadata@cutoff_type == 'pValue') {
-            pvalue_generated <- generate_theoretical_pValue(counts =abundance,
-                                                     myAbundanceMetadata@cutoff)
+            pvalue_generated <- generate_theoretical_pValue(counts = abundance,
+                                                     myAbundanceMetadata@cutoff, 
+                                                     method=method, 
+                                                     pvalueCorrection = pvalueCorrection)
             abundance <- pvalue_generated$counts_with_pValue
             mean_pvalue <- pvalue_generated$mean
             sd_pvalue <- pvalue_generated$sd

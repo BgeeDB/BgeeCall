@@ -333,22 +333,40 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
 #' 
 #' @import dplyr
 #'
-generate_theoretical_pValue <- function(counts, pValueCutoff) {
-    ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
-    selected_intergenic <- filter(counts, abundance > 1e-6 & type == "intergenic")
-
+generate_theoretical_pValue <- function(counts, pValueCutoff, method="Normal", pvalueCorrection="None") {
     ## select genic region from the library
     selected_count <- filter(counts, abundance > 0)  
 
-    ## calculate z-score for each gene_id using the reference intergenic 
-    selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
-    ## calculate p-values for each gene_id
-    selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
+    if(method == "Normal"){
+        ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
+        selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+        ## calculate z-score for each gene_id using the reference intergenic 
+        selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
+        ## calculate p-values for each gene_id
+        selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
+    } else if(method == "TobitNormal"){
+        leftCensoredThreshold <- min(selected_intergenic[selected_intergenic$counts == 1])
+        selected_intergenic$abundance[selected_intergenic$abundance < leftCensoredThreshold] <- leftCensoredThreshold - 1e-6
+        tobitParameters <- tobit(log2(selected_intergenic$abundance) ~ 1, left = log2(leftCensoredThreshold), dist = "exponential")
+        selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
+        selected_count$pValue <- 1 - pexp(log2(selected_count$abundance), rate = 1 / tobitParameters$scale)
+    } else {
+        stop("Incorrect method name for the pValue caclulations")
+    }
+
+    if(pvalueCorrection == "BH"){
+        selected_count$pValue = p.adjust(selected_count$pValue, method="BH")
+    }
+    if(pvalueCorrection == "Bonferroni"){
+        selected_count$pValue = p.adjust(selected_count$pValue, method="bonferroni")
+    }
     counts_with_pValue <- merge(counts, selected_count[, c("id", "zScore", "pValue")], 
                                 by = "id", all.x=TRUE)
-    
+
+    counts_with_pValue$pValue[is.na(counts_with_pValue$pValue)] <- 1
     counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
                                            is.na(counts_with_pValue$pValue)), "absent", "present")
+
     mean <- 2^(mean(log2(selected_intergenic$abundance)))
     sd <- 2^(sd(log2(selected_intergenic$abundance)))
     return(list(counts_with_pValue = counts_with_pValue, mean = mean, sd = sd))
