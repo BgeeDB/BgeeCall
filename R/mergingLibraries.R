@@ -79,11 +79,11 @@ approachesMerging <- function(allFiles, approach, cutoff){
       stop("Select the appropriated method for your quantitative metric: BH, Mean or Median for p-values OR fdr_inverse for q-values", "\n")
     }
     ## calculate the p.adjusted values using a vector of original pValues for each gene_id
-    if approach == "BH"{
+    if (approach == "BH"){
       collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
-    } else if approach == "Mean"{
+    } else if (approach == "Mean"){
       collect_padjValues <- apply(select_pValue, 1, function (x) Pvalue_averaging(x[1:length(select_pValue)], method = "mean"))
-    } else if approach == "Median"{
+    } else if (approach == "Median"){
       collect_padjValues <- apply(select_pValue, 1, function (x) Pvalue_averaging(x[1:length(select_pValue)], method = "median"))
     }
     collect_padjValues <- as.data.frame(t(collect_padjValues))
@@ -238,9 +238,9 @@ Pvalue_averaging <- function(pval_collect, w_values=c(), method="mean"){
   #If no weights are provided, the mean p-value is calculated without weights
   if(!length(w_values)){
     for(row in 1:nrow(pval_collect)){
-      if method == "mean"{
+      if (method == "mean"){
       mean_pval = mean(as.double(pval_collect[row,]), na.rm = TRUE)
-      } else if method == "median"{
+      } else if (method == "median"){
       mean_pval = median(as.double(pval_collect[row,]), na.rm = TRUE)
       }
       corrected_mean_pval = append(corrected_mean_pval, 2*mean_pval)
@@ -250,10 +250,10 @@ Pvalue_averaging <- function(pval_collect, w_values=c(), method="mean"){
   #If weights are provided, the mean p-value is calculated with weights
     for(row in 1:nrow(pval_collect)){
       pvals = as.double(pval_collect[row,])
-      if method == "mean"{
+      if (method == "mean"){
         w_pvals = pvals * w_values
         mean_pval = sum(w_pvals)
-      } else if method == "median"{
+      } else if (method == "median"){
         mean_pval = weighted.median(pvals, w_values, na.rm = TRUE)
       }
       corrected_mean_pval = append(corrected_mean_pval, 2*mean_pval)
