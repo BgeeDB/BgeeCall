@@ -81,6 +81,8 @@ approachesMerging <- function(allFiles, approach, cutoff){
     ## calculate the p.adjusted values using a vector of original pValues for each gene_id
     if (approach == "BH"){
       collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
+      collect_padjValues <- as.data.frame(t(collect_padjValues))
+      collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE))) 
     } else if (approach == "Mean"){
       select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
       select_pValue <- as.data.frame(t(select_pValue))
@@ -90,8 +92,6 @@ approachesMerging <- function(allFiles, approach, cutoff){
       select_pValue <- as.data.frame(t(select_pValue))
       collect_padjValues <- Pvalue_averaging(select_pValue, method = "median")
     }
-    collect_padjValues <- as.data.frame(t(collect_padjValues))
-    collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE))) 
     ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
     allInfo <- data.frame(select_info, collect_padjValues)
     ## provide info just about id and minimum_pValue detected
