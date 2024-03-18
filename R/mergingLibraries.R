@@ -82,9 +82,13 @@ approachesMerging <- function(allFiles, approach, cutoff){
     if (approach == "BH"){
       collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
     } else if (approach == "Mean"){
-      collect_padjValues <- apply(select_pValue, 1, function (x) Pvalue_averaging(x[1:length(select_pValue)], method = "mean"))
+      select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
+      select_pValue <- as.data.frame(t(select_pValue))
+      collect_padjValues <- Pvalue_averaging(select_pValue, method = "mean")
     } else if (approach == "Median"){
-      collect_padjValues <- apply(select_pValue, 1, function (x) Pvalue_averaging(x[1:length(select_pValue)], method = "median"))
+      select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
+      select_pValue <- as.data.frame(t(select_pValue))
+      collect_padjValues <- Pvalue_averaging(select_pValue, method = "median")
     }
     collect_padjValues <- as.data.frame(t(collect_padjValues))
     collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE))) 
@@ -220,7 +224,6 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
 #' @param method Method used to calculate the mean p-value
 #' @param w_values A vector of weights to be used in the mean p-value calculation
 #'
-#' @author Sara Fonseca Costa
 #' @author Alessandro Brandulas Cammarata
 #' 
 #' @export
