@@ -86,11 +86,11 @@ approachesMerging <- function(allFiles, approach, cutoff){
     } else if (approach == "Mean"){
       select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
       select_pValue <- as.data.frame(t(select_pValue))
-      collect_padjValues <- Pvalue_averaging(select_pValue, method = "mean")
+      collect_padjValues$minimum_pValue <- Pvalue_averaging(select_pValue, method = "mean")
     } else if (approach == "Median"){
       select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
       select_pValue <- as.data.frame(t(select_pValue))
-      collect_padjValues <- Pvalue_averaging(select_pValue, method = "median")
+      collect_padjValues$minimum_pValue <- Pvalue_averaging(select_pValue, method = "median")
     }
     ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
     allInfo <- data.frame(select_info, collect_padjValues)
