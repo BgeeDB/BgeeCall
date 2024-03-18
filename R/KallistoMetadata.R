@@ -73,7 +73,7 @@ KallistoMetadata <- setClass(
         count_header = "est_counts",
         abundance_header = "tpm",
         eff_length_header = "eff_length",
-        read_size_kmer_threshold = 50,
+        read_size_kmer_threshold = 60,
         # slots specific to Class
         download_kallisto = FALSE,
         kallisto_windows_url = 
