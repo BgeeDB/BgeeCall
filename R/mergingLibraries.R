@@ -82,15 +82,15 @@ approachesMerging <- function(allFiles, approach, cutoff){
     if (approach == "BH"){
       collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
       collect_padjValues <- as.data.frame(t(collect_padjValues))
-      collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE))) 
+      collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE)))
     } else if (approach == "Mean"){
-      select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
-      select_pValue <- as.data.frame(t(select_pValue))
-      collect_padjValues$minimum_pValue <- Pvalue_averaging(select_pValue, method = "mean")
+      collect_padjValues <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
+      collect_padjValues <- as.data.frame(t(collect_padjValues))
+      collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "mean")
     } else if (approach == "Median"){
-      select_pValue <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
-      select_pValue <- as.data.frame(t(select_pValue))
-      collect_padjValues$minimum_pValue <- Pvalue_averaging(select_pValue, method = "median")
+      collect_padjValues <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
+      collect_padjValues <- as.data.frame(t(collect_padjValues))
+      collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "median")
     }
     ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
     allInfo <- data.frame(select_info, collect_padjValues)
