@@ -72,7 +72,7 @@ UserMetadata <- setClass(
     prototype = prototype(
         working_path = getwd(),
         gtf_source = "ensembl",
-        reads_size = 51,
+        reads_size = 75,
         simple_arborescence = TRUE,
         output_dir = "",
         verbose = TRUE,
