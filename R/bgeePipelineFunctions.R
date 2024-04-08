@@ -343,6 +343,13 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, method="Normal", p
     if(method == "Normal"){
         ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
         selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+
+        # remove outliers using the interquartile range
+        Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
+        Q3 <- quantile(log2(selected_intergenic$abundance), 0.75)
+        IQR <- Q3 - Q1
+        selected_intergenic <- selected_intergenic[log2(selected_intergenic$abundance) > (Q1 - 1.5 * IQR) & log2(selected_intergenic$abundance) < (Q3 + 1.5 * IQR),]
+
         ## calculate z-score for each gene_id using the reference intergenic 
         selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
         ## calculate p-values for each gene_id
