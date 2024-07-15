@@ -65,7 +65,7 @@ checkUserFile <- function(userFile, condition){
 #' @noMd
 #' @noRd
 #' 
-approachesMerging <- function(allFiles, approach, cutoff){
+approachesMerging <- function(allFiles, approach, cutoff, weights=FALSE, weightValues=c()){
   
   librariesData <- try(do.call("cbind", allFiles), silent = TRUE) 
   ## select gene_id
@@ -86,11 +86,19 @@ approachesMerging <- function(allFiles, approach, cutoff){
     } else if (approach == "Mean"){
       collect_padjValues <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
       collect_padjValues <- as.data.frame(t(collect_padjValues))
-      collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "mean")
+      if (weights == TRUE){
+        collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "mean", w_values = weightValues)
+      } else {
+        collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "mean")
+      }
     } else if (approach == "Median"){
       collect_padjValues <- apply(select_pValue, 1, function (x) x[1:length(select_pValue)])
       collect_padjValues <- as.data.frame(t(collect_padjValues))
+      if (weights == TRUE){
+        collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "median", w_values = weightValues)
+      } else {
       collect_padjValues$minimum_pValue <- Pvalue_averaging(collect_padjValues, method = "median")
+      }
     }
     ## data frame with all information (gene_id + all adjusted pvalues of all libraries)
     allInfo <- data.frame(select_info, collect_padjValues)
@@ -166,7 +174,7 @@ approachesMerging <- function(allFiles, approach, cutoff){
 #' the calls to each gene id for the referent condition.
 #' 
 #' 
-merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL) {
+merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL, , weights=FALSE) {
 
   ## check user input
   userFile <- read.table(file = userFile, header = TRUE, sep = "\t")
@@ -205,7 +213,12 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
     allFiles <- lapply(allFiles, read.delim)
     
     #merge calls based on condition
-    callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff)
+    if(weights == FALSE){
+      callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=FALSE)
+    } else {
+      weightValues = userFile["weights"]
+      callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=TRUE, w_values = weightValues)
+    }
     
     #write file with merged results
     write.table(callsFile, file = paste0(outDir, "/Calls_merging_",approach, "_", "cutoff=", cutoff, 
