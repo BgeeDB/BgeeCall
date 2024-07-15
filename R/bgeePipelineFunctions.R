@@ -336,33 +336,23 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
 #' 
 #' @import dplyr
 #'
-generate_theoretical_pValue <- function(counts, pValueCutoff, method="Normal", pvalueCorrection="None") {
+generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="None") {
     ## select genic region from the library
     selected_count <- filter(counts, abundance > 0)  
 
-    if(method == "Normal"){
-        ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
-        selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+    ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
+    selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
 
-        # remove outliers using the interquartile range
-        Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
-        Q3 <- quantile(log2(selected_intergenic$abundance), 0.75)
-        IQR <- Q3 - Q1
-        selected_intergenic <- selected_intergenic[log2(selected_intergenic$abundance) > (Q1 - 1.5 * IQR) & log2(selected_intergenic$abundance) < (Q3 + 1.5 * IQR),]
+    # remove outliers using the interquartile range
+    Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
+    Q3 <- quantile(log2(selected_intergenic$abundance), 0.75)
+    IQR <- Q3 - Q1
+    selected_intergenic <- selected_intergenic[log2(selected_intergenic$abundance) > (Q1 - 1.5 * IQR) & log2(selected_intergenic$abundance) < (Q3 + 1.5 * IQR),]
 
-        ## calculate z-score for each gene_id using the reference intergenic 
-        selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
-        ## calculate p-values for each gene_id
-        selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
-    } else if(method == "TobitNormal"){
-        leftCensoredThreshold <- min(selected_intergenic[selected_intergenic$counts == 1])
-        selected_intergenic$abundance[selected_intergenic$abundance < leftCensoredThreshold] <- leftCensoredThreshold - 1e-6
-        tobitParameters <- tobit(log2(selected_intergenic$abundance) ~ 1, left = log2(leftCensoredThreshold), dist = "exponential")
-        selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
-        selected_count$pValue <- 1 - pexp(log2(selected_count$abundance), rate = 1 / tobitParameters$scale)
-    } else {
-        stop("Incorrect method name for the pValue caclulations")
-    }
+    ## calculate z-score for each gene_id using the reference intergenic 
+    selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
+    ## calculate p-values for each gene_id
+    selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
 
     if(pvalueCorrection == "BH"){
         selected_count$pValue = p.adjust(selected_count$pValue, method="BH")

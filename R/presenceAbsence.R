@@ -41,7 +41,6 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' (optional).
 #' @param myBgeeMetadata A Class BgeeMetadata object (optional).
 #' @param myUserMetadata A Class UserMetadata object.
-#' @param method A string indicating the method to use to calculate the pValue.
 #' @param pvalueCorrection A string indicating the method to use to correct the pValue.
 #'
 #' @author Julien Wollbrett
@@ -65,7 +64,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' }
 #'
 generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"), 
-    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata, method="Normal", pvalueCorrection="None") {
+    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata, pvalueCorrection="None") {
     
     system.file()
     # load data
@@ -166,7 +165,6 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
         }else if (myAbundanceMetadata@cutoff_type == 'pValue') {
             pvalue_generated <- generate_theoretical_pValue(counts = abundance,
                                                      myAbundanceMetadata@cutoff, 
-                                                     method=method, 
                                                      pvalueCorrection = pvalueCorrection)
             abundance <- pvalue_generated$counts_with_pValue
             mean_pvalue <- pvalue_generated$mean
