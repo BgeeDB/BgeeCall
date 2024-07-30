@@ -90,13 +90,15 @@ writeFastq(object = SRR350955,
 ```
 
 In this example we used the Bioconductor AnnotationHub to load transcriptome and gene annotations but you can load them from wherever you want.
-``` {r, message = FALSE, warning = FALSE}
-ah <- AnnotationHub::AnnotationHub()
-ah_resources <- AnnotationHub::query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
+``` {r, message = TRUE, warning = TRUE}
+library(AnnotationHub)
+library(rtracklayer)
+ah <- AnnotationHub()
+ah_resources <- query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 annotation_object <- ah_resources[["AH50789"]]
 # remove MtDNA not tag as C. elegans genome
 annotation_object <- dropSeqlevels(annotation_object, "MtDNA", "coarse")
-transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
+transcriptome_object <- import.2bit(ah_resources[["AH50453"]])
 ```
 
 Once you have access to transcriptome, gene annotations and your RNA-Seq library, an object of class `UserMetadata` has to be created.
