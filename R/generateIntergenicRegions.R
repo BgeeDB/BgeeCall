@@ -75,7 +75,50 @@ remove_Ns_from_intergenic <- function (chr_number, chr_intergenic_regions, max_b
       intergenic_regions_without_N <- rbind(intergenic_regions_without_N, chr_intergenic_regions[line,])
 
     # Now need to parse the sequence in order to find potential block of N
-    } 
+    } else {
+
+      # for each bp of the sequence
+      seq_position <- 0
+      while (seq_position + 1 <=  nchar(intergenic_sequence)) {
+        seq_position <- seq_position + 1
+
+        # start a new block of N if the current bp is a N
+        if (substr(intergenic_sequence, seq_position, seq_position) ==  "N") {
+          block_size = 1
+
+          # continue to increase size of the block of N until we are at a real bp position or at the end of the sequence
+          while (seq_position + 1 <=  nchar(intergenic_sequence) && substr(intergenic_sequence,seq_position + 1,seq_position + 1) ==  "N") {
+            block_size <- block_size + 1
+            seq_position <- seq_position + 1
+          }
+
+          # check the size of the block of N to know if it should be removed
+          if (block_size >=  max_block_size) {
+
+            #absolute position in the chromosome
+            current_chr_stop <- as.numeric(chr_intergenic_regions[line,"start"]) + seq_position - (block_size + 1)
+            # position in the intergenic sequence (the first one in this addition correspond to the start position of the sequence)
+            current_intergenic_stop <- seq_position - block_size
+            current_size <- (current_chr_stop - chr_start) + 1
+            # check size and proportion of N of the subsequence
+            if (current_size >=  min_intergenic_length && proportion_of_N(substr(intergenic_sequence, intergenic_start, current_intergenic_stop)) <=  max_proportion_N) {
+              intergenic_regions_without_N <- rbind(intergenic_regions_without_N,
+                                                    cbind(chr_number, chr_start, current_chr_stop, substr(intergenic_sequence, intergenic_start, current_intergenic_stop))[1,])
+            }
+            intergenic_start <- 1 + seq_position
+            chr_start <- as.numeric(chr_intergenic_regions[line,"start"]) + seq_position
+          }
+        }
+      }
+      # test if it remains one intergenic region to add
+      last_portion_size <- (seq_position - intergenic_start) + 1
+      # check size and proportion of N of the subsequence
+      if (last_portion_size >=  min_intergenic_length && proportion_of_N(substr(intergenic_sequence, intergenic_start, seq_position)) <=  max_proportion_N) {
+        intergenic_regions_without_N <- rbind(intergenic_regions_without_N,
+                                              cbind(chr_number, chr_start, chr_end, substr(intergenic_sequence, intergenic_start, seq_position))[1,])
+      }
+    }
+
   }
   return(intergenic_regions_without_N)
 }
@@ -171,13 +214,12 @@ gene_gtf <- gene_gtf[gene_gtf[,3] == "gene",]
 cat("Extracting gene informations...\n")
 ## splitting the annotation field using single space "; " as a pattern
 split_annotation_list <- strsplit(gene_gtf_exon[,9], "; ",  fixed  = T)
-split_transcript_annotation_list <- strsplit(gene_gtf_exon[,9], "; ",  fixed  = T)
 
 ## getting the vector of the gene IDs (1 for every exon)
 gene_ids <- sapply(split_annotation_list, function(x){ get_annot_value(x, 'gene_id') })
 
 ## getting the vector of the transcript IDs (1 for every exon)
-transcript_ids <- sapply(split_transcript_annotation_list, function(x){ get_annot_value(x, 'transcript_id') })
+transcript_ids <- sapply(split_annotation_list, function(x){ get_annot_value(x, 'transcript_id') })
 
 ## getting the table with mappings between gene IDs and transcript (for tximport)
 tx2gene_ids <- unique(cbind(transcript_ids, gene_ids), MARGIN = 1)
@@ -195,10 +237,9 @@ gene_biotypes <- cbind(
 gene_start <- sapply(split(as.numeric(gene_gtf_exon[,4]), gene_ids), function(x){ sort(as.numeric(x))[1] })
 gene_stop <- sapply(split(as.numeric(gene_gtf_exon[,5]), gene_ids), function(x){ rev(sort(as.numeric(x)))[1] })
 gene_chr <- sapply(split(gene_gtf_exon[,1], gene_ids), function(x){ x[1] })
-gene_strand <- sapply(split(gene_gtf[,7], gene_ids), function(x){ x[1] })
 
 ## chromosome/contig names from given gtf files
-chromosomes <- unique(gene_gtf_exon[,1])
+chromosomes <- unique(gene_gtf[,1])
 ## removing patch contigs before selecting intergenic regions
 chromosomes <- chromosomes[grep('PATCH', chromosomes, invert = TRUE, ignore.case = TRUE)]
 
@@ -211,6 +252,9 @@ rownames(summary_N_removal) <- c("before", "after")
 # To avoid scientific notation we change the value of option "scipen" to 999. At the end of the script we will change to its initial value
 scipen_initial_value <- getOption("scipen")
 options(scipen = 999)
+
+## getting the vector of the gene IDs (1 for every gene)
+gene_ids <- sapply(split_annotation_list, function(x){ get_annot_value(x, 'gene_id') }) 
 
 intergenic_chr = c()
 intergenic_starts = c()
@@ -434,3 +478,28 @@ generate_intergenic_with_ensembl <- function(species_gtf = c("homo_sapiens/Homo_
         generate_initial_intergenic_regions(gene_gtf_path=paste0(gtf_dir, "/", gtf), genome_fasta_path=paste0(gtf_dir, "/", fasta))
     }
 }
+
+
+#' @title Generation of reference intergenic regions
+#'
+#' @description Uses transcriptomic evidence to define which of the initial intergenic regions are truly intergenic and which one might come from annotations errors
+#'
+#' @param species_gtf list of genomes to download following from ensembl or path to the file containing the list of genomes
+#' @param ensembl_release ensembl release from which we want to GTF files
+#' @param ensembl_metazoa_release ensembl metazoa release from which we want to GTF files
+#' @param gtf_dir path to where we want to store the GTF files
+#' @param from_file boolean of whether species_gtf is a file or a list of genomes
+#' @param intergenic_dir path to where the initial intergenic regions will be stored
+#'
+#' @author Alessandro Brandulas Cammarata
+#' 
+#' @import RCurl
+#' @import readr
+#' @import stringr
+#' @import tools
+#' 
+#' @noMd
+#' @noRd
+#' 
+#' 
+
