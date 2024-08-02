@@ -174,7 +174,7 @@ approachesMerging <- function(allFiles, approach, cutoff, weights=FALSE, weightV
 #' the calls to each gene id for the referent condition.
 #' 
 #' 
-merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL, , weights=FALSE) {
+merging_libraries <- function(userFile = NULL, approach = "BH", condition = "species_id", cutoff = 0.05, outDir = NULL, weights=FALSE) {
 
   ## check user input
   userFile <- read.table(file = userFile, header = TRUE, sep = "\t")
