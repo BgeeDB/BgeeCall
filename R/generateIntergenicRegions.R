@@ -368,12 +368,26 @@ summary_N_removal[,"proportion_N"] <- summary_N_removal[,"total_N"] / summary_N_
 ####################################
 output_file_path <- file.path(output_gtf_path, basename(substring(gene_gtf_path, 1, (nchar(gene_gtf_path) -7))))
 
-if (!dir.exists(output_file_path)) {
-  dir.create(intergenic_dir, recursive = TRUE)
+if (!dir.exists(output_gtf_path)) {
+  dir.create(output_gtf_path, recursive = TRUE)
 }
 
 
 ## Output:
+##Reference intergenic object
+message("write file : ", paste(output_file_path, "_interegenic", sep = ""))
+
+write.table(x = Reference_intergenic,
+            file = paste(output_file_path, "_interegenic", sep = ""),
+            sep = "\t",
+            row.names = FALSE,
+            col.names = FALSE,
+            quote = FALSE)
+
+##Intergenic only in fasta format
+#We need to convert the Reference_intergenic object into a fasta file
+convert_to_fasta(Reference_intergenic, paste(output_file_path, "_fasta_interegenic.fa", sep = ""))
+
 ##Intergenic only
 message("write file : ", paste(output_file_path, "gtf_interegenic", sep = ""))
 
@@ -480,26 +494,44 @@ generate_intergenic_with_ensembl <- function(species_gtf = c("homo_sapiens/Homo_
 }
 
 
-#' @title Generation of reference intergenic regions
+#' @title Changed to format of the Reference_intergenic object into a fasta file
 #'
-#' @description Uses transcriptomic evidence to define which of the initial intergenic regions are truly intergenic and which one might come from annotations errors
+#' @description We take the Reference_intergenic object and shift the columns or fuse the column so that the format is the same as a fasta file
 #'
-#' @param species_gtf list of genomes to download following from ensembl or path to the file containing the list of genomes
-#' @param ensembl_release ensembl release from which we want to GTF files
-#' @param ensembl_metazoa_release ensembl metazoa release from which we want to GTF files
-#' @param gtf_dir path to where we want to store the GTF files
-#' @param from_file boolean of whether species_gtf is a file or a list of genomes
-#' @param intergenic_dir path to where the initial intergenic regions will be stored
+#' @param Reference_intergenic object containing the intergenic regions
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @import RCurl
+#' @import dplyr
 #' @import readr
-#' @import stringr
-#' @import tools
 #' 
 #' @noMd
 #' @noRd
 #' 
-#' 
-
+convert_to_fasta <- function(Ref, output_file) {
+  # Initialize empty data frames and list
+  upstream <- data.frame()
+  downstream <- data.frame()
+  fasta_seq <- list()
+  
+  # Open the output file for writing
+  out_f <- file(output_file, 'w')
+  
+  # Initialize variables for looping
+  i <- 1
+  odd <- FALSE
+  
+  # Loop through each line in the input data frame
+  for (line in 1:nrow(Ref)) {
+    new_header <- paste0('>', Ref[i, "upstream/downstream"], '    ', Ref[i, "chr"], Ref[i, "strand"], '    ', Ref[i, "start"], '-', Ref[i, "end"])
+    
+    writeLines(new_header, out_f)
+    fasta_seq[[i]] <- Ref[i, "sequence"]
+    writeLines(Ref[i, "sequence"], out_f)
+    
+    i <- i + 1
+  }
+  
+  # Close the output file
+  close(out_f)
+}
