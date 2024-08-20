@@ -557,7 +557,7 @@ convert_to_fasta <- function(Ref, output_file) {
 #'
 #' 
 
-generate_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_path, gene2biotype_path, TPM_path, output_path="./reference_intergenic_regions", species="my_species") {
+find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_path, gene2biotype_path, TPM_path, output_path="./reference_intergenic_regions", species="my_species") {
   print("Generating reference intergenic regions...")
 
   # Create output folder if it does not exist
@@ -872,4 +872,100 @@ generate_reference_intergenic_regions <- function(intergenic_regions_path, tx2ge
   rm(summed)
   rm(summed_filtered)
   rm(numLibs)
+}
+#' @title Generates reference intergenic regions by removing outlier intergenics
+#'
+#' @description We transform the fasta file containing all intergenic regions to the reference intergenic regions by removing outliers
+#'
+#' @param intergenic_fasta intergenic regions fasta file
+#' @param summed_tpm_file path to the file containing the summed reads for intergenic regions
+#' @param output_file path to the output reference intergenic fasta file with removed outliers
+#'
+#' @author Alessandro Brandulas Cammarata
+#' 
+#' @import dplyr
+#' @import stringr
+#' 
+#' @noMd
+#' @noRd
+#'
+#' 
+generate_fasta_intergenic_regions <- function(intergenic_fasta, summed_tpm_file, output_file) {
+  ## Read the summed TPM file
+  summed_tpm <- read.table(file = summed_tpm_file, header = TRUE, sep = "\t")
+
+  # Filter for intergenic regions where classification matches the pattern 'Reference_intergenic'
+  reference_intergenic <- summed_tpm %>% filter(str_detect(classification, 'Reference_intergenic')) %>% pull(gene_id)
+
+  # Open the input FASTA file and output file
+  fasta_output = file(output_file, "w")
+  fasta_input = file(intergenic_fasta, "r")
+
+  # Initialize the variable describing whether the current sequence is in the reference intergenic regions
+  core <- FALSE
+
+  # Loop through each line in the input file
+  while (TRUE) {
+    line <- readLines(fasta_input, n = 1)
+    if (length(line) == 0) break # End of file
+
+    # Check if the line is a header line 
+    if (startsWith(line, ">")) {
+      # Extract the transcript ID from the line
+      enst_id <- str_extract(line, '[a-z]+_[A-Za-z]+\\d+')
+      print(enst_id)
+      
+      # Check if the extracted transcript ID is in the reference intergenic regions
+      if (enst_id %in% reference_intergenic) {
+        # Write the header line to the output file
+        writeLines(line, fasta_output)
+        core <- TRUE
+      } else {
+        core <- FALSE
+      }
+    } else {
+      # If it's not a header line, write it to the output file if core is TRUE
+      if (core) {
+        writeLines(line, fasta_output)
+        core <- FALSE
+      }
+    }
+  }
+}
+
+
+#' @title Generates reference intergenic regions by removing outlier intergenics
+#'
+#' @description We sum the TPM values of intergenic regions in specified directory containing multiple libraries and find a threshold to remove outlier intergenic regions based on protein coding genes
+#' we then filter the fasta file containing all intergenic regions to the reference intergenic regions by removing outliers
+#'
+#' @param intergenic_regions_path path to the intergenic regions
+#' @param tx2gene_path path to the tx2gene file of the species
+#' @param gene2biotype_path path to the gene2biotype file of the species
+#' @param TPM_path path to the abundance files of the libraries
+#' @param output_path path to the output folder
+#'
+#' @author Alessandro Brandulas Cammarata
+#' 
+#' @import dplyr
+#' @import MASS
+#' @import ggplot2
+#' 
+#' @noMd
+#' @noRd
+#'
+#' 
+
+generate_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_path, gene2biotype_path, TPM_path, output_path="./reference_intergenic_regions", species="my_species") {
+
+  find_reference_intergenic_regions(intergenic_regions_path, tx2gene_path, gene2biotype_path, TPM_path, output_path, species)
+
+  # Extract base name from intergenic_regions_path and append "_fasta_intergenic.fa"
+  base_name <- basename(intergenic_regions_path)
+  fasta_file_name <- paste0(base_name, "_fasta_intergenic.fa")
+
+  # Construct the full path for the fasta file
+  fasta_intergenic <- file.path(output_path, fasta_file_name)
+
+  generate_fasta_intergenic_regions(intergenic_fasta = intergenic_regions_path, summed_tpm_file = paste0(output_path, "/sum_abundance_gene_level+fpkm+intergenic+classification_", species, ".tsv"), paste0(output_path, "/", substr(base_name, 1, nchar(base_name) - 3), "_reference.fa"))
 }
