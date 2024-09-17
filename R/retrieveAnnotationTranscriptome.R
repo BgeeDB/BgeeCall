@@ -308,7 +308,7 @@ find_genome_file_paths <- function(species_taxon_id=c(9606, 9031), ensembl_relea
   
   # URLs for Ensembl Vertebrates, Metazoa, and NCBI
   url_ensembl <- paste0("https://ftp.ensembl.org/pub/release-", ensembl_release, "/species_metadata_EnsemblVertebrates.json")
-  url_metazoa <- paste0("https://ftp.ensembl.org/pub/release-", ensembl_metazoa_release, "/species_metadata_EnsemblVertebrates.json")
+  url_metazoa <- paste0("https://ftp.ensemblgenomes.org/pub/metazoa/release-", ensembl_metazoa_release, "/species_metadata_EnsemblVertebrates.json")
   url_ncbi <- "https://ftp.ncbi.nlm.nih.gov/genomes/refseq/assembly_summary_refseq.txt"
   
   # Initialize a list to store the genome file paths
