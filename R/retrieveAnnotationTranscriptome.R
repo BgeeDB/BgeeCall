@@ -19,7 +19,7 @@
 #' @noRd
 #' 
 #' 
-retrieve_gtf_files <- function(species_gtf=c("homo_sapiens/Homo_sapiens.GRCh38", "gallus_gallus/Gallus_gallus.bGalGal1.mat.broiler.GRCg7b"), ensembl_release=112, ensembl_metazoa_release=59, outDir="./genomes/", from_file=FALSE) {
+retrieve_gtf_files <- function(species_gtf=c("homo_sapiens/Homo_sapiens.GRCh38", "gallus_gallus/Gallus_gallus.bGalGal1.mat.broiler.GRCg7b"), ensembl_release=112, ensembl_metazoa_release=59, outDir="./genomes/", from_file=FALSE, taxon_ids=FALSE) {
 
 if (!dir.exists(outDir)) {
     dir.create(outDir, recursive = TRUE)
@@ -32,6 +32,11 @@ if (!dir.exists(outDir) || !file.access(outDir, 2) == 0) {
 if (from_file == TRUE) {
     tsv <- read_tsv(species_gtf, col_types = cols())
     species_gtf <- unique(tsv$genomeFilePath)
+}
+
+if (taxon_ids == TRUE) {
+  species_gtf = find_genome_file_paths(species_gtf, ensembl_release, ensembl_metazoa_release, outDir) 
+  species_gtf <- as.character(species_gtf)
 }
 
 working_path = getwd()
@@ -246,7 +251,7 @@ retrieve_fasta_gtf <- function(species_gtf=c("homo_sapiens/Homo_sapiens.GRCh38",
 #' @noRd
 #' 
 #' 
-find_genome_file_paths <- function(species_taxon_id=c(9606, 9031), ensembl_release=112, ensembl_metazoa_release=59, outDir="./genomes/") {  
+find_genome_file_paths <- function(species_taxon_ids=c(9606, 9031), ensembl_release=112, ensembl_metazoa_release=59, outDir="./genomes/") {  
   # Helper function to download and process JSON data
   process_json <- function(url, output_filename) {
     output_file <- file.path(outDir, output_filename)
@@ -287,7 +292,7 @@ find_genome_file_paths <- function(species_taxon_id=c(9606, 9031), ensembl_relea
       message(paste("File already exists:", output_file))
     }
     
-    ncbi_data <- read_delim(output_file, delim = "\t", skip = 1, col_names = TRUE, show_col_types = FALSE, na = c("na"))
+    ncbi_data <- read_delim(output_file, delim = "\t", skip = 1, col_names = TRUE, show_col_types = FALSE, na = c("na", "NA", ""))
     
     # Rename the problematic column
     colnames(ncbi_data)[colnames(ncbi_data) == "#assembly_accession"] <- "assembly_accession"
@@ -296,11 +301,12 @@ find_genome_file_paths <- function(species_taxon_id=c(9606, 9031), ensembl_relea
     matching_rows <- ncbi_data %>%
       filter(species_taxid == taxon_id) %>%
       filter(refseq_category %in% c("reference genome", "representative genome")) %>%
-      select(asm_name, assembly_accession)
+      select(asm_name, assembly_accession, organism_name)
     
     # Return concatenated genomefilepath if a match is found
     if (nrow(matching_rows) > 0) {
-      return(paste0(matching_rows$assembly_accession, "/", matching_rows$asm_name))
+      species_name_formatted <- gsub(" ", "_", tolower(matching_rows$organism_name))
+      return(paste0(species_name_formatted, "/", species_name_formatted, "_", matching_rows$assembly_accession, "_", matching_rows$asm_name))
     } else {
       return(NA)  # Return NA if no matches
     }
@@ -308,7 +314,7 @@ find_genome_file_paths <- function(species_taxon_id=c(9606, 9031), ensembl_relea
   
   # URLs for Ensembl Vertebrates, Metazoa, and NCBI
   url_ensembl <- paste0("https://ftp.ensembl.org/pub/release-", ensembl_release, "/species_metadata_EnsemblVertebrates.json")
-  url_metazoa <- paste0("https://ftp.ensemblgenomes.org/pub/metazoa/release-", ensembl_metazoa_release, "/species_metadata_EnsemblVertebrates.json")
+  url_metazoa <- paste0("http://ftp.ensemblgenomes.org/pub/metazoa/release-", ensembl_metazoa_release, "/species_metadata_EnsemblMetazoa.json")
   url_ncbi <- "https://ftp.ncbi.nlm.nih.gov/genomes/refseq/assembly_summary_refseq.txt"
   
   # Initialize a list to store the genome file paths
@@ -348,11 +354,43 @@ find_genome_file_paths <- function(species_taxon_id=c(9606, 9031), ensembl_relea
       genomefilepaths <- append(genomefilepaths, list(genomefilepath))  # Append as list element
     } else {
       # Create the concatenated string if matching rows are found
-      genomefilepath <- paste0(matching_rows$organism_name[1], "/", matching_rows$url_name[1], "/", matching_rows$assembly_name[1])
+      genomefilepath <- paste0(matching_rows$organism_name[1], "/", matching_rows$url_name[1], ".", matching_rows$assembly_name[1])
       genomefilepaths <- append(genomefilepaths, list(genomefilepath))  # Append as list element
     }
   }
   
   return(genomefilepaths)
   
+}
+
+#' @title retrieves FASTA and GTF files from taxon ID
+#'
+#' @description retrieves both FASTA and GTF files for specified species
+#'
+#' @param species_gtf list of genomes to download following from ensembl or path to the file containing the list of genomes
+#' @param ensembl_release ensembl release from which we want to GTF files
+#' @param ensembl_metazoa_release ensembl metazoa release from which we want to GTF files
+#' @param outDir path to where we want to store the GTF files
+#'
+#' @author Alessandro Brandulas Cammarata
+#' 
+#' @import RCurl
+#' @import readr
+#' @import stringr
+#' @import tools
+#' 
+#' @noMd
+#' @noRd
+#' 
+#' 
+retrieve_fasta_gtf_from_taxonid <- function(taxon_id=c(9606, 9031), ensembl_release=112, ensembl_metazoa_release=59, outDir="./genomes/") {
+    # Get the absolute path of outDir
+    full_outDir <- normalizePath(outDir, mustWork = FALSE)
+    
+    # Print the full path
+    print(paste0("Retrieving GTF and FASTA files from taxon ID at: ", full_outDir))
+    
+    # Call your retrieval functions
+    retrieve_gtf_files(taxon_id, ensembl_release, ensembl_metazoa_release, outDir, taxon_ids=TRUE)
+    retrieve_fasta_files(gtf_folder=outDir, ensembl_release, ensembl_metazoa_release, outDir=outDir)
 }
