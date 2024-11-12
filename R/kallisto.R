@@ -97,12 +97,12 @@ potential already installed version of Kallisto.\n")
     }
     need_to_generate_index <- TRUE
     if(!isTRUE(myKallistoMetadata@overwrite_index)) {
-        if ((myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold && 
+        if ((myUserMetadata@reads_size >= AbundanceMetadata@read_size_kmer_threshold && 
             file.exists(transcriptome_index_path)) || 
             (is.na(myUserMetadata@reads_size) == "TRUE" && 
              file.exists(transcriptome_index_path)) ||
             (myUserMetadata@reads_size < 
-            myKallistoMetadata@read_size_kmer_threshold && 
+            AbundanceMetadata@read_size_kmer_threshold && 
             file.exists(transcriptome_k15_index_path))) {
             if(isTRUE(myUserMetadata@verbose)) {
                 message("Index file already exist. No need to create a new one.\n")
@@ -116,7 +116,7 @@ potential already installed version of Kallisto.\n")
         }
         
         # create kallisto index with default kmer size also when user not provide the read_size information
-        if (myUserMetadata@reads_size >= myKallistoMetadata@read_size_kmer_threshold || is.na(myUserMetadata@reads_size) == "TRUE" && 
+        if (myUserMetadata@reads_size >= AbundanceMetadata@read_size_kmer_threshold || is.na(myUserMetadata@reads_size) == "TRUE" && 
             !file.exists(transcriptome_index_path)) {
             kallisto_args <- paste0(" index -i ", transcriptome_index_path,
                 " ", transcriptome_path)
@@ -124,7 +124,7 @@ potential already installed version of Kallisto.\n")
         }
         
         # create kallisto index with kmer size equal to 15
-        if (myUserMetadata@reads_size < myKallistoMetadata@read_size_kmer_threshold && 
+        if (myUserMetadata@reads_size < AbundanceMetadata@read_size_kmer_threshold && 
             is.na(myUserMetadata@reads_size) == "FALSE" &&
             !file.exists(transcriptome_k15_index_path)) {
             kallisto_k15_args <- paste0(" index -k 15 -i ", 
@@ -253,7 +253,7 @@ potential already installed version of Kallisto.")
     
         # if read size < 50nt use transcriptome index with
         # small kmer size
-        if (myUserMetadata@reads_size < KallistoMetadata@read_size_kmer_threshold && 
+        if (myUserMetadata@reads_size < AbundanceMetadata@read_size_kmer_threshold && 
             is.na(myUserMetadata@reads_size) == "FALSE") {
             kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
                 myKallistoMetadata@k15_index_file))
