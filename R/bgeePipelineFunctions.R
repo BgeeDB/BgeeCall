@@ -341,9 +341,11 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="
     selected_count <- filter(counts, abundance > 0)  
 
     ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
-    selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+    selected_intergenic <- filter(counts, type == "intergenic")
 
     ratio_intergenic_overzero <- sum(selected_intergenic$abundance > 0) / nrow(selected_intergenic)
+
+    selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
 
     # remove outliers using the interquartile range
     Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
