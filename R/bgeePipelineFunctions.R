@@ -340,7 +340,6 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="
     ## select genic region from the library
     selected_count <- filter(counts, abundance > 0)  
 
-    ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
     selected_intergenic <- filter(counts, type == "intergenic")
 
     ratio_intergenic_overzero <- sum(selected_intergenic$abundance > 0) / nrow(selected_intergenic)
