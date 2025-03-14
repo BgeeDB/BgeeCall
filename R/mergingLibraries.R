@@ -217,7 +217,7 @@ merging_libraries <- function(userFile = NULL, approach = "BH", condition = "spe
       callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=FALSE)
     } else {
       weightValues = userFile["weights"]
-      callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=TRUE, w_values = weightValues)
+      callsFile <- approachesMerging(allFiles = allFiles, approach = approach, cutoff = cutoff, weights=TRUE, weightValues = weightValues)
     }
     
     #write file with merged results
@@ -267,7 +267,8 @@ Pvalue_averaging <- function(pval_collect, w_values=c(), method="mean"){
     for(row in 1:nrow(pval_collect)){
       pvals = as.double(pval_collect[row,])
       if (method == "mean"){
-        w_pvals = pvals * w_values
+        total_weight = sum(w_values)
+        w_pvals = pvals * (w_values/total_weight)
         mean_pval = sum(w_pvals)
       } else if (method == "median"){
         mean_pval = weighted.median(pvals, w_values, na.rm = TRUE)
