@@ -9,7 +9,7 @@
 #'
 #' @author Julien Wollbrett
 #'
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #'
 #' @export
 #'
@@ -22,7 +22,7 @@
 #'
 list_community_ref_intergenic_species <- function() {
     community <-
-        jsonlite::fromJSON(txt = "https://zenodo.org/api/records/?communities=bgee_intergenic")
+        fromJSON(txt = "https://zenodo.org/api/records/?communities=bgee_intergenic")
     datasets <- NULL
     datasets_index <- 1
     for (records_index in seq_len(nrow(community$hits$hits))) {

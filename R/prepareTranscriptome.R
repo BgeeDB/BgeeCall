@@ -11,7 +11,7 @@
 #'
 #' @author Julien Wollbrett.
 #'
-#' @import Biostrings
+#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse
 #'
 #' @export
 #' 

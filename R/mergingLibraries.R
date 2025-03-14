@@ -11,9 +11,9 @@
 #' @return User data frame
 #' @return Vector name of columns detected
 #' 
-#' @import data.table
-#' @import sjmisc
-#' @import dplyr
+#' @importFrom data.table data.table fread fwrite rbindlist setDT setkey setnames
+#' @importFrom sjmisc str_contains
+#' @importFrom dplyr %>% arrange bind_rows distinct mutate n pull rename summarise ungroup
 #' 
 #' @noMd
 #' @noRd
@@ -29,7 +29,7 @@ checkUserFile <- function(userFile, condition){
          "the condition is choosed to merge.")
   }
   
-  if(is_empty(userFile[,"species_id"]) ==TRUE) {
+  if(sjmisc::is_empty(userFile[,"species_id"]) ==TRUE) {
     stop("Some rows have empty value for the \"species_id\" column.\n",
          "\"species_id\" should always be provided.")
   }
@@ -59,8 +59,8 @@ checkUserFile <- function(userFile, condition){
 #'
 #' @return data frame with minimum pValue or qValue detected (dependent of the approach selected) and the calls
 #' 
-#' @import data.table
-#' @import dplyr
+#' @importFrom data.table data.table fread fwrite rbindlist setDT setkey setnames
+#' @importFrom dplyr %>% arrange bind_rows distinct mutate n pull rename summarise ungroup
 #' 
 #' @noMd
 #' @noRd
@@ -75,12 +75,12 @@ approachesMerging <- function(allFiles, approach, cutoff, weights=FALSE, weightV
     
     ## select all pValues column from all libraries
     select_pValue = librariesData[, grepl("^pValue", names(librariesData))]
-    if(is_empty(select_pValue) == TRUE){
+    if(sjmisc::is_empty(select_pValue) == TRUE){
       stop("Select the appropriated method for your quantitative metric: BH, Mean or Median for p-values OR fdr_inverse for q-values", "\n")
     }
     ## calculate the p.adjusted values using a vector of original pValues for each gene_id
     if (approach == "BH"){
-      collect_padjValues <- apply(select_pValue, 1, function (x) p.adjust(x[1:length(select_pValue)], method = "BH"))
+      collect_padjValues <- apply(select_pValue, 1, function (x) stats::p.adjust(x[1:length(select_pValue)], method = "BH"))
       collect_padjValues <- as.data.frame(t(collect_padjValues))
       collect_padjValues$minimum_pValue <- do.call(pmin, c(collect_padjValues, list(na.rm = TRUE)))
     } else if (approach == "Mean"){
@@ -117,7 +117,7 @@ approachesMerging <- function(allFiles, approach, cutoff, weights=FALSE, weightV
     
     ## select all qValues column from all libraries
     select_qValue = librariesData[, grepl("^qValue", names(librariesData))]
-    if(is_empty(select_qValue) == TRUE){
+    if(sjmisc::is_empty(select_qValue) == TRUE){
       stop("Select the appropriated method for your quantitative metric: BH for p-values OR fdr_inverse for q-values", "\n")
     }
     select_qValue$minimum_qValue <- do.call(pmin, c(select_qValue, list(na.rm = TRUE))) 

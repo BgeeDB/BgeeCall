@@ -36,7 +36,7 @@ load_gene_to_biotype <- function(myAbundanceMetadata = new("AbundanceMetadata"),
 #'
 #' @return The mapping between gene IDs and biotypes
 #'
-#' @import rtracklayer
+#' @importFrom rtracklayer import export
 #' 
 #' @return create the mapping between genes and biotypes
 #' 

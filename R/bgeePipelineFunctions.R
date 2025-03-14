@@ -334,7 +334,7 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
 #' @noMd
 #' @noRd
 #' 
-#' @import dplyr
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #'
 generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="None") {
     ## select genic region from the library
@@ -399,7 +399,7 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="
 #' @noMd
 #' @noRd
 #' 
-#' @import dplyr
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #'
 generate_qValue <- function(counts, qValueCutoff) {
     

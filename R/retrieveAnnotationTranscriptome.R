@@ -10,10 +10,13 @@
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @import RCurl
-#' @import readr
-#' @import stringr
-#' @import tools
+#' @importFrom RCurl getURL
+#' @importFrom readr read_tsv write_tsv parse_date
+#' @importFrom stringr str_extract str_detect
+#' @importFrom tools file_path_sans_ext
+#' @importFrom curl curl_download
+#' @importFrom jsonlite fromJSON
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
@@ -84,7 +87,7 @@ setwd(working_path)
 #'
 #' @return Boolean of whether the retrival happened successfully
 #' 
-#' @import RCurl
+#' @importFrom RCurl getURL
 #' 
 #' @noMd
 #' @noRd
@@ -92,7 +95,7 @@ setwd(working_path)
 #' 
 download_file <- function(url, dest) {
   tryCatch({
-    bin <- getBinaryURL(url)
+    bin <- getURL(url)
     writeBin(bin, dest)
     return(TRUE)
   }, error = function(e) {
@@ -137,10 +140,13 @@ unzip_file <- function(file) {
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @import RCurl
-#' @import readr
-#' @import stringr
-#' @import tools
+#' @importFrom RCurl getURL
+#' @importFrom readr read_tsv write_tsv parse_date
+#' @importFrom stringr str_extract str_detect
+#' @importFrom tools file_path_sans_ext
+#' @importFrom curl curl_download
+#' @importFrom jsonlite fromJSON
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
@@ -217,10 +223,13 @@ setwd(working_path)
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @import RCurl
-#' @import readr
-#' @import stringr
-#' @import tools
+#' @importFrom RCurl getURL
+#' @importFrom readr read_tsv write_tsv parse_date
+#' @importFrom stringr str_extract str_detect
+#' @importFrom tools file_path_sans_ext
+#' @importFrom curl curl_download
+#' @importFrom jsonlite fromJSON
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
@@ -242,10 +251,10 @@ retrieve_fasta_gtf <- function(species_gtf=c("homo_sapiens/Homo_sapiens.GRCh38",
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @import curl
-#' @import jsonlite
-#' @import dplyr
-#' @import readr
+#' @importFrom curl curl_download
+#' @importFrom jsonlite fromJSON
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom readr read_delim
 #' 
 #' @noMd
 #' @noRd
@@ -374,10 +383,13 @@ find_genome_file_paths <- function(species_taxon_ids=c(9606, 9031), ensembl_rele
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @import RCurl
-#' @import readr
-#' @import stringr
-#' @import tools
+#' @importFrom RCurl getURL
+#' @importFrom readr read_tsv write_tsv parse_date
+#' @importFrom stringr str_extract str_detect
+#' @importFrom tools file_path_sans_ext
+#' @importFrom curl curl_download
+#' @importFrom jsonlite fromJSON
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
