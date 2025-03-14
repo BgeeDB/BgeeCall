@@ -2,7 +2,7 @@
 #'
 #' @description This function creates kallisto indexes. 
 #' Two indexes can be created depending on the reads size (see 
-#' `AbundanceMetadata@read_size_kmer_threshold` and `UserMetadata@reads_size` 
+#' `myKallistoMetadata@read_size_kmer_threshold` and `UserMetadata@reads_size` 
 #' for more information). One with default kmer value (31 nt) and one with 
 #' kmer size of 15 nt. In order to generate.
 #'
