@@ -134,6 +134,8 @@ remove_Ns_from_intergenic <- function (chr_number, chr_intergenic_regions, max_b
 #' @author Julien Roux
 #' @author Marta Rosikiewicz
 #' 
+#' @importFrom Biostrings countPattern
+#' 
 #' @noMd
 #' @noRd
 proportion_of_N <- function (sequence) {
@@ -175,13 +177,10 @@ count_number_of_occurences <- function (pattern, string) {
 #' @author Julien Roux
 #' @author Marta Rosikiewicz
 #' 
-#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
-#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse countPattern
-#' @importFrom RCurl getURL
-#' @importFrom readr read_tsv write_tsv parse_date
-#' @importFrom stringr str_extract str_detect
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
-#' @importFrom ggplot2 ggplot aes geom_density geom_vline scale_color_manual labs theme_minimal scale_fill_manual theme element_blank element_text element_rect
+#' @importFrom Biostrings readDNAStringSet
+#' @importFrom IRanges IRanges intersect coverage slice
+#' @importFrom dplyr filter
+#' @importFrom ggplot2 ggplot aes geom_density geom_vline scale_color_manual labs theme_minimal scale_fill_manual theme element_blank element_text
 #'
 #' @export
 #' 
@@ -314,7 +313,7 @@ for(chr in chromosomes){
   intergenic_all_IR <- IRanges::slice(coverage(gene_IR), lower = 0, upper = 0, rangesOnly = TRUE)
   Max_chromosomal_distance = max(end(intergenic_all_IR)[length(intergenic_all_IR)], end(gene_IR)[length(gene_IR)])
   intergenic_gene1k_IR <- IRanges::IRanges(start = intergenic_starts[intergenic_chr == as.character(chr)], end = intergenics_end[intergenic_chr == as.character(chr)])
-  intergenic_ref_IR <- Biostrings::intersect(intergenic_all_IR, intergenic_gene1k_IR)
+  intergenic_ref_IR <- IRanges::intersect(intergenic_all_IR, intergenic_gene1k_IR)
   intergenic_ref_IR <- intergenic_ref_IR[intergenic_ref_IR@width >= 1001]
   
   chr_intergenic_regions = final_intergenic_regions[final_intergenic_regions[,"chr"] == chr & final_intergenic_regions[, "start"] %in% intergenic_ref_IR@start & as.numeric(final_intergenic_regions[, "end"]) <= as.numeric(Max_chromosomal_distance), ]
@@ -468,18 +467,9 @@ write.table(x = gene_biotypes,
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
-#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse countPattern
-#' @importFrom RCurl getURL
-#' @importFrom readr read_tsv write_tsv parse_date
-#' @importFrom stringr str_extract str_detect
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
-#' @importFrom ggplot2 ggplot aes geom_density geom_vline scale_color_manual labs theme_minimal scale_fill_manual theme element_blank element_text element_rect
-#' 
 #' @noMd
 #' @noRd
-#' 
-#' 
+
 generate_intergenic_with_ensembl <- function(species_gtf = c("homo_sapiens/Homo_sapiens.GRCh38", "gallus_gallus/Gallus_gallus.bGalGal1.mat.broiler.GRCg7b"), ensembl_release = 112, ensembl_metazoa_release = 59, gtf_dir = "./genomes/", from_file = FALSE, intergenic_dir = "./intergenic_regions") {
 
     retrieve_fasta_gtf(species_gtf = species_gtf, ensembl_release = ensembl_release, ensembl_metazoa_release = ensembl_metazoa_release, outDir = gtf_dir, from_file = from_file)
@@ -506,14 +496,6 @@ generate_intergenic_with_ensembl <- function(species_gtf = c("homo_sapiens/Homo_
 #' @param Reference_intergenic object containing the intergenic regions
 #'
 #' @author Alessandro Brandulas Cammarata
-#' 
-#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
-#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse countPattern
-#' @importFrom RCurl getURL
-#' @importFrom readr read_tsv write_tsv parse_date
-#' @importFrom stringr str_extract str_detect
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
-#' @importFrom ggplot2 ggplot aes geom_density geom_vline scale_color_manual labs theme_minimal scale_fill_manual theme element_blank element_text element_rect
 #' 
 #' @noMd
 #' @noRd
@@ -558,8 +540,7 @@ convert_to_fasta <- function(Ref, output_file) {
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @importFrom dplyr %>% arrange bind_rows distinct mutate n pull rename summarise ungroup
-#' @importFrom MASS fitdistr
+#' @importFrom dplyr %>% distinct
 #' @importFrom ggplot2 ggplot aes geom_density geom_vline labs theme_minimal scale_color_manual scale_fill_manual theme element_blank element_text element_rect
 #' @importFrom scales alpha
 #' 
@@ -894,12 +875,8 @@ find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_p
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 
-#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
-#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse countPattern
-#' @importFrom RCurl getURL
-#' @importFrom readr read_tsv write_tsv parse_date
 #' @importFrom stringr str_extract str_detect
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom dplyr filter pull
 #' 
 #' @noMd
 #' @noRd
@@ -960,10 +937,6 @@ generate_fasta_intergenic_regions <- function(intergenic_fasta, summed_tpm_file,
 #' @param output_path path to the output folder
 #'
 #' @author Alessandro Brandulas Cammarata
-#' 
-#' @importFrom dplyr %>% arrange bind_rows distinct mutate n pull rename summarise ungroup
-#' @importFrom MASS fitdistr
-#' @importFrom ggplot2 ggplot aes geom_density geom_vline labs theme_minimal scale_color_manual scale_fill_manual theme element_blank element_text element_rect
 #' 
 #' @export
 #'
