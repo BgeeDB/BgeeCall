@@ -813,7 +813,7 @@ find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_p
   pdf2 <- kde2$y
   
   # Find the crossover point where PDF of protein-coding is always higher than PDF of intergenics
-  crossover_index <- which(pdf2 > pdf1)[1]
+  crossover_index <- which(pdf2 > pdf1 & kde1$x > quantile_20)[1]
   # Throw an error if no crossover point is found
   if (crossover_index == 0) {
     stop("No crossover point found where pdf2 is higher than pdf1.")
@@ -823,7 +823,7 @@ find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_p
   # Identify outlier intergenic regions based on the crossover value
   mislabelled_values <- intergenic_data[intergenic_data >= crossover_value]
   
-  print(paste("Crossover value where PDF of dist2 becomes higher than PDF of dist1:", crossover_value))
+  print(paste("Crossover value where PDF of protein-coding becomes higher than PDF of intergenic regions:", crossover_value))
   print(paste("Number of mislabelled intergenic regions identified by KDE crossover point:", length(mislabelled_values)))
   #print(mislabelled_values)
   
