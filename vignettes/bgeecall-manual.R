@@ -26,7 +26,7 @@ ah <- AnnotationHub::AnnotationHub()
 ah_resources <- AnnotationHub::query(ah, c("Ensembl", "Caenorhabditis elegans", "84"))
 annotation_object <- ah_resources[["AH50789"]]
 # remove MtDNA not tag as C. elegans genome
-annotation_object <- dropSeqlevels(annotation_object, "MtDNA", "coarse")
+annotation_object <- GenomeInfoDb::dropSeqlevels(annotation_object, "MtDNA", "coarse")
 transcriptome_object <- rtracklayer::import.2bit(ah_resources[["AH50453"]])
 
 ## ---- message = FALSE, warning = FALSE----------------------------------------
