@@ -41,7 +41,6 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 #' @return TxDb annotation
 #'
-#' @import GenomicFeatures
 #' @import txdbmaker
 #'
 #' @noMd
@@ -51,8 +50,10 @@ create_TxDb <- function(myUserMetadata) {
     # create txdb from GRanges Object
     # use the suppressWarnings function in order not to print useless warnings like :
     # The "phase" metadata column contains non-NA values for features of type stop_codon. This information was ignored.
-    txdb <- suppressWarnings(makeTxDbFromGRanges(myUserMetadata@annotation_object, 
+  print("test makeTxDbFromGRanges")
+    txdb <- suppressWarnings(txdbmaker::makeTxDbFromGRanges(myUserMetadata@annotation_object, 
         taxonomyId = as.numeric(myUserMetadata@species_id)))
+    print("after makeTxDbFromGRanges")
     return(txdb)
 }
 
