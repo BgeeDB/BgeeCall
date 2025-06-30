@@ -9,7 +9,8 @@ merging_libraries(
   approach = "BH",
   condition = "species_id",
   cutoff = 0.05,
-  outDir = NULL
+  outDir = NULL,
+  weights = FALSE
 )
 }
 \arguments{
@@ -45,4 +46,6 @@ condition = c(species_id, anatEntity, devStage, sex, strain), cutoff = 0.05, out
 }
 \author{
 Sara Fonseca Costa
+
+Alessandro Brandulas Cammarata
 }

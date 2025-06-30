@@ -323,32 +323,61 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
 #'
 #' @param counts A list of estimated counts
 #' @param pValueCutoff the pValue cutoff
+#' @param method the method to use for the pValue calculation
+#' @param pvalueCorrection the method to use for the pValue correction
 #'
 #' @return counts with zscore, pvalue and calls, but also the mean and the sd of ref. intergenic
 #' 
 #' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
 #'
 #' @noMd
 #' @noRd
 #' 
-#' @import dplyr
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #'
-generate_theoretical_pValue <- function(counts, pValueCutoff) {
-    ## select values with TPM > 1e-6 (because we will use log2 scale and to avoid few outliers in the intergenic regions)
-    selected_intergenic <- filter(counts, abundance > 1e-6 & type == "intergenic")
-
+generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="None") {
     ## select genic region from the library
-    selected_count <- filter(counts, abundance > 0)  
+    selected_count <- filter(counts, abundance > 0 & type == "genic")  
 
+    selected_intergenic <- filter(counts, type == "intergenic")
+
+    ratio_intergenic_overzero <- sum(selected_intergenic$abundance > 0) / nrow(selected_intergenic)
+
+    selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+
+    # remove outliers using the interquartile range
+    Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
+    Q3 <- quantile(log2(selected_intergenic$abundance), 0.75)
+    IQR <- Q3 - Q1
+    selected_intergenic <- selected_intergenic[log2(selected_intergenic$abundance) > (Q1 - 1.5 * IQR) & log2(selected_intergenic$abundance) < (Q3 + 1.5 * IQR),]
+
+    if (nrow(selected_intergenic) == 0) {
+        stop("No intergenic regions with TPM values > 0")
+    }
+    
     ## calculate z-score for each gene_id using the reference intergenic 
     selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
     ## calculate p-values for each gene_id
-    selected_count$pValue <- pnorm(selected_count$zScore, lower.tail = FALSE)
+    selected_count$pValue <- ratio_intergenic_overzero * pnorm(selected_count$zScore, lower.tail = FALSE)
+
+    if (sd(log2(selected_intergenic$abundance)) == 0) {
+        selected_count$pValue <- ratio_intergenic_overzero
+    }
+
+    if(pvalueCorrection == "BH"){
+        selected_count$pValue = p.adjust(selected_count$pValue, method="BH")
+    }
+    if(pvalueCorrection == "Bonferroni"){
+        selected_count$pValue = p.adjust(selected_count$pValue, method="bonferroni")
+    }
     counts_with_pValue <- merge(counts, selected_count[, c("id", "zScore", "pValue")], 
                                 by = "id", all.x=TRUE)
-    
+
+    counts_with_pValue$pValue[is.na(counts_with_pValue$pValue)] <- 1
     counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
                                            is.na(counts_with_pValue$pValue)), "absent", "present")
+
     mean <- 2^(mean(log2(selected_intergenic$abundance)))
     sd <- 2^(sd(log2(selected_intergenic$abundance)))
     return(list(counts_with_pValue = counts_with_pValue, mean = mean, sd = sd))
@@ -370,7 +399,7 @@ generate_theoretical_pValue <- function(counts, pValueCutoff) {
 #' @noMd
 #' @noRd
 #' 
-#' @import dplyr
+#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
 #'
 generate_qValue <- function(counts, qValueCutoff) {
     

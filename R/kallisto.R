@@ -2,7 +2,7 @@
 #'
 #' @description This function creates kallisto indexes. 
 #' Two indexes can be created depending on the reads size (see 
-#' `AbundanceMetadata@read_size_kmer_threshold` and `UserMetadata@reads_size` 
+#' `myKallistoMetadata@read_size_kmer_threshold` and `UserMetadata@reads_size` 
 #' for more information). One with default kmer value (31 nt) and one with 
 #' kmer size of 15 nt. In order to generate.
 #'
@@ -253,7 +253,7 @@ potential already installed version of Kallisto.")
     
         # if read size < 50nt use transcriptome index with
         # small kmer size
-        if (myUserMetadata@reads_size < 50 && 
+        if (myUserMetadata@reads_size < myKallistoMetadata@read_size_kmer_threshold && 
             is.na(myUserMetadata@reads_size) == "FALSE") {
             kallisto_index_path <- file.path(file.path(kallisto_index_dir, 
                 myKallistoMetadata@k15_index_file))

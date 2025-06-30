@@ -41,7 +41,9 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 #' @return TxDb annotation
 #'
-#' @import txdbmaker
+#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
+#' @importFrom rhdf5 h5read
+#' @importFrom tximport tximport summarizeToGene
 #'
 #' @noMd
 #' @noRd
@@ -136,8 +138,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #' 
 #' @author Julien Wollbrett
 #'
-#' @import rhdf5
-#' @import tximport
+#' @importFrom rhdf5 h5read
+#' @importFrom tximport tximport summarizeToGene
 #'
 #' @export
 #' 

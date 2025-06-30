@@ -11,7 +11,7 @@
 #'
 #' @return A dataframe containing reference intergenic ids
 #' 
-#' @import Biostrings
+#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse
 #' 
 #' @noMd
 #' @noRd
@@ -41,10 +41,12 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' (optional).
 #' @param myBgeeMetadata A Class BgeeMetadata object (optional).
 #' @param myUserMetadata A Class UserMetadata object.
+#' @param pvalueCorrection A string indicating the method to use to correct the pValue.
 #'
 #' @author Julien Wollbrett
 #' @author Julien Roux
 #' @author Sara Fonseca Costa
+#' @author Alessandro Brandulas Cammarata
 #' 
 #' @return path to the 4 output files
 #'
@@ -62,7 +64,7 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' }
 #'
 generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadata"), 
-    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata) {
+    myBgeeMetadata = new("BgeeMetadata"), myUserMetadata, pvalueCorrection="None") {
     
     system.file()
     # load data
@@ -161,8 +163,9 @@ generate_presence_absence <- function(myAbundanceMetadata = new("KallistoMetadat
                                                   by = "id")
         # generate calls and calculate abundance_cutoff
         }else if (myAbundanceMetadata@cutoff_type == 'pValue') {
-            pvalue_generated <- generate_theoretical_pValue(counts =abundance,
-                                                     myAbundanceMetadata@cutoff)
+            pvalue_generated <- generate_theoretical_pValue(counts = abundance,
+                                                     myAbundanceMetadata@cutoff, 
+                                                     pvalueCorrection = pvalueCorrection)
             abundance <- pvalue_generated$counts_with_pValue
             mean_pvalue <- pvalue_generated$mean
             sd_pvalue <- pvalue_generated$sd

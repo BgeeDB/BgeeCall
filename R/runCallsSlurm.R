@@ -48,7 +48,7 @@
 #' @return generate index files
 #' 
 #' @export
-#' @import rslurm
+#' @importFrom rslurm slurm_apply get_job_status get_slurm_out
 #' 
 #' @examples 
 #' \dontrun{
@@ -164,7 +164,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
 #' @return generate calls
 #' 
 #' @export
-#' @import rslurm
+#' @importFrom rslurm slurm_apply get_job_status get_slurm_out
 #' 
 #' @examples 
 #' \dontrun{

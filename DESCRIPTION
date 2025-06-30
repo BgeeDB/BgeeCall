@@ -15,7 +15,7 @@ Description: BgeeCall allows to generate present/absent gene expression calls wi
     Calls are generated based on reference intergenic sequences. These sequences are generated based on expression of all RNA-Seq 
     libraries of each species integrated in Bgee (https://bgee.org).
 Depends: R (>= 3.6)
-Imports: GenomicFeatures, tximport, Biostrings, rtracklayer, biomaRt, jsonlite, methods, dplyr, data.table, sjmisc, grDevices, graphics, stats, utils, rslurm, rhdf5, txdbmaker
+Imports: GenomicFeatures, tximport, Biostrings, rtracklayer, biomaRt, jsonlite, methods, dplyr, data.table, sjmisc, grDevices, graphics, stats, utils, rslurm, rhdf5, txdbmaker, IRanges
 License: GPL-3 + file LICENSE
 URL: https://github.com/BgeeDB/BgeeCall
 BugReports: https://github.com/BgeeDB/BgeeCall/issues
@@ -26,3 +26,4 @@ RoxygenNote: 7.3.2
 Encoding: UTF-8
 NeedsCompilation: no
 SystemRequirements: kallisto
+Roxygen: list(roclets = c("namespace", "rd"))

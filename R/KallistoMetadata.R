@@ -73,7 +73,7 @@ KallistoMetadata <- setClass(
         count_header = "est_counts",
         abundance_header = "tpm",
         eff_length_header = "eff_length",
-        read_size_kmer_threshold = 50,
+        read_size_kmer_threshold = 60,
         # slots specific to Class
         download_kallisto = FALSE,
         kallisto_windows_url = 
@@ -90,8 +90,8 @@ KallistoMetadata <- setClass(
         index_file = "transcriptome.idx",
         #transcriptome index file for kmer size = 15
         k15_index_file = "transcriptome_k15.idx", 
-        single_end_parameters = "-t 1 --single -l 180 -s 30 --bias",
-        pair_end_parameters = "-t 1 --bias",
+        single_end_parameters = "-t 1 --single -l 180 -s 30",
+        pair_end_parameters = "-t 1",
         overwrite_index = FALSE,
         overwrite_quant = FALSE,
         overwrite_calls = TRUE
