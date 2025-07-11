@@ -156,6 +156,7 @@ approachesMerging <- function(allFiles, approach, cutoff, weights=FALSE, weightV
 #' @param condition Condition/s where the merging should be done
 #' @param cutoff Cutoff that should be applied to call Present/Absent genes
 #' @param outDir Directory where the output files should be saved
+#' @param weights Boolean to indicate if the user wants to use weights in the mean/median p-value calculation
 #'
 #' @author Sara Fonseca Costa
 #' @author Alessandro Brandulas Cammarata

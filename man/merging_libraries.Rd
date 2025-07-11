@@ -23,6 +23,8 @@ merging_libraries(
 \item{cutoff}{Cutoff that should be applied to call Present/Absent genes}
 
 \item{outDir}{Directory where the output files should be saved}
+
+\item{weights}{Boolean to indicate if the user wants to use weights in the mean/median p-value calculation}
 }
 \value{
 A dataframe containing the minimum quantitative value (p-value or q-value) and 

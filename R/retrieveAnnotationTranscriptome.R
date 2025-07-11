@@ -1,3 +1,8 @@
+utils::globalVariables(c(
+  "organism.taxonomy_id", "assembly.assembly_name", "organism.url_name", "organism.name", "organism.strain",
+  "species_taxid", "refseq_category", "asm_name", "assembly_accession", "organism_name", "strain"
+))
+
 #' @title Retrieve GTF files from ensembl, ensembl metazoa or ncbi 
 #'
 #' @description Downloads the GTF files of the given species for the specified ensembl release

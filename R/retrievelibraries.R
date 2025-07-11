@@ -1,3 +1,5 @@
+utils::globalVariables("library_strategy")
+
 #' @title Download FASTQ files by Species and Tissue/Organ
 #'
 #' @description This function downloads FASTQ files from SRA for a specified species and tissue type.
@@ -11,6 +13,9 @@
 #' @param sratk_path Path to the SRA Toolkit installation directory
 #' @param libraries_number Maximum number of libraries to download
 #' @param sqlite_file Path to the SRAmetadb SQLite file
+#' 
+#' @importFrom RSQLite SQLite dbConnect dbDisconnect dbGetQuery
+#' 
 #' @noRd
 download_sra_by_tissue <- function(species_name, tissue_keyword = NULL, download_dir, sratk_path, libraries_number, sqlite_file = "SRAmetadb.sqlite") {
     # Step 0: Check if the SQLite file exists; if not, download it

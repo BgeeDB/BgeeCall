@@ -1,3 +1,6 @@
+utils::globalVariables(c(
+  "target_id", "type", "gene_id", "log2_TPM", "quantile_20", "value", "distribution"
+))
 #' @title subsetting the annotation file
 #'
 #' @description Retrieves a specific part of the annotation field from the GTF file
@@ -668,7 +671,7 @@ find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_p
   ## if no library wass found for this species
   if (numLibs == 0){
     cat("  No library found")
-    next
+    return(NULL)
   }
   
   ## Else:
