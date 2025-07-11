@@ -23,6 +23,8 @@ generate_reference_intergenic_regions(
 \item{TPM_path}{path to the abundance files of the libraries}
 
 \item{output_path}{path to the output folder}
+
+\item{species}{species name or ID to be used in the output files}
 }
 \description{
 We sum the TPM values of intergenic regions in specified directory containing multiple libraries and find a threshold to remove outlier intergenic regions based on protein coding genes

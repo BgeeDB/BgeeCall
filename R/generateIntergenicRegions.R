@@ -169,7 +169,6 @@ count_number_of_occurences <- function (pattern, string) {
 #' @param N_block_size number of successive N from which it is considered as a block of N (and removed)
 #' @param N_proportion higher proportion of N than this threshold results in removing the sequence
 #' @param output_gtf_path full path to output folder + base name for output files
-#' @param download_gtf_fasta boolean on whether to download the gtf and fasta from ensembl or
 #' @param Rout_path path to  output .Rout file (optional)
 #'
 #' @author Alessandro Brandulas Cammarata
@@ -592,7 +591,7 @@ find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_p
       cat("  Reading the ", libraryId, "\n")
       numLibs = numLibs + 1
       ## read transcript level data for each library
-      kallisto_transcript_current <- read.table(file, h=T, sep="\t")
+      kallisto_transcript_current <- read.table(file, header=T, sep="\t")
       # Remove all the transcripts that are not in the tx2gene file
       kallisto_transcript_current <- kallisto_transcript_current %>% filter(target_id %in% tx2gene$target_id)
       #sanity check that transcript are always in the same order in abundance files
@@ -607,7 +606,7 @@ find_reference_intergenic_regions <- function(intergenic_regions_path, tx2gene_p
   if (numLibs == 1){
     ## provide output directly from gene level
     file2 <- paste0(output_path, "/abundance_gene_level+fpkm+intergenic.tsv")
-    summed <- read.table(file2, h=T, sep="\t")
+    summed <- read.table(file2, header=T, sep="\t")
     # add mapping of gene and 
   } else {
     ## sum the raw counts for all libraries
@@ -935,6 +934,7 @@ generate_fasta_intergenic_regions <- function(intergenic_fasta, summed_tpm_file,
 #' @param gene2biotype_path path to the gene2biotype file of the species
 #' @param TPM_path path to the abundance files of the libraries
 #' @param output_path path to the output folder
+#' @param species species name or ID to be used in the output files
 #'
 #' @author Alessandro Brandulas Cammarata
 #' 

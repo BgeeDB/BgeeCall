@@ -53,6 +53,8 @@ checkUserFile <- function(userFile, condition){
 #' @param allFiles List with all libraries to be treated
 #' @param approach Approach selected to merge libraries, BH or fdr_inverse
 #' @param cutoff Threshold value to be applied to call expressed genes
+#' @param weights Boolean to indicate if the user wants to use weights in the mean/median p-value calculation
+#' @param weightValues A vector of weights to be used in the mean/median p-value calculation
 #'
 #' @author Sara Fonseca Costa
 #' @author Alessandro Brandulas Cammarata

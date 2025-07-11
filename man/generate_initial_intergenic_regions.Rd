@@ -25,8 +25,6 @@ generate_initial_intergenic_regions(
 \item{output_gtf_path}{full path to output folder + base name for output files}
 
 \item{Rout_path}{path to  output .Rout file (optional)}
-
-\item{download_gtf_fasta}{boolean on whether to download the gtf and fasta from ensembl or}
 }
 \description{
 generates intergenic regions from the species GTF and FASTA file by taking intergenic regions upstream and downstream of each gene
