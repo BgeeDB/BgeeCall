@@ -50,7 +50,7 @@ create_TxDb <- function(myUserMetadata) {
     # create txdb from GRanges Object
     # use the suppressWarnings function in order not to print useless warnings like :
     # The "phase" metadata column contains non-NA values for features of type stop_codon. This information was ignored.
-    txdb <- suppressWarnings(makeTxDbFromGRanges(myUserMetadata@annotation_object, 
+    txdb <- suppressWarnings(txdbmaker::makeTxDbFromGRanges(myUserMetadata@annotation_object, 
         taxonomyId = as.numeric(myUserMetadata@species_id)))
     return(txdb)
 }
@@ -67,6 +67,8 @@ create_TxDb <- function(myUserMetadata) {
 #' @param myUserMetadata A Reference Class UserMetadata object.
 #'
 #' @author Julien Wollbrett
+#' 
+#' @importFrom biomaRt keys
 #'
 #' @noMd
 #' @noRd

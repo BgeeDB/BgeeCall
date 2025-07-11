@@ -5,7 +5,7 @@
 #' @importFrom IRanges IRanges coverage slice
 #' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
 #' @importFrom rtracklayer import export
-#' @importFrom biomaRt useEnsembl getBM
+#' @importFrom biomaRt useEnsembl getBM keys
 #' @importFrom readr parse_date read_tsv write_tsv
 #' @importFrom sjmisc str_contains
 #' @importFrom tximport tximport summarizeToGene

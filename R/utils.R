@@ -692,6 +692,8 @@ retrieve_intergenic_path <-
 #' - else read the file
 #'
 #' @return A data frame containing the ID of all intergenic sequences
+#' 
+#' @importFrom Biostrings readDNAStringSet
 #'
 #' @noMd
 #' @noRd
@@ -706,7 +708,7 @@ get_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
     if (!file.exists(intergenic_ids_file)) {
         bgee_intergenic_file <-
             retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
-        bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
+        bgee_intergenic <- Biostrings::readDNAStringSet(bgee_intergenic_file)
         # intergenic ID correspond to part of the header
         # before the first space character
         intergenic_ids <- as.data.frame(sub("^([^ ]+) .*",
