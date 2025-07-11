@@ -1,4 +1,4 @@
-#' @importFrom stats density p.adjust pnorm qnorm sd median
+#' @importFrom stats density p.adjust pnorm qnorm sd median 
 #' @importFrom dplyr %>% arrange bind_rows distinct mutate n pull rename summarise ungroup
 #' @importFrom data.table data.table fread fwrite rbindlist setDT setkey setnames
 #' @importFrom Biostrings DNAString DNAStringSet readDNAStringSet writeXStringSet width subseq reverseComplement
@@ -20,5 +20,11 @@
 #' @importFrom tools file_path_sans_ext
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
+#' @importFrom graphics arrows axis mtext
+#' @importFrom methods callNextMethod validObject
+#' @importFrom stats aggregate approxfun complete.cases end integrate na.omit quantile weighted.mean
+#' @importFrom utils compareVersion download.file head packageVersion read.delim untar unzip
+#' @importFrom spatstat.univar weighted.median
+#' 
 
 NULL 
