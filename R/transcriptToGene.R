@@ -68,7 +68,7 @@ create_TxDb <- function(myUserMetadata) {
 #'
 #' @author Julien Wollbrett
 #' 
-#' @importFrom biomaRt keys
+#' @importFrom AnnotationDbi keys select
 #'
 #' @noMd
 #' @noRd
@@ -93,10 +93,10 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
             dir.create(annotation_path, recursive = TRUE)
         }
         txdb <- create_TxDb(myUserMetadata = myUserMetadata)
-        k <- biomaRt::keys(txdb, keytype = "TXNAME")
+        k <- AnnotationDbi::keys(txdb, keytype = "TXNAME")
         # Used suppressMessages in order not to print meesages like :
         # 'select()' returned 1:1 mapping between keys and columns
-        tx2gene <- suppressMessages(as.data.frame(biomaRt::select(txdb, 
+        tx2gene <- suppressMessages(as.data.frame(AnnotationDbi::select(txdb, 
             k, "GENEID", "TXNAME")))
         intergenic_tx2gene <- intergenic_tx2gene(myBgeeMetadata = myBgeeMetadata, 
             myUserMetadata = myUserMetadata)
