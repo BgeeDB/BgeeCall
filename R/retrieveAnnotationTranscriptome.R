@@ -287,7 +287,7 @@ find_genome_file_paths <- function(species_taxon_ids=c(9606, 9031), ensembl_rele
   find_matching_rows <- function(species_metadata, taxon_id) {
     species_metadata %>%
       filter(organism.taxonomy_id == taxon_id) %>%
-      select(assembly.assembly_name, organism.url_name, organism.name, organism.taxonomy_id, organism.strain) %>%
+      dplyr::select(assembly.assembly_name, organism.url_name, organism.name, organism.taxonomy_id, organism.strain) %>%
       rename(assembly_name = assembly.assembly_name,
              url_name = organism.url_name,
              organism_name = organism.name,
@@ -315,7 +315,7 @@ find_genome_file_paths <- function(species_taxon_ids=c(9606, 9031), ensembl_rele
     matching_rows <- ncbi_data %>%
       filter(species_taxid == taxon_id) %>%
       filter(refseq_category %in% c("reference genome", "representative genome")) %>%
-      select(asm_name, assembly_accession, organism_name)
+      dplyr::select(asm_name, assembly_accession, organism_name)
     
     # Return concatenated genomefilepath if a match is found
     if (nrow(matching_rows) > 0) {

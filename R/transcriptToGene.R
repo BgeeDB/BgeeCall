@@ -94,7 +94,7 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         }
         txdb <- create_TxDb(myUserMetadata = myUserMetadata)
         k <- AnnotationDbi::keys(txdb, keytype = "TXNAME")
-        # Used suppressMessages in order not to print meesages like :
+        # Used suppressMessages in order not to print messages like :
         # 'select()' returned 1:1 mapping between keys and columns
         tx2gene <- suppressMessages(as.data.frame(AnnotationDbi::select(txdb, 
             k, "GENEID", "TXNAME")))

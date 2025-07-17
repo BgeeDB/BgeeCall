@@ -5,7 +5,6 @@
 #' @importFrom IRanges IRanges coverage slice
 #' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
 #' @importFrom rtracklayer import export
-#' @importFrom biomaRt useEnsembl getBM keys
 #' @importFrom readr parse_date read_tsv write_tsv
 #' @importFrom sjmisc str_contains
 #' @importFrom tximport tximport summarizeToGene
@@ -25,6 +24,7 @@
 #' @importFrom stats aggregate approxfun complete.cases end integrate na.omit quantile weighted.mean
 #' @importFrom utils compareVersion download.file head packageVersion read.delim untar unzip
 #' @importFrom spatstat.univar weighted.median
+#' @importFrom AnnotationDbi select keys
 #' 
 
 NULL 
