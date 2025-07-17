@@ -21,7 +21,7 @@ utils::globalVariables(c(
 #' @importFrom tools file_path_sans_ext
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom dplyr filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
@@ -151,7 +151,7 @@ unzip_file <- function(file) {
 #' @importFrom tools file_path_sans_ext
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom dplyr filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
@@ -234,7 +234,7 @@ setwd(working_path)
 #' @importFrom tools file_path_sans_ext
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom dplyr filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
@@ -258,7 +258,7 @@ retrieve_fasta_gtf <- function(species_gtf=c("homo_sapiens/Homo_sapiens.GRCh38",
 #' 
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom dplyr filter mutate arrange group_by summarise ungroup distinct
 #' @importFrom readr read_delim
 #' 
 #' @noMd
@@ -394,7 +394,7 @@ find_genome_file_paths <- function(species_taxon_ids=c(9606, 9031), ensembl_rele
 #' @importFrom tools file_path_sans_ext
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
-#' @importFrom dplyr select filter mutate arrange group_by summarise ungroup distinct
+#' @importFrom dplyr filter mutate arrange group_by summarise ungroup distinct
 #' 
 #' @noMd
 #' @noRd
