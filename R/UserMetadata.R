@@ -65,7 +65,7 @@ UserMetadata <- setClass(
         output_dir = "character",
         verbose = "logical",
         custom_intergenic_path = "character",
-        encripted_pattern = "character"
+        encrypted_pattern = "character"
     ),
     
     # Set the default values for the slots.
