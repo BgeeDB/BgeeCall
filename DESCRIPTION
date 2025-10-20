@@ -7,6 +7,7 @@ Authors@R:
 	c(person("Julien", "Wollbrett", 
 		role = c("aut", "cre"), 
 		email = "julien.wollbrett@unil.ch"),
+    person("Alessandro", "Brandulas Cammarata", role = "aut"),
     person("Sara", "Fonseca Costa", role = "aut"),
     person("Julien", "Roux", role = "aut"),
     person("Marc", "Robinson Rechavi", role = "ctb"),
