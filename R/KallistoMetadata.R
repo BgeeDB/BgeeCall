@@ -31,7 +31,7 @@
 #' @slot overwrite_index logical allowing to overwrite already existing index. FALSE by
 #' default. Then by default already existing index files will not be generated again.
 #' @slot overwrite_quant logical allowing to overwrite already existing abundance.txt 
-#' files. FALSE by default. Then by default already existing quantitfdication files will 
+#' files. FALSE by default. Then by default already existing quantification files will 
 #' not be generated again.
 #' @slot overwrite_calls logical allowing to overwrite already existing present/absent 
 #' calls. FALSE by default. Then by default already generated calls will not be 
@@ -77,13 +77,13 @@ KallistoMetadata <- setClass(
         # slots specific to Class
         download_kallisto = FALSE,
         kallisto_windows_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_windows-v0.45.0.zip",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_windows-v0.51.1.tar.gz",
         kallisto_linux_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_linux-v0.45.0.tar.gz",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_linux-v0.51.1.tar.gz",
         kallisto_osx_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_mac-v0.45.0.tar.gz",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_mac_m1-v0.51.1.tar.gz",
         kallisto_windows_dir = "kallisto",
-        kallisto_linux_dir = "kallisto_linux-v0.45.0",
+        kallisto_linux_dir = "kallisto",
         kallisto_osx_dir = "kallisto",
         unix_kallisto_name = "kallisto",
         windows_kallisto_name = "kallisto.exe",
