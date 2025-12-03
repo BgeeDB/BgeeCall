@@ -342,9 +342,25 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="
 
     selected_intergenic <- filter(counts, type == "intergenic")
 
-    ratio_intergenic_overzero <- sum(selected_intergenic$abundance > 0) / nrow(selected_intergenic)
+    ratio_intergenic_overzero <- if (nrow(selected_intergenic) == 0) {
+        0
+    } else {
+        sum(selected_intergenic$abundance > 0) / nrow(selected_intergenic)
+    }
 
     selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
+
+    if (nrow(selected_intergenic) == 0) {
+        warning("No intergenic regions with TPM values > 0; setting pValue = 0 and zScore = NA for expressed genes")
+        selected_count$zScore <- NA
+        selected_count$pValue <- 0
+        counts_with_pValue <- merge(counts, selected_count[, c("id", "zScore", "pValue")], 
+                                    by = "id", all.x=TRUE)
+        counts_with_pValue$pValue[is.na(counts_with_pValue$pValue)] <- 1
+        counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
+                                               is.na(counts_with_pValue$pValue)), "absent", "present")
+        return(list(counts_with_pValue = counts_with_pValue, mean = NA, sd = NA))
+    }
 
     # remove outliers using the interquartile range
     Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
@@ -353,16 +369,33 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="
     selected_intergenic <- selected_intergenic[log2(selected_intergenic$abundance) > (Q1 - 1.5 * IQR) & log2(selected_intergenic$abundance) < (Q3 + 1.5 * IQR),]
 
     if (nrow(selected_intergenic) == 0) {
-        stop("No intergenic regions with TPM values > 0")
+        warning("All intergenic regions receiving reads were removed as outliers; setting pValue = 0 and zScore = NA for expressed genes")
+        selected_count$zScore <- NA
+        selected_count$pValue <- 0
+        counts_with_pValue <- merge(counts, selected_count[, c("id", "zScore", "pValue")], 
+                                    by = "id", all.x=TRUE)
+        counts_with_pValue$pValue[is.na(counts_with_pValue$pValue)] <- 1
+        counts_with_pValue$call <- ifelse((counts_with_pValue$pValue > pValueCutoff | 
+                                               is.na(counts_with_pValue$pValue)), "absent", "present")
+        return(list(counts_with_pValue = counts_with_pValue, mean = NA, sd = NA))
     }
     
-    ## calculate z-score for each gene_id using the reference intergenic 
-    selected_count$zScore <- (log2(selected_count$abundance) - mean(log2(selected_intergenic$abundance))) / sd(log2(selected_intergenic$abundance))
-    ## calculate p-values for each gene_id
-    selected_count$pValue <- ratio_intergenic_overzero * pnorm(selected_count$zScore, lower.tail = FALSE)
+    intergenic_sd <- sd(log2(selected_intergenic$abundance))
+    intergenic_mean <- mean(log2(selected_intergenic$abundance))
 
-    if (sd(log2(selected_intergenic$abundance)) == 0) {
-        selected_count$pValue <- ratio_intergenic_overzero
+    if (is.na(intergenic_sd) || intergenic_sd == 0) {
+        intergenic_value <- unique(selected_intergenic$abundance)
+        warning(paste0("All intergenic regions have the same TPM value (", intergenic_value, "); assigning heuristic p-values"))
+        selected_count$zScore <- NA
+        selected_count$pValue <- ifelse(
+            selected_count$abundance > intergenic_value, 0,
+            ifelse(selected_count$abundance == intergenic_value, ratio_intergenic_overzero, 1)
+        )
+    } else {
+        ## calculate z-score for each gene_id using the reference intergenic 
+        selected_count$zScore <- (log2(selected_count$abundance) - intergenic_mean) / intergenic_sd
+        ## calculate p-values for each gene_id
+        selected_count$pValue <- ratio_intergenic_overzero * pnorm(selected_count$zScore, lower.tail = FALSE)
     }
 
     if(pvalueCorrection == "BH"){
