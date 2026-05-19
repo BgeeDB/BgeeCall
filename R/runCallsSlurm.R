@@ -48,7 +48,7 @@
 #' @return generate index files
 #' 
 #' @export
-#' @importFrom rslurm slurm_apply get_job_status get_slurm_out
+#' @import rslurm
 #' 
 #' @examples 
 #' \dontrun{
@@ -108,7 +108,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
   
   sjobs <- rslurm::slurm_apply(f = index_wrapper, params = unique_df, jobname = "generate_index", 
                               nodes = nodes, cpus_per_node = 1, submit = submit, 
-                              add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
+                              global_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata"), 
                               sh_template = submit_sh_template, rscript_path = rscript_path, slurm_options = slurm_options)
   return(sjobs)
 }
@@ -164,7 +164,7 @@ generate_slurm_indexes <- function(kallistoMetadata = new("KallistoMetadata"),
 #' @return generate calls
 #' 
 #' @export
-#' @importFrom rslurm slurm_apply get_job_status get_slurm_out
+#' @import rslurm
 #' 
 #' @examples 
 #' \dontrun{
@@ -213,7 +213,7 @@ generate_slurm_calls <- function(kallistoMetadata = new("KallistoMetadata"),
   
   sjobs <- rslurm::slurm_apply(f = calls_wrapper, params = user_df, jobname = "generate_calls", 
                                nodes = nodes, cpus_per_node = 1, submit = submit, 
-                               add_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata", 
+                               global_objects = c("kallistoMetadata", "bgeeMetadata", "userMetadata", 
                                "checkTxVersion"), sh_template = submit_sh_template, 
                                rscript_path = rscript_path, slurm_options = slurm_options)
   return(sjobs)
