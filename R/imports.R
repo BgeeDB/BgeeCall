@@ -3,7 +3,8 @@
 #' @importFrom data.table data.table fread fwrite rbindlist setDT setkey setnames
 #' @importFrom Biostrings DNAString DNAStringSet readDNAStringSet writeXStringSet width subseq reverseComplement
 #' @importFrom IRanges IRanges coverage slice
-#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
+#' @importFrom GenomicFeatures exonsBy transcriptsBy
+#' @importFrom txdbmaker makeTxDbFromGRanges
 #' @importFrom rtracklayer import export
 #' @importFrom biomaRt useEnsembl getBM
 #' @importFrom readr parse_date read_tsv write_tsv
