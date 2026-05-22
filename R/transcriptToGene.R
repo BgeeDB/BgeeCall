@@ -41,7 +41,8 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 #' @return TxDb annotation
 #'
-#' @importFrom GenomicFeatures makeTxDbFromGFF exonsBy transcriptsBy
+#' @importFrom GenomicFeatures exonsBy transcriptsBy
+#' @importFrom txdbmaker makeTxDbFromGRanges
 #' @importFrom rhdf5 h5read
 #' @importFrom tximport tximport summarizeToGene
 #'
