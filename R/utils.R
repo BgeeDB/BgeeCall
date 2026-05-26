@@ -315,9 +315,9 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
                 # to allow to decrypt it
                 if( grepl("enc$", first_file_path, perl = TRUE) ) {
                     first_file_path <- gsub("FASTQ_PATH", first_file_path, 
-                        myUserMetadata@encripted_pattern)
+                        myUserMetadata@encrypted_pattern)
                     second_file_path <- gsub("FASTQ_PATH", second_file_path, 
-                        myUserMetadata@encripted_pattern)
+                        myUserMetadata@encrypted_pattern)
                 }
                 fastq_files_names = paste(fastq_files_names,first_file_path,
                     second_file_path, sep = " ")
@@ -343,7 +343,7 @@ get_merged_fastq_file_names <- function(myUserMetadata) {
             single_end_file_path <- file.path(myUserMetadata@rnaseq_lib_path, fastq_files[i])
             if( grepl("enc$", single_end_file_path, perl = TRUE) ) {
                 single_end_file_path <- gsub("FASTQ_PATH", single_end_file_path, 
-                    myUserMetadata@encripted_pattern)
+                    myUserMetadata@encrypted_pattern)
             }
             fastq_files_names = paste(fastq_files_names, single_end_file_path, sep = " ")
         }
@@ -692,6 +692,8 @@ retrieve_intergenic_path <-
 #' - else read the file
 #'
 #' @return A data frame containing the ID of all intergenic sequences
+#' 
+#' @importFrom Biostrings readDNAStringSet
 #'
 #' @noMd
 #' @noRd
@@ -706,7 +708,7 @@ get_intergenic_ids <- function(myBgeeMetadata, myUserMetadata) {
     if (!file.exists(intergenic_ids_file)) {
         bgee_intergenic_file <-
             retrieve_intergenic_path(myBgeeMetadata, myUserMetadata)
-        bgee_intergenic <- readDNAStringSet(bgee_intergenic_file)
+        bgee_intergenic <- Biostrings::readDNAStringSet(bgee_intergenic_file)
         # intergenic ID correspond to part of the header
         # before the first space character
         intergenic_ids <- as.data.frame(sub("^([^ ]+) .*",

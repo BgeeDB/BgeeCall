@@ -17,7 +17,7 @@
 #'
 #' @return Mapping between transcript IDs, type (genic or intergenic) and biotypes
 #'
-#' @import Biostrings
+#' @importFrom Biostrings readDNAStringSet writeXStringSet DNAStringSet width subseq reverseComplement intersect union setdiff setequal collapse
 #'
 #' @noMd
 #' @noRd

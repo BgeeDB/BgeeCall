@@ -65,14 +65,14 @@ UserMetadata <- setClass(
         output_dir = "character",
         verbose = "logical",
         custom_intergenic_path = "character",
-        encripted_pattern = "character"
+        encrypted_pattern = "character"
     ),
     
     # Set the default values for the slots.
     prototype = prototype(
         working_path = getwd(),
         gtf_source = "ensembl",
-        reads_size = 51,
+        reads_size = 75,
         simple_arborescence = TRUE,
         output_dir = "",
         verbose = TRUE,

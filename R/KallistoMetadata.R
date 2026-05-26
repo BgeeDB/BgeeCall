@@ -31,7 +31,7 @@
 #' @slot overwrite_index logical allowing to overwrite already existing index. FALSE by
 #' default. Then by default already existing index files will not be generated again.
 #' @slot overwrite_quant logical allowing to overwrite already existing abundance.txt 
-#' files. FALSE by default. Then by default already existing quantitfdication files will 
+#' files. FALSE by default. Then by default already existing quantification files will 
 #' not be generated again.
 #' @slot overwrite_calls logical allowing to overwrite already existing present/absent 
 #' calls. FALSE by default. Then by default already generated calls will not be 
@@ -73,25 +73,25 @@ KallistoMetadata <- setClass(
         count_header = "est_counts",
         abundance_header = "tpm",
         eff_length_header = "eff_length",
-        read_size_kmer_threshold = 50,
+        read_size_kmer_threshold = 60,
         # slots specific to Class
         download_kallisto = FALSE,
         kallisto_windows_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_windows-v0.45.0.zip",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_windows-v0.51.1.tar.gz",
         kallisto_linux_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_linux-v0.45.0.tar.gz",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_linux-v0.51.1.tar.gz",
         kallisto_osx_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_mac-v0.45.0.tar.gz",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_mac_m1-v0.51.1.tar.gz",
         kallisto_windows_dir = "kallisto",
-        kallisto_linux_dir = "kallisto_linux-v0.45.0",
+        kallisto_linux_dir = "kallisto",
         kallisto_osx_dir = "kallisto",
         unix_kallisto_name = "kallisto",
         windows_kallisto_name = "kallisto.exe",
         index_file = "transcriptome.idx",
         #transcriptome index file for kmer size = 15
         k15_index_file = "transcriptome_k15.idx", 
-        single_end_parameters = "-t 1 --single -l 180 -s 30 --bias",
-        pair_end_parameters = "-t 1 --bias",
+        single_end_parameters = "-t 1 --single -l 180 -s 30",
+        pair_end_parameters = "-t 1",
         overwrite_index = FALSE,
         overwrite_quant = FALSE,
         overwrite_calls = TRUE

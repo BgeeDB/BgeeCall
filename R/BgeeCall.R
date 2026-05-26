@@ -25,6 +25,5 @@
 #' 
 #' @author Julien Wollbrett
 #'
-#' @docType package
 #' @name BgeeCall
-NULL
+"_PACKAGE"

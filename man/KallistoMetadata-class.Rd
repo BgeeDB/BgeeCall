@@ -54,7 +54,7 @@ kmers and will be used only for libraries containing reads smallest than 50nt.}
 default. Then by default already existing index files will not be generated again.}
 
 \item{\code{overwrite_quant}}{logical allowing to overwrite already existing abundance.txt 
-files. FALSE by default. Then by default already existing quantitfdication files will 
+files. FALSE by default. Then by default already existing quantification files will 
 not be generated again.}
 
 \item{\code{overwrite_calls}}{logical allowing to overwrite already existing present/absent 

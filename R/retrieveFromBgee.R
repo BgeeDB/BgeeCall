@@ -2,7 +2,7 @@
 #'
 #' @description Return information related to species having Bgee reference intergenic 
 #' sequences available for the selected Bgee intergenic release: 
-#' \itemize{
+#' \describe{
 #'  \item{speciesId}{ the NCBI species ID of the species}
 #'  \item{specieName}{ scientific species name}
 #'  \item{numberOfLibraries}{ number of libraries used to generate these reference intergenic

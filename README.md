@@ -5,7 +5,7 @@
 
 `BgeeCall` is a collection of functions that uses [Bgee](https://bgee.org/) expertise to create gene expression present/absent calls
 
-The `BgeeCall` package allows to: 
+The `BgeeCall` package allows to:
 
 * Generate calls of presence/absence of expression at the gene level. You can generate these calls for any RNA-Seq samples as long as the species is available in Bgee (information available from the `list_bgee_species()` function).
 * Download reference intergenic sequences for species available in Bgee.

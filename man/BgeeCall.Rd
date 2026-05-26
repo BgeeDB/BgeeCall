@@ -2,6 +2,7 @@
 % Please edit documentation in R/BgeeCall.R
 \docType{package}
 \name{BgeeCall}
+\alias{BgeeCall-package}
 \alias{BgeeCall}
 \title{generate gene expression calls with BgeeCall}
 \description{

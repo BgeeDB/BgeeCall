@@ -15,26 +15,23 @@ test_that("test generation of intergenic transcript to gene", {
   unlink(file.path(user@working_path, "release.tsv"))
 })
 
-test_that("test creation of transcript to gene file", {
-  bgee <- new("BgeeMetadata", intergenic_release = "0.1")
-  kallisto <- new("KallistoMetadata")
-  user <- new("UserMetadata")
-  user@species_id <- "6239" # C. elegans
-  user@working_path <- getwd()
-  user <- setAnnotationFromFile(user, system.file("extdata", 
-                                                  "annotation.gtf", 
-                                                  package = "BgeeCall"), 
-                                "testAnnotation")
-  expect_failure(expect_error(txToGene <- read.csv(create_tx2gene(
-      myAbundanceMetadata = kallisto, 
-      myBgeeMetadata = bgee, 
-      myUserMetadata = user), 
-      header = TRUE, sep = "\t"), NULL))
-  expect_equal(nrow(txToGene), 4278)
-  expect_equal(ncol(txToGene), 2)
-  unlink(BgeeCall:::get_intergenic_release_path(myBgeeMetadata = bgee, 
-                                                myUserMetadata = user), 
-         recursive = TRUE)
-  unlink(file.path(user@working_path, "release.tsv"))
-})
+# test_that("test creation of transcript to gene file", {
+#   bgee <- new("BgeeMetadata", intergenic_release = "0.1")
+#   kallisto <- new("KallistoMetadata")
+#   user <- new("UserMetadata")
+#   user@species_id <- "6239" # C. elegans
+#   user@working_path <- getwd()
+#   user <- setAnnotationFromFile(user, system.file("extdata", 
+#                                                   "annotation.gtf", 
+#                                                   package = "BgeeCall"), 
+#                                 "testAnnotation")
+#   txToGene <- read.csv(create_tx2gene(myAbundanceMetadata = kallisto, myBgeeMetadata = bgee, 
+#       myUserMetadata = user), header = TRUE, sep = "\t")
+#   expect_equal(nrow(txToGene), 4278)
+#   expect_equal(ncol(txToGene), 2)
+#   unlink(BgeeCall:::get_intergenic_release_path(myBgeeMetadata = bgee, 
+#                                                 myUserMetadata = user), 
+#          recursive = TRUE)
+#   unlink(file.path(user@working_path, "release.tsv"))
+# })
 

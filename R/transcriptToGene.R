@@ -41,7 +41,7 @@ intergenic_tx2gene <- function(myBgeeMetadata, myUserMetadata) {
 #'
 #' @return TxDb annotation
 #'
-#' @import GenomicFeatures
+#' @importFrom txdbmaker makeTxDbFromGRanges
 #'
 #' @noMd
 #' @noRd
@@ -50,7 +50,7 @@ create_TxDb <- function(myUserMetadata) {
     # create txdb from GRanges Object
     # use the suppressWarnings function in order not to print useless warnings like :
     # The "phase" metadata column contains non-NA values for features of type stop_codon. This information was ignored.
-    txdb <- suppressWarnings(makeTxDbFromGRanges(myUserMetadata@annotation_object, 
+    txdb <- suppressWarnings(txdbmaker::makeTxDbFromGRanges(myUserMetadata@annotation_object, 
         taxonomyId = as.numeric(myUserMetadata@species_id)))
     return(txdb)
 }
@@ -67,6 +67,8 @@ create_TxDb <- function(myUserMetadata) {
 #' @param myUserMetadata A Reference Class UserMetadata object.
 #'
 #' @author Julien Wollbrett
+#' 
+#' @importFrom AnnotationDbi keys select
 #'
 #' @noMd
 #' @noRd
@@ -91,10 +93,10 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
             dir.create(annotation_path, recursive = TRUE)
         }
         txdb <- create_TxDb(myUserMetadata = myUserMetadata)
-        k <- biomaRt::keys(txdb, keytype = "TXNAME")
-        # Used suppressMessages in order not to print meesages like :
+        k <- AnnotationDbi::keys(txdb, keytype = "TXNAME")
+        # Used suppressMessages in order not to print messages like :
         # 'select()' returned 1:1 mapping between keys and columns
-        tx2gene <- suppressMessages(as.data.frame(biomaRt::select(txdb, 
+        tx2gene <- suppressMessages(as.data.frame(AnnotationDbi::select(txdb, 
             k, "GENEID", "TXNAME")))
         intergenic_tx2gene <- intergenic_tx2gene(myBgeeMetadata = myBgeeMetadata, 
             myUserMetadata = myUserMetadata)
@@ -134,8 +136,8 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
 #' 
 #' @author Julien Wollbrett
 #'
-#' @import rhdf5
-#' @import tximport
+#' @importFrom rhdf5 h5read
+#' @importFrom tximport tximport summarizeToGene
 #'
 #' @export
 #' 

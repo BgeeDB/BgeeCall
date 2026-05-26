@@ -7,7 +7,8 @@
 generate_presence_absence(
   myAbundanceMetadata = new("KallistoMetadata"),
   myBgeeMetadata = new("BgeeMetadata"),
-  myUserMetadata
+  myUserMetadata,
+  pvalueCorrection = "None"
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ generate_presence_absence(
 \item{myBgeeMetadata}{A Class BgeeMetadata object (optional).}
 
 \item{myUserMetadata}{A Class UserMetadata object.}
+
+\item{pvalueCorrection}{A string indicating the method to use to correct the pValue.}
 }
 \value{
 path to the 4 output files
@@ -53,4 +56,6 @@ Julien Wollbrett
 Julien Roux
 
 Sara Fonseca Costa
+
+Alessandro Brandulas Cammarata
 }
