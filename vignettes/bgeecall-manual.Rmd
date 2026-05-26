@@ -150,7 +150,9 @@ calls_output <- generate_calls_workflow(abundanceMetadata = kallisto, userMetada
 ```{r, echo=FALSE}
 user_BgeeCall <- setWorkingPath(user_BgeeCall, system.file("extdata", package = "BgeeCall"))
 user_BgeeCall<- setSimpleArborescence(user_BgeeCall, TRUE)
-calls_output <- generate_presence_absence(myUserMetadata = user_BgeeCall)
+bgee_BgeeCall <- new("BgeeMetadata")
+bgee_BgeeCall <- setIntergenicRelease(bgeeObject = bgee_BgeeCall, intergenicRelease = "1.0")
+calls_output <- generate_presence_absence(myUserMetadata = user_BgeeCall, myBgeeMetadata = bgee_BgeeCall)
 ```
 
 Each analyze generates 5 files and return path to each one of them.
