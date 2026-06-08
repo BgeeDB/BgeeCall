@@ -11,10 +11,8 @@ galaxy_calls(
   reads_size = 51,
   transcriptome_path = NULL,
   annotation_path = NULL,
-  output_dir = NULL,
-  ignore_tx_version = FALSE,
-  custom_intergenic_path = NULL,
-  userFile = NULL
+  output_file = NULL,
+  custom_intergenic_path = NULL
 )
 }
 \arguments{
@@ -31,10 +29,10 @@ By default all runs are used.}
 
 \item{annotation_path}{path to the gtf file containing gene annotation}
 
+\item{output_file}{file containing the path to all result files generated}
+
 \item{custom_intergenic_path}{(optional) To use if the "custom" reference intergenic
 release has been selected. Provides the path to the reference intergenic file}
-
-\item{output_file}{file containing the path to all result files generated}
 }
 \description{
 Function generating calls for galaxy. It is a simple adaptor of the
