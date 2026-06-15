@@ -41,7 +41,8 @@ user <- new('UserMetadata', working_path = system.file('extdata',
 package = 'BgeeCall'), species_id = '6239', rnaseq_lib_path = system.file(
 'extdata', 'SRX099901_subset', package = 'BgeeCall'), 
 annotation_name = 'WBcel235_84', simple_arborescence = TRUE)
-calls_output <- generate_presence_absence(myUserMetadata = user)
+bgee <- new('BgeeMetadata', intergenic_release = '1.0')
+calls_output <- generate_presence_absence(myUserMetadata = user, myBgeeMetadata = bgee)
 
 #
 }
