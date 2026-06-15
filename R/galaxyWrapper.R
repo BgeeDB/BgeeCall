@@ -20,8 +20,7 @@
 
 galaxy_calls <- function(species_id = NULL, run_ids = NULL, rnaseq_lib_path = NULL,
                          reads_size = 51, transcriptome_path = NULL, annotation_path = NULL,
-                         output_dir = NULL, ignore_tx_version = FALSE,
-                         custom_intergenic_path = NULL, userFile = NULL) {
+                         output_file = NULL, custom_intergenic_path = NULL) {
   if (is.null(species_id) || is.null(rnaseq_lib_path) || is.null(transcriptome_path)
       || is.null(annotation_path)) {
     stop("Did not provide the proper input to generate the call. You should provide",
