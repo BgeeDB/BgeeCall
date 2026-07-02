@@ -82,11 +82,13 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
     annotation_path <- get_annotation_path(myBgeeMetadata, 
         myUserMetadata)
     tx2gene_file <- myAbundanceMetadata@tx2gene_file
+    tx2gene_file_sc <- myAbundanceMetadata@tx2gene_file_sc
     if (myAbundanceMetadata@ignoreTxVersion) {
         tx2gene_file <- myAbundanceMetadata@tx2gene_file_without_version
     }
     tx2gene_path <- file.path(annotation_path, tx2gene_file)
-    if (!file.exists(tx2gene_path)) {
+    sc_path <- file.path(annotation_path, tx2gene_file_sc)
+    if (!file.exists(tx2gene_path) || !file.exists(sc_path)) {
         if(isTRUE(myUserMetadata@verbose)) {
             message("Generate file ", tx2gene_file, ".\n")
         }
@@ -116,6 +118,10 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
         
         write.table(x = tx2gene, file = tx2gene_path, 
             sep = "\t", row.names = FALSE, quote = FALSE)
+        
+        # Also write a headerless file for bustools
+        tx2gene_sc <- tx2gene[, c("TXNAME", "GENEID")]
+        write.table(x = tx2gene_sc, file = sc_path, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
     }
     return(tx2gene_path)
 }
