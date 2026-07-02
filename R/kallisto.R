@@ -359,9 +359,32 @@ download_kallisto <- function(myKallistoMetadata, myUserMetadata) {
             
         } else if (os_version == "osx") {
             temp_path <- file.path(kallisto_dir, "temp.gz")
-            success <- download.file(url = myKallistoMetadata@kallisto_osx_url, 
-                destfile = temp_path, mode = "wb")
-            untar(temp_path, exdir = myUserMetadata@working_path)
+            arch <- Sys.info()[["machine"]]
+            if (arch %in% c("arm64", "aarch64")) {
+                cpu_brand <- system("sysctl -n machdep.cpu.brand_string", intern = TRUE)
+                if (grepl("M2", cpu_brand)) {
+                    success <- download.file(url = myKallistoMetadata@kallisto_osx_m2_url, 
+                        destfile = temp_path, mode = "wb")
+                    untar(temp_path, exdir = myUserMetadata@working_path)
+                } else if (grepl("M1", cpu_brand)) {
+                    success <- download.file(url = myKallistoMetadata@kallisto_osx_m1_url, 
+                        destfile = temp_path, mode = "wb")
+                    untar(temp_path, exdir = myUserMetadata@working_path)
+                } else {
+                    warning("Your MacOS has an ARM architecture but neither M1 or M2 CPU. Defaulting to M2 binary.
+                    If you encounter issues with kallisto please download and install it yourself following official
+                    website instructions (https://pachterlab.github.io/kallisto/download)")
+                    success <- download.file(url = myKallistoMetadata@kallisto_osx_m2_url, 
+                        destfile = temp_path, mode = "wb")
+                    untar(temp_path, exdir = myUserMetadata@working_path)
+                }
+            } else if (arch == "x86_64"){
+                success <- download.file(url = myKallistoMetadata@kallisto_osx_url, 
+                    destfile = temp_path, mode = "wb")
+                untar(temp_path, exdir = myUserMetadata@working_path)
+            } else {
+                stop("Your MacOS has an unknown or unsupported architecture.")
+            }
             
         } else if (os_version == "windows") {
             temp_path <- file.path(kallisto_dir, "temp.zip")

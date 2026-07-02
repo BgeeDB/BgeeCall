@@ -49,6 +49,8 @@ KallistoMetadata <- setClass(
         kallisto_windows_url = "character",
         kallisto_linux_url = "character",
         kallisto_osx_url = "character",
+        kallisto_osx_m1_url = "character",
+        kallisto_osx_m2_url = "character",
         kallisto_windows_dir = "character",
         kallisto_linux_dir = "character",
         kallisto_osx_dir = "character",
@@ -77,13 +79,17 @@ KallistoMetadata <- setClass(
         # slots specific to Class
         download_kallisto = FALSE,
         kallisto_windows_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_windows-v0.45.0.zip",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_windows-v0.50.1.tar.gz",
         kallisto_linux_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_linux-v0.45.0.tar.gz",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_linux-v0.50.1.tar.gz",
         kallisto_osx_url = 
-            "https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_mac-v0.45.0.tar.gz",
+            "https://github.com/pachterlab/kallisto/releases/download/v0.51.1/kallisto_mac-v0.50.1.tar.gz",
+        kallisto_osx_m1_url = 
+            "https://github.com/pachterlab/kallisto/releases/download/v0.50.1/kallisto_mac_m1-v0.50.1.tar.gz",
+        kallisto_osx_m2_url = 
+            "https://github.com/pachterlab/kallisto/releases/download/v0.50.1/kallisto_mac_m2-v0.50.1.tar.gz",
         kallisto_windows_dir = "kallisto",
-        kallisto_linux_dir = "kallisto_linux-v0.45.0",
+        kallisto_linux_dir = "kallisto_linux-v0.50.1",
         kallisto_osx_dir = "kallisto",
         unix_kallisto_name = "kallisto",
         windows_kallisto_name = "kallisto.exe",
