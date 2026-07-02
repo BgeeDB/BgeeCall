@@ -20,21 +20,25 @@ DropletMetadata <- setClass(
     Class = "DropletMetadata",
 
     representation = representation(
+        species_id = "character",
+        run_id = "character",
         sequencing_technology = "character",
         celltype_annotation = "data.frame",
         count_matrix = "ANY",
         fastq_r1_path = "character",
         fastq_r2_path = "character",
-        h5ad_path = "character"
+        h5ad_path = "character",
+        whitelist_path = "character"
     ),
 
     prototype = prototype(
-        sequencing_technology = "10xV3",
+        sequencing_technology = "10xv3",
         celltype_annotation = data.frame(),
         count_matrix = NULL,
         fastq_r1_path = character(0),
         fastq_r2_path = character(0),
-        h5ad_path = character(0)
+        h5ad_path = character(0),
+        whitelist_path = character(0)
     ),
     validity = function(object) {
         if (nrow(object@celltype_annotation) > 0) {
