@@ -40,7 +40,8 @@ user <- new("UserMetadata", working_path = system.file("extdata",
     "SRX099901_subset", package = "BgeeCall"), 
   annotation_name = "WBcel235_84", simple_arborescence = TRUE)
 abundance_file <- system.file('extdata', 'abundance.tsv', package = 'BgeeCall')
-tx_import <- run_tximport(myUserMetadata = user, 
+bgee <- new("BgeeMetadata", intergenic_release = "1.0")
+tx_import <- run_tximport(myUserMetadata = user, myBgeeMetadata = bgee,
 abundanceFile = abundance_file)
 }
 
