@@ -1,7 +1,7 @@
 Package: BgeeCall
 Type: Package
 Title: Automatic RNA-Seq present/absent gene expression calls generation
-Version: 1.29.2
+Version: 1.29.3
 Date: 2021-05
 Authors@R: 
 	c(person("Julien", "Wollbrett", 
@@ -24,8 +24,8 @@ BugReports: https://github.com/BgeeDB/BgeeCall/issues
 VignetteBuilder: knitr
 biocViews: Software, GeneExpression, RNASeq
 Suggests: knitr, testthat, rmarkdown, AnnotationHub, GenomeInfoDb, httr
-RoxygenNote: 7.3.2
 Encoding: UTF-8
 NeedsCompilation: no
 SystemRequirements: kallisto
 Roxygen: list(roclets = c("namespace", "rd"))
+Config/roxygen2/version: 8.0.0
