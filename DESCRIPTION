@@ -1,12 +1,13 @@
 Package: BgeeCall
 Type: Package
 Title: Automatic RNA-Seq present/absent gene expression calls generation
-Version: 1.19.0
-Date: 2021-05
+Version: 1.29.0
+Date: 2026-08
 Authors@R: 
 	c(person("Julien", "Wollbrett", 
 		role = c("aut", "cre"), 
 		email = "julien.wollbrett@unil.ch"),
+    person("Alessandro", "Brandulas Cammarata", role = "aut"),
     person("Sara", "Fonseca Costa", role = "aut"),
     person("Julien", "Roux", role = "aut"),
     person("Marc", "Robinson Rechavi", role = "ctb"),
