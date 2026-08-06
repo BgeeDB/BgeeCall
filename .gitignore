@@ -11,3 +11,4 @@ kallisto/
 bustools/
 /intergenic_*/
 kallisto_bus_output/
+.Rbuildignore
