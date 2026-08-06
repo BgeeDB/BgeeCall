@@ -7,4 +7,7 @@
 BgeeCall.Rproj
 _rslurm_generate_index/
 release.tsv
-.Rbuildignore
+kallisto/
+bustools/
+/intergenic_*/
+kallisto_bus_output/
