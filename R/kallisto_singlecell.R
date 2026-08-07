@@ -26,6 +26,29 @@ check_run_id <- function(run_id) {
     invisible(run_id)
 }
 
+#' @title Sets the paths of the count matrix files written by bustools
+#'
+#' @description Generates the paths for the outputs of the bustools count step.
+#'
+#' @param dge_dir Directory containing the bustools outputs.
+#' @param run_id Run Identifier of the droplet library
+#'
+#' @return A named list with the `prefix`, `mtx`, `genes` and `barcodes` paths.
+#'
+#' @noMd
+#' @noRd
+#'
+bus_output_paths <- function(dge_dir, run_id) {
+    check_run_id(run_id)
+    prefix <- file.path(dge_dir, run_id)
+    return(list(
+        prefix = prefix,
+        mtx = paste0(prefix, ".mtx"),
+        genes = paste0(prefix, ".genes.txt"),
+        barcodes = paste0(prefix, ".barcodes.txt")))
+}
+
+
 #' @title Retrieve execution path or download Bustools
 #' 
 #' @description Checks if bustools binary already exists in the system or if absent and download flag
