@@ -48,6 +48,41 @@ bus_output_paths <- function(dge_dir, run_id) {
         barcodes = paste0(prefix, ".barcodes.txt")))
 }
 
+#' @title Ordering paired FASTQ files for kallisto bus
+#'
+#' @description Order the paired FASTQ files correctly for kallisto bus and
+#' checks that there is the same number of r1 and r2 and that they exist.
+#'
+#' @param fastq_r1 Character vector of read 1 (barcode and UMI) files.
+#' @param fastq_r2 Character vector of read 2 (biological sequence) files.
+#' @param check_exists Logical. Check that every file exists (default TRUE).
+#'
+#' @return A character vector of interleaved file paths.
+#'
+#' @noMd
+#' @noRd
+#'
+Order_fastq_r1_r2 <- function(fastq_r1, fastq_r2, check_exists = TRUE) {
+    if (length(fastq_r1) == 0 && length(fastq_r2) == 0) {
+        stop("both DropletMetadata@fastq_r1_path and ",
+            "DropletMetadata@fastq_r2_path must contain at least one file.")
+    }
+    if (length(fastq_r1) != length(fastq_r2)) {
+        stop("DropletMetadata@fastq_r1_path and DropletMetadata@fastq_r2_path ",
+            "must have the same length (", length(fastq_r1), " and ",
+            length(fastq_r2), " provided). kallisto bus expects one read 2 ",
+            "file for each read 1 file.")
+    }
+    if (isTRUE(check_exists)) {
+        all_files <- c(fastq_r1, fastq_r2)
+        absent <- all_files[!file.exists(all_files)]
+        if (length(absent) > 0) {
+            stop("fastq file(s) not found : ", paste(absent, collapse = ", "))
+        }
+    }
+    return(as.vector(rbind(fastq_r1, fastq_r2)))
+}
+
 
 #' @title Retrieve execution path or download Bustools
 #' 
