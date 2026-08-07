@@ -30,4 +30,4 @@
 #' @importFrom curl curl_download
 #' @importFrom jsonlite fromJSON
 
-NULL 
+NULL

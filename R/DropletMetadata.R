@@ -7,10 +7,10 @@
 #' library's output directory, so it must be a non-empty string without a path separator. Defaults to "library".
 #' To be set when processing more than one library, otherwise every library writes to the 
 #' same output directory and reuse earlier results.
-#' @slot sequencing_technology Character string indicating the single-cell target technology 
+#' @slot sequencing_technology Character string indicating the single-cell target technology
 #' (e.g., "10xV2", "10xV3", "DropSeq"). Essential for bustools processing (check kallisto kb --list for 
 #' supported technologies).
-#' @slot celltype_annotation A data.frame mapping unique cell barcodes to their 
+#' @slot celltype_annotation A data.frame mapping unique cell barcodes to their
 #' corresponding biological groupings, such as cell types or clusters.
 #' @slot count_matrix An optional highly sparse matrix (dgCMatrix) provided by the user 
 #' if the computationally expensive fastq processing phase is bypassed.
