@@ -1,3 +1,30 @@
+#' @title Validate a droplet library run identifier
+#'
+#' @description Checks the validity of the run_id argument in dropletMetadata.
+#' The run id is used as the output prefix for most output files,
+#' so an empty or missing value silently drops the argument from the
+#' command line.
+#'
+#' @param run_id Value of the `run_id` slot of a DropletMetadata object.
+#'
+#' @return `run_id` if valid, otherwise raises an error.
+#'
+#' @noMd
+#' @noRd
+#'
+check_run_id <- function(run_id) {
+    if (!is.character(run_id) || length(run_id) != 1L || is.na(run_id) ||
+        !nzchar(run_id)) {
+        stop("DropletMetadata@run_id must be a single non-empty character ",
+            "string since it is used as the prefix of every bustools output",
+             "file.")
+    }
+    if (grepl("[/\\\\]", run_id)) {
+        stop("DropletMetadata@run_id must not contain a path separator. ",
+            "Provided value : ", run_id)
+    }
+    invisible(run_id)
+}
 
 #' @title Retrieve execution path or download Bustools
 #' 

@@ -3,6 +3,10 @@
 #' @description An S4 class that contains all metadata needed to run the present/absent calls
 #' for pseudobulked droplet-based single-cell RNA-seq data.
 #'
+#' @slot run_id Identifier of the droplet library. It is used as to create the name of the 
+#' library's output directory, so it must be a non-empty string without a path separator. Defaults to "library".
+#' To be set when processing more than one library, otherwise every library writes to the 
+#' same output directory and reuse earlier results.
 #' @slot sequencing_technology Character string indicating the single-cell target technology 
 #' (e.g., "10xV2", "10xV3", "DropSeq"). Essential for bustools processing (check kallisto kb --list for 
 #' supported technologies).
@@ -32,6 +36,7 @@ DropletMetadata <- setClass(
     ),
 
     prototype = prototype(
+        run_id = "library",
         sequencing_technology = "10xv3",
         celltype_annotation = data.frame(),
         count_matrix = NULL,
@@ -41,6 +46,13 @@ DropletMetadata <- setClass(
         whitelist_path = character(0)
     ),
     validity = function(object) {
+        if (length(object@run_id) != 1 || is.na(object@run_id) ||
+            !nzchar(object@run_id)) {
+            return("run_id must be a single non-empty character string.")
+        }
+        if (grepl("[/\\\\]", object@run_id)) {
+            return("run_id must not contain a path separator.")
+        }
         if (nrow(object@celltype_annotation) > 0) {
             if (!all(c("barcode", "celltype") %in% colnames(object@celltype_annotation))) {
                 return("the celltype_annotation data.frame must contain a 'barcode' and 'celltype' column.")
