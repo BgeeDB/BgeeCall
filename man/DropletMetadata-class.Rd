@@ -12,11 +12,16 @@ for pseudobulked droplet-based single-cell RNA-seq data.
 \section{Slots}{
 
 \describe{
-\item{\code{sequencing_technology}}{Character string indicating the single-cell target technology 
+\item{\code{run_id}}{Identifier of the droplet library. It is used as to create the name of the 
+library's output directory, so it must be a non-empty string without a path separator. Defaults to "library".
+To be set when processing more than one library, otherwise every library writes to the 
+same output directory and reuse earlier results.}
+
+\item{\code{sequencing_technology}}{Character string indicating the single-cell target technology
 (e.g., "10xV2", "10xV3", "DropSeq"). Essential for bustools processing (check kallisto kb --list for 
 supported technologies).}
 
-\item{\code{celltype_annotation}}{A data.frame mapping unique cell barcodes to their 
+\item{\code{celltype_annotation}}{A data.frame mapping unique cell barcodes to their
 corresponding biological groupings, such as cell types or clusters.}
 
 \item{\code{count_matrix}}{An optional highly sparse matrix (dgCMatrix) provided by the user 
