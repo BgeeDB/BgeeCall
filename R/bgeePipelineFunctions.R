@@ -346,14 +346,21 @@ generate_theoretical_pValue <- function(counts, pValueCutoff, pvalueCorrection="
 
     selected_intergenic <- filter(counts, abundance > 0 & type == "intergenic")
 
-    # remove outliers using the interquartile range
-    Q1 <- quantile(log2(selected_intergenic$abundance), 0.25)
-    Q3 <- quantile(log2(selected_intergenic$abundance), 0.75)
+    if (nrow(selected_intergenic) == 0) {
+        stop("No intergenic regions with abundance > 0. The library is either
+too shallow, or the reference intergenic sequences are missing from the index.")
+    }
+
+    # remove outliers using the interquartile range (Tukey's method)
+    log_intergenic <- log2(selected_intergenic$abundance)
+    Q1 <- quantile(log_intergenic, 0.25)
+    Q3 <- quantile(log_intergenic, 0.75)
     IQR <- Q3 - Q1
-    selected_intergenic <- selected_intergenic[log2(selected_intergenic$abundance) > (Q1 - 1.5 * IQR) & log2(selected_intergenic$abundance) < (Q3 + 1.5 * IQR),]
+    selected_intergenic <- selected_intergenic[log_intergenic >= (Q1 - 1.5 * IQR) & log_intergenic <= (Q3 + 1.5 * IQR), ]
 
     if (nrow(selected_intergenic) == 0) {
-        stop("No intergenic regions with TPM values > 0")
+        stop("Every intergenic region with abundance > 0 was removed as an
+outlier, so no null distribution can be built.")
     }
     
     ## calculate z-score for each gene_id using the reference intergenic 
