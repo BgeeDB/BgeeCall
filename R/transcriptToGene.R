@@ -88,7 +88,19 @@ create_tx2gene <- function(myAbundanceMetadata, myBgeeMetadata,
     }
     tx2gene_path <- file.path(annotation_path, tx2gene_file)
     sc_path <- file.path(annotation_path, tx2gene_file_sc)
-    if (!file.exists(tx2gene_path) || !file.exists(sc_path)) {
+    if (file.exists(tx2gene_path) && !file.exists(sc_path)) {
+        # Removing column names from bulk tx2gene file to create a headerless file for
+        # bustools.
+        if (isTRUE(myUserMetadata@verbose)) {
+            message("Generate file ", tx2gene_file_sc, " from ",
+                tx2gene_file, ".\n")
+        }
+        existing <- read.table(tx2gene_path, header = TRUE, sep = "\t")
+        write.table(x = existing[, c("TXNAME", "GENEID")], file = sc_path,
+            sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+        return(tx2gene_path)
+    }
+    if (!file.exists(tx2gene_path)) {
         if(isTRUE(myUserMetadata@verbose)) {
             message("Generate file ", tx2gene_file, ".\n")
         }
