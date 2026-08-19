@@ -493,6 +493,34 @@ run_kallisto_bus <- function(droplet_metadata,
         stop("the single-cell transcript to gene file was not found at ",
             t2g_path, ".")
     }
+    # Verify that the transcript to gene file matches the kallisto index
+    # otherwise every read would be discarded and the count matrix would be
+    # empty.
+    # Notably can be a problem with version suffixes included or not.
+
+    # Get the list of transcripts from tx2gene file
+    t2g_transcripts <- sub("\t.*", "", readLines(t2g_path))
+    # Compare with kallisto index targets
+    matched <- sum(quantified_targets %in% t2g_transcripts)
+    if (matched == 0) {
+        stop("None of the ", length(quantified_targets), " targets of the ",
+            "kallisto index appear in the transcript to gene file ", t2g_path,
+            ". The transcriptome and the annotation have to use the same ",
+            "transcript identifiers ; check for version suffixes present in ",
+            "one and not the other. First index target : ",
+            quantified_targets[1], ". First mapping entry : ",
+            t2g_transcripts[1], ".")
+    }
+    if (matched < length(quantified_targets) && verbose) {
+        message("Note : ", length(quantified_targets) - matched, " of the ",
+            length(quantified_targets), " index targets are absent from the ",
+            "transcript to gene file and their reads will be discarded. Please",
+            "check that you are using the same transcript identifiers in the",
+            "transcriptome and the annotation, for instance with or without",
+            "version suffixes. First index target : ", quantified_targets[1],
+            ". First mapping entry : ", t2g_transcripts[1])
+    }
+
     if (verbose) {
         message("Counting UMIs into a gene by cell matrix.")
     }
