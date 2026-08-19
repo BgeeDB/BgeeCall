@@ -201,16 +201,18 @@ bustools_count_args <- function(t2g_path, out_prefix, ecmap_path, txnames_path,
 #' @noRd
 #'
 run_binary <- function(exec, args, step, verbose = FALSE) {
+    # Quote the arguments to avoid problems with spaces
+    quoted_args <- shQuote(args)
+    command_line <- paste(shQuote(exec), paste(quoted_args, collapse = " "))
     if (isTRUE(verbose)) {
-        message("Running : ", exec, " ", paste(args, collapse = " "))
+        message("Running : ", command_line)
     }
-    output <- suppressWarnings(system2(command = exec, args = args,
+    output <- suppressWarnings(system2(command = exec, args = quoted_args,
         stdout = TRUE, stderr = TRUE))
     status <- attr(output, "status")
     if (!is.null(status) && status != 0) {
-        stop(step, " failed with exit status ", status, ".\nCommand : ", exec,
-            " ", paste(args, collapse = " "), "\nOutput :\n",
-            paste(output, collapse = "\n"))
+        stop(step, " failed with exit status ", status, ".\nCommand : ",
+            command_line, "\nOutput :\n", paste(output, collapse = "\n"))
     }
     invisible(output)
 }
