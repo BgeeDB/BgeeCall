@@ -54,12 +54,15 @@ get_ref_intergenic_ids <- function(myBgeeMetadata,
 #' 
 #' @examples {
 #' # this example reuse data present in the directory 'extdata' of the package.
-#' user <- new('UserMetadata', working_path = system.file('extdata', 
+#' user <- new('UserMetadata', working_path = system.file('extdata',
 #' package = 'BgeeCall'), species_id = '6239', rnaseq_lib_path = system.file(
-#' 'extdata', 'SRX099901_subset', package = 'BgeeCall'), 
+#' 'extdata', 'SRX099901_subset', package = 'BgeeCall'),
 #' annotation_name = 'WBcel235_84', simple_arborescence = TRUE)
-#' calls_output <- generate_presence_absence(myUserMetadata = user)
-#' 
+#' # Set intergenic release 2.0
+#' bgee <- new('BgeeMetadata', intergenic_release = '2.0')
+#' calls_output <- generate_presence_absence(myBgeeMetadata = bgee,
+#' myUserMetadata = user)
+#'
 #' #
 #' }
 #'
