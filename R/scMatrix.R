@@ -100,3 +100,93 @@ harmonize_barcodes <- function(barcodes, strip_prefix = TRUE,
     }
     return(barcodes)
 }
+
+#' @title Match a cell type annotation to the barcodes of a count matrix
+#'
+#' @description Match the cell-type annotation to the barcodes of the count
+#' matrix.
+#'
+#' @param celltype_annotation A data.frame holding a `barcode` and a
+#' `celltype` column.
+#' @param matrix_barcodes Character vector of barcodes as used by the count
+#' matrix (its column names).
+#' @param verbose Logical. Report how many barcodes were matched.
+#'
+#' @return A data.frame with a `barcode` column holding the matrix spelling
+#' and a `celltype` column, one row per annotated barcode found in the matrix.
+#'
+#' @noMd
+#' @noRd
+#'
+match_celltype_annotation <- function(celltype_annotation, matrix_barcodes,
+    verbose = TRUE) {
+    # Check that the annotation has the two required columns.
+    if (!all(c("barcode", "celltype") %in% colnames(celltype_annotation))) {
+        stop("the celltype_annotation data.frame must contain a 'barcode' ",
+            "and a 'celltype' column, got : ",
+            paste(colnames(celltype_annotation), collapse = ", "))
+    }
+
+    # Harmonize barcodes in both the annotation and the matrix.
+    annotation_key <- harmonize_barcodes(celltype_annotation$barcode)
+    matrix_key <- harmonize_barcodes(matrix_barcodes, strip_prefix = FALSE,
+        strip_suffix = FALSE)
+
+    # Look for duplicated barcodes, throw a warning and keep only the first one.
+    duplicated_barcodes <- duplicated(annotation_key)
+    if (any(duplicated_barcodes)) {
+        warning(sum(duplicated_barcodes), " duplicated barcode(s) in the ",
+            "cell type annotation. Only the first occurrence of each ",
+            "barcode is kept.")
+        celltype_annotation <-
+            celltype_annotation[!duplicated_barcodes, , drop = FALSE]
+        annotation_key <- annotation_key[!duplicated_barcodes]
+    }
+
+    matched_index <- match(annotation_key, matrix_key)
+    keep <- !is.na(matched_index)
+
+    if (!any(keep)) {
+        # Diagnose the most common cause of a total mismatch : the annotation
+        # follows the opposite strand convention. Diagnosed only, never fixed
+        # silently.
+        reverse_complement_hits <- 0
+        tryCatch({
+            sampled <- head(annotation_key, 1000)
+            reverse_complement_hits <- sum(as.character(
+                reverseComplement(DNAStringSet(sampled))) %in% matrix_key)
+        }, error = function(e) NULL)
+        stop("none of the ", length(annotation_key), " annotated barcodes ",
+            "match the ", length(matrix_key), " barcodes of the count ",
+            "matrix.\n  example annotated barcode (harmonised) : ",
+            annotation_key[1], "\n  example matrix barcode : ",
+            matrix_key[1], "\n",
+            if (reverse_complement_hits > 0) {
+                paste0("  NOTE : ", reverse_complement_hits,
+                    " of the first ", length(head(annotation_key, 1000)),
+                    " annotated barcodes match the matrix after reverse ",
+                    "complementing. The annotation likely follows the ",
+                    "opposite strand convention, please reverse complement ",
+                    "its barcodes before use.\n")
+            },
+            "  Check the sequencing technology and the barcode convention ",
+            "of the annotation.")
+    }
+
+    # Report the number of matched barcodes and its fraction.
+    matched_fraction <- sum(keep) / length(annotation_key)
+    if (isTRUE(verbose)) {
+        message("Matched ", sum(keep), " of ", length(annotation_key),
+            " annotated barcodes to the ", length(matrix_key),
+            " barcodes of the count matrix.")
+    }
+    if (matched_fraction < 0.5) {
+        warning("only ", round(100 * matched_fraction, 1), "% of the ",
+            "annotated barcodes were found in the count matrix.")
+    }
+
+    return(data.frame(
+        barcode = matrix_barcodes[matched_index[keep]],
+        celltype = as.character(celltype_annotation$celltype[keep]),
+        stringsAsFactors = FALSE))
+}
