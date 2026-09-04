@@ -190,3 +190,57 @@ match_celltype_annotation <- function(celltype_annotation, matrix_barcodes,
         celltype = as.character(celltype_annotation$celltype[keep]),
         stringsAsFactors = FALSE))
 }
+
+#' @title Associate barcode to cell type annotation for pseudobulking
+#'
+#' @description Returns a data.frame associating the barcodes of the count
+#' matrix to the cell type annotation provided in the DropletMetadata object.
+#'
+#' @param droplet_metadata A DropletMetadata object.
+#' @param count_matrix The count matrix, genes in rows and cells in columns,
+#' as returned by `read_bustools_matrix`.
+#' @param min_umi_per_barcode Numeric. When no annotation is provided, only
+#' barcodes holding at least this many UMI counts are pooled. The default of
+#' 0 keeps every barcode.
+#' @param verbose Logical. Report how many barcodes were matched or pooled.
+#'
+#' @return A data.frame with a `barcode` and a `celltype` column, keyed on
+#' the matrix spelling of the barcodes.
+#'
+#' @noMd
+#' @noRd
+#'
+resolve_celltype_annotation <- function(droplet_metadata, count_matrix,
+    min_umi_per_barcode = 0, verbose = TRUE) {
+    matrix_barcodes <- colnames(count_matrix)
+    if (is.null(matrix_barcodes)) {
+        stop("the count matrix has no column names, cell barcodes are ",
+            "expected as column names.")
+    }
+
+    if (nrow(droplet_metadata@celltype_annotation) > 0) {
+        return(match_celltype_annotation(
+            droplet_metadata@celltype_annotation, matrix_barcodes,
+            verbose = verbose))
+    }
+
+    keep <- rep(TRUE, length(matrix_barcodes))
+    if (min_umi_per_barcode > 0) {
+        keep <- Matrix::colSums(count_matrix) >= min_umi_per_barcode
+        if (!any(keep)) {
+            stop("no barcode holds at least ", min_umi_per_barcode,
+                " UMI counts.")
+        }
+    }
+    warning("no cell type annotation was provided : the ", sum(keep),
+        " barcode(s) of the count matrix are pooled into a single ",
+        "pseudobulk sample named 'all_cells'. No cell calling or empty ",
+        "droplet filtering was performed, so this pool also holds the ",
+        "ambient RNA of the empty droplets. Provide a celltype_annotation ",
+        "(or a min_umi_per_barcode threshold) to generate biologically ",
+        "meaningful calls per cell type.")
+    return(data.frame(
+        barcode = matrix_barcodes[keep],
+        celltype = "all_cells",
+        stringsAsFactors = FALSE))
+}
