@@ -807,3 +807,41 @@ quiet <- function(x) {
     on.exit(sink()) 
     invisible(force(x)) 
 } 
+
+#' @title Path to the output directory of one droplet-based single-cell
+#' library
+#'
+#' @description Single-cell analogue of `get_tool_output_path`. The library
+#' directory is named after `DropletMetadata@run_id`.
+#'
+#' @noMd
+#' @noRd
+#'
+get_sc_output_path <- function(myAbundanceMetadata,
+    myBgeeMetadata,
+    myUserMetadata,
+    myDropletMetadata) {
+    if (!is.na(myUserMetadata@output_dir) &&
+        myUserMetadata@output_dir != "") {
+        return(myUserMetadata@output_dir)
+    }
+    if (myUserMetadata@simple_arborescence) {
+        return(
+            file.path(
+                get_intergenic_release_path(myBgeeMetadata,
+                    myUserMetadata),
+                "all_results",
+                myDropletMetadata@run_id
+            )
+        )
+    }
+    return(file.path(
+        get_tool_transcriptome_path(myAbundanceMetadata,
+            myBgeeMetadata, myUserMetadata),
+        paste0(
+            "annotation_",
+            gsub("\\.", "_", myUserMetadata@annotation_name)
+        ),
+        myDropletMetadata@run_id
+    ))
+}
