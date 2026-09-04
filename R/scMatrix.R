@@ -67,3 +67,36 @@ read_bustools_matrix <- function(mtx_path, genes_path, barcodes_path,
     }
     return(methods::as(counts, "CsparseMatrix"))
 }
+
+#' @title Normalise cell barcodes names
+#'
+#' @description Remove non-nucleotide prefix in barcode names: a sample prefix
+#' separated by an underscore, a colon or a dot (`sample1_AAAC...`) and the
+#' lane or GEM well suffix (`AAAC...-1`). bustools emits the bare nucleotide
+#' barcode, so the stripped form is the one the count matrix uses.
+#'
+#' @param barcodes Character vector of cell barcodes.
+#' @param strip_prefix Logical. Remove everything up to the last underscore,
+#' colon or dot.
+#' @param strip_suffix Logical. Remove a trailing dash followed by digits.
+#' @param to_upper Logical. Uppercase the result.
+#'
+#' @return A character vector holding the normalized barcodes.
+#'
+#' @noMd
+#' @noRd
+#'
+harmonize_barcodes <- function(barcodes, strip_prefix = TRUE,
+    strip_suffix = TRUE, to_upper = TRUE) {
+    barcodes <- as.character(barcodes)
+    if (isTRUE(strip_prefix)) {
+        barcodes <- sub("^.*[_:.]", "", barcodes)
+    }
+    if (isTRUE(strip_suffix)) {
+        barcodes <- sub("-[0-9]+$", "", barcodes)
+    }
+    if (isTRUE(to_upper)) {
+        barcodes <- toupper(barcodes)
+    }
+    return(barcodes)
+}
