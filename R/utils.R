@@ -869,3 +869,55 @@ sanitize_celltype_name <- function(celltype_names) {
     return(make.unique(sanitized, sep = "_"))
 }
 
+#' @title Summary of the S4 objects of a single-cell run
+#'
+#' @description Single-cell analogue of
+#' `generate_S4_object_properties_output`:
+#' it reads `UserMetadata@rnaseq_lib_path` and computes the bulk output
+#' path.
+#'
+#' @noMd
+#' @noRd
+#'
+generate_sc_S4_object_properties_output <- function(myAbundanceMetadata,
+    myBgeeMetadata,
+    myUserMetadata,
+    myDropletMetadata,
+    outputDir) {
+    slot_row <- function(slot_name, slot_value) {
+        c(slot_name, ifelse(length(slot_value) == 0,
+            NA_character_,
+            paste(as.character(slot_value), collapse = ",")))
+    }
+    output <- rbind(
+        slot_row("AbundanceMetadata@tool_name",
+            myAbundanceMetadata@tool_name),
+        slot_row("AbundanceMetadata@cutoff_type",
+            myAbundanceMetadata@cutoff_type),
+        slot_row("AbundanceMetadata@cutoff",
+            myAbundanceMetadata@cutoff),
+        slot_row("BgeeMetadata@intergenic_release",
+            myBgeeMetadata@intergenic_release),
+        slot_row("UserMetadata@species_id",
+            myUserMetadata@species_id),
+        slot_row("UserMetadata@transcriptome_name",
+            myUserMetadata@transcriptome_name),
+        slot_row("UserMetadata@annotation_name",
+            myUserMetadata@annotation_name),
+        slot_row("UserMetadata@simple_arborescence",
+            myUserMetadata@simple_arborescence),
+        slot_row("DropletMetadata@run_id",
+            myDropletMetadata@run_id),
+        slot_row("DropletMetadata@sequencing_technology",
+            myDropletMetadata@sequencing_technology),
+        slot_row("DropletMetadata@fastq_r1_path",
+            myDropletMetadata@fastq_r1_path),
+        slot_row("DropletMetadata@fastq_r2_path",
+            myDropletMetadata@fastq_r2_path),
+        slot_row("DropletMetadata@whitelist_path",
+            myDropletMetadata@whitelist_path),
+        slot_row("output_dir", outputDir)
+    )
+    colnames(output) <- c("Slot name", "Slot value")
+    return(output)
+}
