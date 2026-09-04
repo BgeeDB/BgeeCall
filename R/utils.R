@@ -845,3 +845,27 @@ get_sc_output_path <- function(myAbundanceMetadata,
         myDropletMetadata@run_id
     ))
 }
+
+#' @title Turn cell type labels into directory names
+#'
+#' @description Cell type labels come from user annotations and may hold
+#' spaces, slashes or any other character (`CD4+ T cell`, `neuron/glia`).
+#' Every run of characters that does not belong in a file name is replaced
+#' with an underscore, empty results are named, and duplicates are
+#' disambiguated so that two labels never write to the same directory.
+#'
+#' @param celltype_names Character vector of cell type labels.
+#'
+#' @return A character vector of the same length holding safe, unique
+#' directory names.
+#'
+#' @noMd
+#' @noRd
+#'
+sanitize_celltype_name <- function(celltype_names) {
+    sanitized <- gsub("[^A-Za-z0-9._-]+", "_", as.character(celltype_names))
+    sanitized <- gsub("^_+|_+$", "", sanitized)
+    sanitized[!nzchar(sanitized)] <- "unnamed"
+    return(make.unique(sanitized, sep = "_"))
+}
+
