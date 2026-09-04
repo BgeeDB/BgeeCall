@@ -119,7 +119,7 @@ the first value with maximum coding/intergenic ratio. r=",
 #'
 plot_distributions <- function(counts,
     selected_coding, selected_intergenic,
-    cutoff, myUserMetadata) {
+    cutoff, myUserMetadata, title = NULL, abundance_label = "TPM") {
     ## Plotting of the distribution of TPMs for coding
     ## and intergenic regions + cutoff Note: this code
     ## is largely similar to plotting section in
@@ -143,7 +143,11 @@ plot_distributions <- function(counts,
         dens_intergenic$y * sum(selected_intergenic) / length(counts$abundance)
     
     ## Plot whole distribution
-    title <- basename(myUserMetadata@rnaseq_lib_path)
+    ## the default title is the bulk library name, single-cell calls pass
+    ## the run id and cell type instead
+    if (is.null(title)) {
+        title <- basename(myUserMetadata@rnaseq_lib_path)
+    }
     plot(
         dens,
         ylim = c(0, max(dens$y) * 1.1),
@@ -164,7 +168,7 @@ plot_distributions <- function(counts,
         cex.axis = 0.8
     )
     mtext(
-        expression(log[2]('TPM'+10 ^ -6)),
+        bquote(log[2](.(abundance_label) + 10^-6)),
         1,
         adj = 1,
         padj = 0,
@@ -250,7 +254,7 @@ plot_distributions <- function(counts,
 #' @noRd
 #'
 cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=NULL, 
-    sd_pvalue=NULL, myUserMetadata, myAbundanceMetadata) {
+    sd_pvalue=NULL, myUserMetadata, myAbundanceMetadata, libraryId = NULL) {
     ## Calculate summary statistics to export in cutoff
     ## info file
     genic_present <- sum(counts[[column]][counts$type ==
@@ -272,8 +276,13 @@ cutoff_info <- function(counts, column, abundance_cutoff, r_cutoff, mean_pvalue=
         sum(counts[[column]][counts$type == "intergenic"] == "present")
     
     ## Export cutoff_info_file
+    ## the default library id is the bulk library name, single-cell calls
+    ## pass the run id and cell type instead
+    if (is.null(libraryId)) {
+        libraryId <- basename(myUserMetadata@rnaseq_lib_path)
+    }
     to_export <- c(
-        basename(myUserMetadata@rnaseq_lib_path),
+        libraryId,
         abundance_cutoff,
         genic_present,
         number_genic_present,
